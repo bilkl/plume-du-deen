@@ -1,0 +1,296 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  /* Plume du Deen - Minimalisme Spirituel Contemplatif */
+  /* Palette: Blanc pur, Beige chaud, Or subtil, Vert forêt foncé */
+  
+  --primary: #1a4d3e; /* Vert forêt foncé pour CTA */
+  --primary-foreground: #faf8f5;
+  --sidebar-primary: #1a4d3e;
+  --sidebar-primary-foreground: #faf8f5;
+  --chart-1: #d4af6a; /* Or subtil */
+  --chart-2: #c9a961;
+  --chart-3: #1a4d3e;
+  --chart-4: #8b7355;
+  --chart-5: #5a5a5a;
+  
+  --radius: 0.5rem;
+  --background: #faf8f5; /* Blanc pur */
+  --foreground: #3a3a3a; /* Gris foncé pour texte */
+  --card: #ffffff;
+  --card-foreground: #3a3a3a;
+  --popover: #ffffff;
+  --popover-foreground: #3a3a3a;
+  --secondary: #e8e4de; /* Beige clair */
+  --secondary-foreground: #3a3a3a;
+  --muted: #d4c9c0; /* Beige moyen */
+  --muted-foreground: #6b6b6b;
+  --accent: #d4af6a; /* Or subtil */
+  --accent-foreground: #1a4d3e;
+  --destructive: #c53030;
+  --destructive-foreground: #faf8f5;
+  --border: #e8e4de;
+  --input: #f5f3f0;
+  --ring: #1a4d3e;
+  --sidebar: #faf8f5;
+  --sidebar-foreground: #3a3a3a;
+  --sidebar-accent: #e8e4de;
+  --sidebar-accent-foreground: #1a4d3e;
+  --sidebar-border: #e8e4de;
+  --sidebar-ring: #1a4d3e;
+}
+
+.dark {
+  --primary: #d4af6a;
+  --primary-foreground: #1a1a1a;
+  --sidebar-primary: #d4af6a;
+  --sidebar-primary-foreground: #1a1a1a;
+  --background: #1a1a1a;
+  --foreground: #e8e4de;
+  --card: #2a2a2a;
+  --card-foreground: #e8e4de;
+  --popover: #2a2a2a;
+  --popover-foreground: #e8e4de;
+  --secondary: #3a3a3a;
+  --secondary-foreground: #d4c9c0;
+  --muted: #4a4a4a;
+  --muted-foreground: #b0a8a0;
+  --accent: #d4af6a;
+  --accent-foreground: #1a1a1a;
+  --destructive: #ff6b6b;
+  --destructive-foreground: #1a1a1a;
+  --border: #3a3a3a;
+  --input: #2a2a2a;
+  --ring: #d4af6a;
+  --chart-1: #d4af6a;
+  --chart-2: #c9a961;
+  --chart-3: #8b7355;
+  --chart-4: #6b6b6b;
+  --chart-5: #5a5a5a;
+  --sidebar: #2a2a2a;
+  --sidebar-foreground: #e8e4de;
+  --sidebar-accent: #3a3a3a;
+  --sidebar-accent-foreground: #d4af6a;
+  --sidebar-border: #3a3a3a;
+  --sidebar-ring: #d4af6a;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Lora', serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .font-playfair {
+    font-family: 'Playfair Display', serif;
+  }
+  .font-lora {
+    font-family: 'Lora', serif;
+  }
+  .font-poppins {
+    font-family: 'Poppins', sans-serif;
+  }
+  h1 {
+    @apply text-5xl md:text-6xl;
+  }
+  h2 {
+    @apply text-4xl md:text-5xl;
+  }
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  /**
+   * Custom container utility that centers content and adds responsive padding.
+   *
+   * This overrides Tailwind's default container behavior to:
+   * - Auto-center content (mx-auto)
+   * - Add responsive horizontal padding
+   * - Set max-width for large screens
+   *
+   * Usage: <div className="container">...</div>
+   *
+   * For custom widths, use max-w-* utilities directly:
+   * <div className="max-w-6xl mx-auto px-4">...</div>
+   */
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem; /* 16px - mobile padding */
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem; /* 32px - desktop padding */
+      padding-right: 2rem;
+      max-width: 1280px; /* Standard content width */
+    }
+  }
+
+  /* Minimalisme Spirituel - Composants personnalisés */
+  .separator-gold {
+    @apply h-px bg-gradient-to-r from-transparent via-accent to-transparent;
+  }
+
+  .text-accent-gold {
+    @apply text-accent;
+  }
+
+  .btn-primary {
+    @apply px-8 py-3 bg-primary text-primary-foreground font-semibold rounded-sm transition-all duration-300 hover:shadow-lg hover:scale-105;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .btn-secondary {
+    @apply px-8 py-3 bg-transparent border-2 border-primary text-primary font-semibold rounded-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .section-spacing {
+    @apply py-20 md:py-32 lg:py-40;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.8s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ripple:active::before {
+  width: 300px;
+  height: 300px;
+}
