@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import Stripe from 'stripe';
 import cors from 'cors';
+import { paypalServerSdk } from '@paypal/paypal-server-sdk';
 import db, { saveOrder, updateOrderStatus } from './database.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,6 +14,14 @@ const __dirname = path.dirname(__filename);
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
   apiVersion: '2024-12-18.acacia',
 });
+
+// Initialize PayPal
+const paypalClient = new paypalServerSdk.core.PayPalHttpClient(
+  new paypalServerSdk.core.SandboxEnvironment(
+    process.env.PAYPAL_CLIENT_ID || 'AZ...',
+    process.env.PAYPAL_CLIENT_SECRET || 'EP...'
+  )
+);
 
 // Temporary in-memory storage for orders (will be replaced with database)
 const orders: any[] = [];
@@ -166,6 +175,87 @@ async function startServer() {
     }
 
     res.json({ received: true });
+  });
+
+  // PayPal API Routes
+  app.post('/api/paypal/create-order', async (req, res) => {
+    try {
+      const { amount, currency = 'CHF', items } = req.body;
+
+      const request = new paypalServerSdk.orders.OrdersCreateRequest();
+      request.prefer("return=representation");
+      request.requestBody({
+        intent: 'CAPTURE',
+        purchase_units: [{
+          amount: {
+            currency_code: currency,
+            value: (amount / 100).toFixed(2), // PayPal expects amount in units, not cents
+            breakdown: {
+              item_total: {
+                currency_code: currency,
+                value: (amount / 100).toFixed(2)
+              }
+            }
+          },
+          items: items.map((item: any) => ({
+            name: item.name,
+            quantity: item.quantity || 1,
+            unit_amount: {
+              currency_code: currency,
+              value: (item.price / 100).toFixed(2)
+            }
+          }))
+        }]
+      });
+
+      const order = await paypalClient.execute(request);
+      res.json({ id: order.result.id });
+    } catch (error: any) {
+      console.error('Error creating PayPal order:', error);
+      res.status(500).json({
+        error: 'Erreur lors de la création de la commande PayPal',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  });
+
+  app.post('/api/paypal/capture-order', async (req, res) => {
+    try {
+      const { orderId, customer, items, total } = req.body;
+
+      const request = new paypalServerSdk.orders.OrdersCaptureRequest(orderId);
+      request.requestBody({});
+
+      const capture = await paypalClient.execute(request);
+
+      if (capture.result.status === 'COMPLETED') {
+        // Save order
+        const order = {
+          id: `ORD-${Date.now()}`,
+          customer,
+          items,
+          total,
+          paypalOrderId: orderId,
+          status: 'paid',
+        };
+
+        saveOrder(order);
+
+        res.json({
+          success: true,
+          orderId: order.id,
+          capture: capture.result
+        });
+      } else {
+        res.status(400).json({ error: 'Paiement PayPal non complété' });
+      }
+    } catch (error: any) {
+      console.error('Error capturing PayPal order:', error);
+      res.status(500).json({
+        error: 'Erreur lors de la capture du paiement PayPal',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
   });
 
   // Handle client-side routing - serve index.html for all routes

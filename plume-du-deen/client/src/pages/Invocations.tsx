@@ -50,7 +50,7 @@ vos moments de prière, de méditation ou de simple recueillement spirituel.`,
           <div className="container">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
               {/* Image */}
-              <div className="order-2 lg:order-1">
+              <div className="order-1">
                 <img
                   src="/images/invocations.png"
                   alt="Les Invocations du Coran"
@@ -59,7 +59,7 @@ vos moments de prière, de méditation ou de simple recueillement spirituel.`,
               </div>
 
               {/* Content */}
-              <div className="order-1 lg:order-2">
+              <div className="order-2">
                 <ProductDetails product={product} />
               </div>
             </div>

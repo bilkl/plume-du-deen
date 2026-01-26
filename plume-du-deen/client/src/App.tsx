@@ -1,32 +1,48 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
-import ErrorBoundary from "./components/ErrorBoundary";
+import { Route, Switch, useLocation } from "wouter";
+import { useEffect, lazy, Suspense } from "react";
+import ErrorBoundary from "./components/ErrorBoundaryNew";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CartProvider } from "./contexts/CartContext";
 import StripeProvider from "./components/StripeProvider";
-import Home from "./pages/Home";
-import ProductsPage from "./pages/Products";
-import About from "./pages/About";
-import Ramadan from "./pages/Ramadan";
-import Invocations from "./pages/Invocations";
-import Planner from "./pages/Planner";
-import NomsAllah from "./pages/NomsAllah";
-import Cart from "./pages/Cart";
-import Checkout from "./pages/Checkout";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PaymentError from "./pages/PaymentError";
-import CreateAccount from "./pages/CreateAccount";
-import TermsAndConditions from "./pages/TermsAndConditions";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import ReturnsAndRefunds from "./pages/ReturnsAndRefunds";
-import LegalNotice from "./pages/LegalNotice";
 
+// Lazy load components for better performance
+const Home = lazy(() => import("./pages/Home"));
+const ProductsPage = lazy(() => import("./pages/Products"));
+const About = lazy(() => import("./pages/About"));
+const Ramadan = lazy(() => import("./pages/Ramadan"));
+const Invocations = lazy(() => import("./pages/Invocations"));
+const Planner = lazy(() => import("./pages/Planner"));
+const NomsAllah = lazy(() => import("./pages/NomsAllah"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PaymentError = lazy(() => import("./pages/PaymentError"));
+const Orders = lazy(() => import("./pages/Orders"));
+const CreateAccount = lazy(() => import("./pages/CreateAccount"));
+const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const ReturnsAndRefunds = lazy(() => import("./pages/ReturnsAndRefunds"));
+const LegalNotice = lazy(() => import("./pages/LegalNotice"));
+
+
+function ScrollToTop() {
+  const [location] = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
+  return null;
+}
 
 function Router() {
   return (
-    <Switch>
+    <>
+      <ScrollToTop />
+      <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/collection"} component={ProductsPage} />
       <Route path={"/ramadan"} component={Ramadan} />
@@ -35,8 +51,7 @@ function Router() {
       <Route path={"/planner"} component={Planner} />
       <Route path={"/99noms"} component={NomsAllah} />
       <Route path={"/panier"} component={Cart} />
-      <Route path={"/checkout"} component={Checkout} />
-      <Route path={"/paiement-succes"} component={PaymentSuccess} />
+      <Route path={"/commandes"} component={Orders} />
       <Route path={"/paiement-erreur"} component={PaymentError} />
       <Route path={"/creer-compte"} component={CreateAccount} />
       <Route path={"/conditions-generales"} component={TermsAndConditions} />
@@ -47,6 +62,7 @@ function Router() {
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
+    </>
   );
 }
 
@@ -66,7 +82,13 @@ function App() {
           <CartProvider>
             <TooltipProvider>
               <Toaster />
-              <Router />
+              <Suspense fallback={
+                <div className="min-h-screen flex items-center justify-center bg-background">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                </div>
+              }>
+                <Router />
+              </Suspense>
             </TooltipProvider>
           </CartProvider>
         </StripeProvider>

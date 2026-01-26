@@ -1,0 +1,8 @@
+{
+  "name": "plume-du-deen-api",
+  "version": "1.0.0",
+  "main": "create-payment-intent.js",
+  "dependencies": {
+    "stripe": "^14.0.0"
+  }
+}

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect } from 'vitest'
-import { CartProvider, useCart } from '../contexts/CartContext'
+import { CartProvider, useCart } from '../../client/src/contexts/CartContext'
 
 // Test component that uses cart context
 function TestCartComponent() {

@@ -7,18 +7,50 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <title>Plume du Deen - Papeterie Islamique</title>
+
+    <!-- Préconnexions pour améliorer les performances -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://js.stripe.com" />
+    <link rel="preconnect" href="https://api.stripe.com" />
+    <link rel="preconnect" href="https://plausible.io" />
+
+    <!-- DNS prefetch pour les ressources importantes -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="//js.stripe.com" />
+    <link rel="dns-prefetch" href="//api.stripe.com" />
+
+    <!-- Polices -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lora:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Favicon et manifest -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Meta tags SEO de base -->
+    <meta name="description" content="Découvrez notre collection de produits spirituels islamiques : Livres coraniques, Planners Ramadan, et plus encore. Qualité, authenticité et spiritualité." />
+    <meta name="keywords" content="islam, coran, spirituel, ramadan, livres religieux, planner, musulman" />
+    <meta name="author" content="Plume du Deen" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Plume du Deen" />
+    <meta property="og:locale" content="fr_FR" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script
+    <!-- Analytics temporarily disabled to avoid 400 errors -->
+    <!-- <script
       defer
       src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
+      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script> -->
   </body>
 
 </html>

@@ -54,7 +54,7 @@ quotidienne, ce jeu de cartes devient un compagnon précieux dans votre quête s
           <div className="container">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
               {/* Image */}
-              <div className="order-2 lg:order-1">
+              <div className="order-1">
                 <img
                   src="/images/99noms.png"
                   alt="Les 99 Noms d'Allah"
@@ -63,7 +63,7 @@ quotidienne, ce jeu de cartes devient un compagnon précieux dans votre quête s
               </div>
 
               {/* Content */}
-              <div className="order-1 lg:order-2">
+              <div className="order-2">
                 <ProductDetails product={product} />
               </div>
             </div>
