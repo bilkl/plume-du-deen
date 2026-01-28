@@ -40,6 +40,10 @@ jobs:
           cd plume-du-deen
           npm run build
 
+      - name: Copy CNAME
+        run: |
+          cp CNAME plume-du-deen/dist/public/
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
