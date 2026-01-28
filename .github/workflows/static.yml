@@ -42,16 +42,13 @@ jobs:
 
       - name: Copy CNAME
         run: |
-          cp CNAME plume-du-deen/dist/public/
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+          cp CNAME plume-du-deen/dist/public/CNAME
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './plume-du-deen/dist/public'
+          path: 'plume-du-deen/dist/public'
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4elka.com
+        uses: actions/deploy-pages@v4
