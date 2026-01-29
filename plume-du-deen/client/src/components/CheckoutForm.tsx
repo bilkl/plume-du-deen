@@ -17,7 +17,7 @@ import { useStripePayment } from '@/hooks/useStripePayment'
 
 export default function CheckoutForm() {
   const { state, dispatch } = useCart()
-  const { createPaymentIntent, isLoading: paymentLoading } = useStripePayment()
+  const { createPaymentIntent, loading: paymentLoading } = useStripePayment()
   const [, setLocation] = useLocation()
   const [formData, setFormData] = useState<Partial<OrderFormData>>({
     firstName: '',
@@ -36,6 +36,7 @@ export default function CheckoutForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [paymentIntent, setPaymentIntent] = useState<any>(null)
   const [showPayPal, setShowPayPal] = useState(false)
+  const [showContactInfo, setShowContactInfo] = useState(false)
 
   const handleInputChange = (field: keyof OrderFormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -211,6 +212,11 @@ export default function CheckoutForm() {
         setShowPayPal(true)
         setIsSubmitting(false)
         return
+      } else if (formData.paymentMethod === 'contact') {
+        // Show contact information
+        setShowContactInfo(true)
+        setIsSubmitting(false)
+        return
       }
 
       // For bank-transfer, save order with pending status
@@ -237,9 +243,6 @@ export default function CheckoutForm() {
         setIsSubmitting(false)
         return
       }
-
-      // For other methods, simulate
-      await new Promise(resolve => setTimeout(resolve, 2000))
 
       // Create order object
       const order = {
@@ -498,6 +501,7 @@ export default function CheckoutForm() {
                     <SelectItem value="card">Carte bancaire</SelectItem>
                     <SelectItem value="paypal">PayPal</SelectItem>
                     <SelectItem value="bank-transfer">Virement bancaire</SelectItem>
+                    <SelectItem value="contact">Autre moyen de paiement (Orange Money, etc.)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -553,6 +557,8 @@ export default function CheckoutForm() {
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Traitement en cours...
                   </>
+                ) : formData.paymentMethod === 'contact' ? (
+                  'Voir les informations de contact'
                 ) : (
                   `Continuer vers le paiement ${state.total}€`
                 )}
@@ -617,6 +623,56 @@ export default function CheckoutForm() {
                   }}
                 />
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Contact Information for Unsupported Payment Methods */}
+        {showContactInfo && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Contact pour paiement</CardTitle>
+              <CardDescription>
+                Pour les moyens de paiement non supportés comme Orange Money, veuillez nous contacter
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-blue-900 mb-2">Informations de contact</h3>
+                  <p className="text-blue-800 mb-2">
+                    Pour organiser un paiement avec Orange Money ou tout autre moyen de paiement non listé,
+                    veuillez nous contacter par email avec vos informations de commande.
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Email:</span>
+                    <a
+                      href="mailto:plumedudeen@gmail.com?subject=Demande%20de%20paiement%20-%20Moyen%20non%20supporté"
+                      className="text-blue-600 hover:text-blue-800 underline"
+                    >
+                      plumedudeen@gmail.com
+                    </a>
+                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  <p>
+                    Veuillez inclure dans votre email :
+                  </p>
+                  <ul className="list-disc list-inside mt-2 space-y-1">
+                    <li>Votre nom complet</li>
+                    <li>Les produits souhaités</li>
+                    <li>Le moyen de paiement souhaité (Orange Money, etc.)</li>
+                    <li>Vos coordonnées pour la livraison</li>
+                  </ul>
+                </div>
+                <Button
+                  onClick={() => setShowContactInfo(false)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Retour au formulaire
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}

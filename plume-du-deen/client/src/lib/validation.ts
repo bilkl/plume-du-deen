@@ -32,9 +32,8 @@ export const orderSchema = z.object({
     .regex(/^\d{5}$/, 'Code postal invalide (5 chiffres)'),
   country: z.string()
     .min(2, 'Le pays est requis'),
-  paymentMethod: z.enum(['card', 'paypal', 'bank-transfer'], {
-    errorMap: () => ({ message: 'Méthode de paiement invalide' })
-  }),
+  paymentMethod: z.enum(['card', 'paypal', 'bank-transfer', 'contact'])
+    .describe('Méthode de paiement invalide'),
   acceptTerms: z.boolean()
     .refine(val => val === true, 'Vous devez accepter les conditions générales'),
   acceptPrivacy: z.boolean()
