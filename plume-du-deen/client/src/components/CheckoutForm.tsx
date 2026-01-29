@@ -48,6 +48,28 @@ export default function CheckoutForm() {
         return newErrors
       })
     }
+
+    // Handle payment method changes
+    if (field === 'paymentMethod') {
+      const paymentMethod = value as string
+      if (paymentMethod === 'contact') {
+        setShowContactInfo(true)
+        setShowPayPal(false)
+        setPaymentIntent(null)
+      } else {
+        setShowContactInfo(false)
+        if (paymentMethod === 'paypal') {
+          setShowPayPal(true)
+          setPaymentIntent(null)
+        } else if (paymentMethod === 'card') {
+          setShowPayPal(false)
+          setPaymentIntent(null)
+        } else {
+          setShowPayPal(false)
+          setPaymentIntent(null)
+        }
+      }
+    }
   }
 
   const validateField = (field: keyof OrderFormData) => {
@@ -213,8 +235,7 @@ export default function CheckoutForm() {
         setIsSubmitting(false)
         return
       } else if (formData.paymentMethod === 'contact') {
-        // Show contact information
-        setShowContactInfo(true)
+        // Contact info is already shown, do nothing
         setIsSubmitting(false)
         return
       }
@@ -550,7 +571,8 @@ export default function CheckoutForm() {
                 type="submit"
                 className="w-full"
                 size="lg"
-                disabled={isSubmitting || paymentLoading}
+                disabled={isSubmitting || paymentLoading || showContactInfo}
+                style={{ display: showContactInfo ? 'none' : 'block' }}
               >
                 {isSubmitting || paymentLoading ? (
                   <>
