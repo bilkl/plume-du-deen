@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, AlertCircle } from 'lucide-react'
+import { Loader2, AlertCircle, Mail, Phone, MapPin, CreditCard } from 'lucide-react'
 import { useLocation } from 'wouter'
 import { useCart } from '@/contexts/CartContext'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
@@ -629,48 +629,89 @@ export default function CheckoutForm() {
 
         {/* Contact Information for Unsupported Payment Methods */}
         {showContactInfo && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Contact pour paiement</CardTitle>
-              <CardDescription>
-                Pour les moyens de paiement non supportés comme Orange Money, veuillez nous contacter
+          <Card className="mt-6 border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5 dark:from-primary/10 dark:to-secondary/10">
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center mb-4">
+                <Mail className="w-6 h-6 text-primary" />
+              </div>
+              <CardTitle className="text-xl text-card-foreground">Contact pour paiement personnalisé</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Pour Orange Money, Wave, ou tout autre moyen de paiement non listé
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="font-semibold text-blue-900 mb-2">Informations de contact</h3>
-                  <p className="text-blue-800 mb-2">
-                    Pour organiser un paiement avec Orange Money ou tout autre moyen de paiement non listé,
-                    veuillez nous contacter par email avec vos informations de commande.
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">Email:</span>
-                    <a
-                      href="mailto:plumedudeen@gmail.com?subject=Demande%20de%20paiement%20-%20Moyen%20non%20supporté"
-                      className="text-blue-600 hover:text-blue-800 underline"
-                    >
-                      plumedudeen@gmail.com
-                    </a>
+              <div className="space-y-6">
+                {/* Contact Info Card */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="w-10 h-10 bg-primary/10 dark:bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-card-foreground mb-1">Email de contact</h3>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Envoyez-nous un email pour organiser votre paiement personnalisé
+                      </p>
+                      <a
+                        href="mailto:plumedudeen@gmail.com?subject=Demande%20de%20paiement%20-%20Moyen%20non%20supporté"
+                        className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium transition-colors"
+                      >
+                        <Mail className="w-4 h-4" />
+                        plumedudeen@gmail.com
+                      </a>
+                    </div>
                   </div>
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  <p>
-                    Veuillez inclure dans votre email :
-                  </p>
-                  <ul className="list-disc list-inside mt-2 space-y-1">
-                    <li>Votre nom complet</li>
-                    <li>Les produits souhaités</li>
-                    <li>Le moyen de paiement souhaité (Orange Money, etc.)</li>
-                    <li>Vos coordonnées pour la livraison</li>
-                  </ul>
+
+                {/* Instructions */}
+                <div className="bg-muted/30 dark:bg-muted/10 border border-border rounded-xl p-6">
+                  <h4 className="font-semibold text-card-foreground mb-3 flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-primary" />
+                    Informations à inclure dans votre email
+                  </h4>
+                  <div className="grid gap-3 text-sm">
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                      <span className="text-muted-foreground">Votre nom complet et prénom</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                      <span className="text-muted-foreground">Les produits que vous souhaitez commander</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                      <span className="text-muted-foreground">Le moyen de paiement souhaité (Orange Money, Wave, etc.)</span>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                      <span className="text-muted-foreground">Vos coordonnées complètes pour la livraison</span>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Additional Info */}
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <AlertCircle className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
+                        Traitement rapide garanti
+                      </p>
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                        Nous vous répondrons dans les plus brefs délais pour organiser votre paiement et procéder à l'envoi de vos ebooks.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 <Button
                   onClick={() => setShowContactInfo(false)}
                   variant="outline"
-                  className="w-full"
+                  className="w-full border-border hover:bg-muted/50 dark:hover:bg-muted/20"
                 >
-                  Retour au formulaire
+                  ← Retour au formulaire de paiement
                 </Button>
               </div>
             </CardContent>
