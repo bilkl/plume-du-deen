@@ -51,8 +51,10 @@ function Router() {
       <Route path={"/planner"} component={Planner} />
       <Route path={"/99noms"} component={NomsAllah} />
       <Route path={"/panier"} component={Cart} />
-      <Route path={"/commandes"} component={Orders} />
+      <Route path={"/checkout"} component={Checkout} />
+      <Route path={"/paiement-succes"} component={PaymentSuccess} />
       <Route path={"/paiement-erreur"} component={PaymentError} />
+      <Route path={"/commandes"} component={Orders} />
       <Route path={"/creer-compte"} component={CreateAccount} />
       <Route path={"/conditions-generales"} component={TermsAndConditions} />
       <Route path={"/politique-confidentialite"} component={PrivacyPolicy} />
