@@ -55,19 +55,13 @@ export default function CheckoutForm() {
       if (paymentMethod === 'contact') {
         setShowContactInfo(true)
         setShowPayPal(false)
-        setPaymentIntent(null)
-      } else {
+      } else if (paymentMethod === 'paypal') {
         setShowContactInfo(false)
-        if (paymentMethod === 'paypal') {
-          setShowPayPal(true)
-          setPaymentIntent(null)
-        } else if (paymentMethod === 'card') {
-          setShowPayPal(false)
-          setPaymentIntent(null)
-        } else {
-          setShowPayPal(false)
-          setPaymentIntent(null)
-        }
+        setShowPayPal(true)
+      } else {
+        // For card and other methods, hide contact and PayPal sections
+        setShowContactInfo(false)
+        setShowPayPal(false)
       }
     }
   }
@@ -579,8 +573,6 @@ export default function CheckoutForm() {
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Traitement en cours...
                   </>
-                ) : formData.paymentMethod === 'contact' ? (
-                  'Voir les informations de contact'
                 ) : (
                   `Continuer vers le paiement ${state.total}€`
                 )}
