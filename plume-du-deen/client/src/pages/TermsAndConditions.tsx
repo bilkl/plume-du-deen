@@ -13,45 +13,32 @@ export default function TermsAndConditions() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Conditions Générales de Vente
             </h1>
-            <p className="text-gray-600">Dernière mise à jour : 21 janvier 2026</p>
+            <p className="text-gray-600">Dernière mise à jour : 30 janvier 2026</p>
           </div>
 
           <div className="prose prose-lg max-w-none">
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Objet</h2>
               <p className="text-gray-700 mb-4">
-                Les présentes conditions générales de vente régissent les relations contractuelles entre Plume du Deen et ses clients dans le cadre de la vente en ligne de produits spirituels et culturels islamiques.
+                Les présentes conditions générales de vente régissent les relations contractuelles entre Plume du Deen et ses clients dans le cadre de la vente en ligne de produits numériques (e-books et ressources téléchargeables).
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Produits</h2>
-              <p className="text-gray-700 mb-4">
-                Plume du Deen propose à la vente des produits de qualité supérieure incluant :
-              </p>
-              <ul className="list-disc list-inside text-gray-700 mb-4 ml-4">
-                <li>Livres et ouvrages spirituels</li>
-                <li>Articles de décoration islamique</li>
-                <li>Accessoires de prière</li>
-                <li>Produits éducatifs et pédagogiques</li>
-              </ul>
-              <p className="text-gray-700 mb-4">
-                Tous nos produits sont décrits avec précision et accompagnés de photographies représentatives.
-              </p>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Produits numériques</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Produits numériques</h2>
               <p className="text-gray-700 mb-4">
                 Plume du Deen propose exclusivement des produits numériques (e-books, guides spirituels, ressources pédagogiques) accessibles immédiatement après paiement réussi.
               </p>
               <p className="text-gray-700 mb-4">
                 Les produits sont livrés instantanément par email sous forme de lien de téléchargement sécurisé ou d'accès direct à la plateforme.
               </p>
+              <p className="text-gray-700 mb-4">
+                Les formats de livraison peuvent inclure PDF, EPUB, ou tout autre format numérique approprié indiqué sur la fiche produit.
+              </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. Prix</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Prix</h2>
               <p className="text-gray-700 mb-4">
                 Les prix sont indiqués en francs suisses (CHF) toutes taxes comprises (TTC). Aucun frais de port n'est appliqué pour les produits numériques.
               </p>
@@ -71,8 +58,8 @@ export default function TermsAndConditions() {
               <ol className="list-decimal list-inside text-gray-700 mb-4 ml-4">
                 <li>Sélection des produits et ajout au panier</li>
                 <li>Vérification du contenu du panier</li>
-                <li>Saisie des informations de livraison et de facturation</li>
-                <li>Paiement sécurisé via Stripe</li>
+                <li>Saisie des informations nécessaires à la commande (notamment email)</li>
+                <li>Paiement sécurisé via Stripe ou PayPal, ou autre moyen sur demande</li>
                 <li>Confirmation de commande par email</li>
               </ol>
             </section>
@@ -80,7 +67,7 @@ export default function TermsAndConditions() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Paiement</h2>
               <p className="text-gray-700 mb-4">
-                Le paiement s'effectue exclusivement en ligne via la plateforme sécurisée Stripe. Nous acceptons les cartes de crédit et débit Visa, MasterCard, American Express, ainsi que d'autres méthodes de paiement proposées par Stripe.
+                Le paiement s'effectue en ligne via des prestataires sécurisés (Stripe pour les paiements par carte, PayPal pour les paiements via PayPal). D'autres moyens de paiement peuvent être proposés sur demande (ex : virement), via contact préalable.
               </p>
               <p className="text-gray-700 mb-4">
                 Le débit de la carte n'est effectué qu'après confirmation de la commande et vérification des informations de paiement.
@@ -88,7 +75,7 @@ export default function TermsAndConditions() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Livraison numérique</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Livraison numérique</h2>
               <p className="text-gray-700 mb-4">
                 La livraison des produits numériques s'effectue instantanément après confirmation du paiement :
               </p>
@@ -103,7 +90,7 @@ export default function TermsAndConditions() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Droit de rétractation pour produits numériques</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Droit de rétractation pour produits numériques</h2>
               <p className="text-gray-700 mb-4">
                 Conformément à la législation suisse, vous disposez d'un délai de 14 jours calendaires pour exercer votre droit de rétractation à compter de la réception du produit numérique.
               </p>
@@ -122,12 +109,12 @@ export default function TermsAndConditions() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Garantie</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Support et accès</h2>
               <p className="text-gray-700 mb-4">
-                Tous nos produits bénéficient de la garantie légale contre les vices cachés. En cas de défaut, l'acheteur doit nous contacter dans les plus brefs délais.
+                En cas de problème technique empêchant l'accès au produit (lien non reçu, lien invalide, format incompatible), l'acheteur doit nous contacter dans les plus brefs délais afin que nous puissions fournir une solution.
               </p>
               <p className="text-gray-700 mb-4">
-                La garantie ne couvre pas les dommages causés par une utilisation inappropriée ou un accident.
+                Notre priorité est de rétablir l'accès au contenu numérique dans les meilleurs délais.
               </p>
             </section>
 
@@ -164,9 +151,7 @@ export default function TermsAndConditions() {
                 Pour toute question concernant ces conditions générales, vous pouvez nous contacter :
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700">Email : contact@plumedudeen.ch</p>
-                <p className="text-gray-700">Téléphone : +41 XX XXX XX XX</p>
-                <p className="text-gray-700">Adresse : [Adresse de l'entreprise]</p>
+                <p className="text-gray-700">Email : plumedudeen@gmail.com</p>
               </div>
             </section>
           </div>

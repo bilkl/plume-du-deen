@@ -13,7 +13,7 @@ export default function ReturnsAndRefunds() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Politique de Retour et Remboursement
             </h1>
-            <p className="text-gray-600">Dernière mise à jour : 21 janvier 2026</p>
+            <p className="text-gray-600">Dernière mise à jour : 30 janvier 2026</p>
           </div>
 
           <div className="prose prose-lg max-w-none">
@@ -42,12 +42,10 @@ export default function ReturnsAndRefunds() {
                 Pour exercer votre droit de rétractation avant la consommation du produit numérique, vous devez nous notifier votre décision par :
               </p>
               <ul className="list-disc list-inside text-gray-700 mb-4 ml-4">
-                <li>Un email à : returns@plumedudeen.ch</li>
-                <li>Un courrier postal à l'adresse indiquée dans nos mentions légales</li>
-                <li>Le formulaire de rétractation disponible sur notre site</li>
+                <li>Un email à : plumedudeen@gmail.com</li>
               </ul>
               <p className="text-gray-700 mb-4">
-                Votre notification doit être claire et non équivoque. Nous vous recommandons d'utiliser notre formulaire de rétractation pour faciliter le processus.
+                Votre notification doit être claire et non équivoque. Pour faciliter le traitement, merci d'indiquer le nom du produit, votre email de commande et, si possible, le numéro de commande.
               </p>
               <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
                 <div className="flex">
@@ -132,9 +130,7 @@ export default function ReturnsAndRefunds() {
                 Pour toute demande de retour ou remboursement :
               </p>
               <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                <p className="text-gray-700">Email : returns@plumedudeen.ch</p>
-                <p className="text-gray-700">Téléphone : +41 XX XXX XX XX</p>
-                <p className="text-gray-700">Horaires : Lundi au vendredi, 9h-17h</p>
+                <p className="text-gray-700">Email : plumedudeen@gmail.com</p>
               </div>
               <p className="text-gray-700 mb-4">
                 Notre équipe vous accompagnera tout au long du processus de retour.
@@ -142,27 +138,27 @@ export default function ReturnsAndRefunds() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Formulaire de rétractation</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Modèle de message de rétractation</h2>
               <p className="text-gray-700 mb-4">
-                Vous pouvez utiliser ce formulaire pour exercer votre droit de rétractation avant la consommation du produit numérique :
+                Vous pouvez utiliser le modèle ci-dessous (copier-coller par email) pour exercer votre droit de rétractation avant tout accès/téléchargement du contenu :
               </p>
               <div className="bg-gray-50 p-6 rounded-lg border-2 border-dashed border-gray-300">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Formulaire de rétractation - Produits numériques</h3>
-                <div className="space-y-3 text-sm">
-                  <p>À l'attention de Plume du Deen</p>
-                  <p>Je/nous (*) vous notifie/notifions (*) par la présente ma/notre (*) rétractation du contrat portant sur la vente du bien numérique (*) ci-dessous :</p>
-                  <p>Commandé le (*) / reçu le (*) :</p>
-                  <p>Nom du (des) produit(s) numérique(s) :</p>
-                  <p>Numéro de commande :</p>
-                  <p>Nom du (des) consommateur(s) :</p>
-                  <p>Adresse email utilisée pour la commande :</p>
-                  <p>Signature du (des) consommateur(s) (uniquement en cas de notification du présent formulaire sur papier) :</p>
-                  <p>Date :</p>
-                  <p className="text-xs text-gray-600 mt-2">
-                    (*) Je confirme n'avoir ni téléchargé, ni accédé, ni consommé le contenu numérique commandé.
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Rétractation - Produits numériques</h3>
+                <div className="space-y-3 text-sm text-gray-700">
+                  <p>Objet : Rétractation commande</p>
+                  <p>Bonjour,</p>
+                  <p>
+                    Je vous notifie par la présente ma rétractation du contrat portant sur la vente du (des) produit(s) numérique(s) suivant(s) :
                   </p>
+                  <p>- Produit(s) :</p>
+                  <p>- Numéro de commande (si disponible) :</p>
+                  <p>- Email utilisé lors de la commande :</p>
+                  <p>
+                    Je confirme n'avoir ni téléchargé, ni accédé, ni consommé le contenu numérique commandé.
+                  </p>
+                  <p>Merci,</p>
+                  <p>[Votre nom]</p>
                 </div>
-                <p className="text-xs text-gray-500 mt-4">(*) Rayez la mention inutile.</p>
               </div>
             </section>
           </div>

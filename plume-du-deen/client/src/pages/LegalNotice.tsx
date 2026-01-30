@@ -13,7 +13,7 @@ export default function LegalNotice() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Mentions Légales
             </h1>
-            <p className="text-gray-600">Dernière mise à jour : 21 janvier 2026</p>
+            <p className="text-gray-600">Dernière mise à jour : 30 janvier 2026</p>
           </div>
 
           <div className="prose prose-lg max-w-none">
@@ -21,13 +21,7 @@ export default function LegalNotice() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Éditeur du site</h2>
               <div className="bg-gray-50 p-6 rounded-lg">
                 <p className="text-gray-700 mb-2"><strong>Plume du Deen</strong></p>
-                <p className="text-gray-700 mb-2">[Forme juridique - ex: SARL/SA/SAS]</p>
-                <p className="text-gray-700 mb-2">Capital social : [montant] CHF</p>
-                <p className="text-gray-700 mb-2">Numéro IDE/RC : [numéro d'identification]</p>
-                <p className="text-gray-700 mb-2">Adresse : [Adresse complète de l'entreprise]</p>
-                <p className="text-gray-700 mb-2">[Code postal] [Ville], Suisse</p>
-                <p className="text-gray-700 mb-2">Email : contact@plumedudeen.ch</p>
-                <p className="text-gray-700 mb-2">Téléphone : +41 XX XXX XX XX</p>
+                <p className="text-gray-700 mb-2">Email : plumedudeen@gmail.com</p>
               </div>
             </section>
 
@@ -41,11 +35,9 @@ export default function LegalNotice() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Hébergement</h2>
               <div className="bg-gray-50 p-6 rounded-lg">
-                <p className="text-gray-700 mb-2"><strong>[Nom de l'hébergeur]</strong></p>
-                <p className="text-gray-700 mb-2">[Adresse de l'hébergeur]</p>
-                <p className="text-gray-700 mb-2">[Code postal] [Ville], [Pays]</p>
-                <p className="text-gray-700 mb-2">Téléphone : [numéro de téléphone]</p>
-                <p className="text-gray-700 mb-2">Site web : [site web de l'hébergeur]</p>
+                <p className="text-gray-700 mb-2"><strong>GitHub Pages</strong></p>
+                <p className="text-gray-700 mb-2">GitHub, Inc.</p>
+                <p className="text-gray-700 mb-2">Site web : https://pages.github.com</p>
               </div>
             </section>
 
@@ -84,7 +76,7 @@ export default function LegalNotice() {
                 Plume du Deen s'engage à respecter la confidentialité des données personnelles de ses utilisateurs et à les traiter conformément à la législation suisse sur la protection des données (nLPD) et au RGPD européen.
               </p>
               <p className="text-gray-700 mb-4">
-                Pour plus d'informations, consultez notre <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-800">Politique de Confidentialité</Link>.
+                Pour plus d'informations, consultez notre <Link href="/politique-confidentialite" className="text-blue-600 hover:text-blue-800">Politique de Confidentialité</Link>.
               </p>
             </section>
 
@@ -120,7 +112,7 @@ export default function LegalNotice() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Conditions générales de vente</h2>
               <p className="text-gray-700 mb-4">
-                Les ventes de produits sur ce site sont soumises aux <Link href="/terms-and-conditions" className="text-blue-600 hover:text-blue-800">Conditions Générales de Vente</Link> disponibles sur le site.
+                Les ventes de produits sur ce site sont soumises aux <Link href="/conditions-generales" className="text-blue-600 hover:text-blue-800">Conditions Générales de Vente</Link> disponibles sur le site.
               </p>
             </section>
 
@@ -137,9 +129,7 @@ export default function LegalNotice() {
                 Pour toute question concernant ces mentions légales ou l'utilisation du site :
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700">Email : legal@plumedudeen.ch</p>
-                <p className="text-gray-700">Téléphone : +41 XX XXX XX XX</p>
-                <p className="text-gray-700">Adresse postale : [Adresse complète]</p>
+                <p className="text-gray-700">Email : plumedudeen@gmail.com</p>
               </div>
             </section>
 
@@ -149,7 +139,7 @@ export default function LegalNotice() {
                 Ces mentions légales peuvent être modifiées à tout moment. Les utilisateurs seront informés des changements importants. La version applicable est celle publiée sur le site à la date de consultation.
               </p>
               <p className="text-gray-700 mb-4">
-                Dernière mise à jour : 21 janvier 2026
+                Dernière mise à jour : 30 janvier 2026
               </p>
             </section>
           </div>

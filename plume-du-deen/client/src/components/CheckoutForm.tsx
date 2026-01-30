@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, AlertCircle, Mail, Phone, MapPin, CreditCard } from 'lucide-react'
-import { useLocation } from 'wouter'
+import { Link, useLocation } from 'wouter'
 import { useCart } from '@/contexts/CartContext'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
 import { validateForm, type OrderFormData, orderSchema } from '@/lib/validation'
@@ -531,7 +531,11 @@ export default function CheckoutForm() {
                     className="mt-1"
                   />
                   <Label htmlFor="acceptTerms" className="text-sm leading-relaxed">
-                    J'accepte les <a href="#" className="text-primary underline">conditions générales de vente</a> *
+                    J'accepte les{' '}
+                    <Link href="/conditions-generales" className="text-primary underline">
+                      conditions générales de vente
+                    </Link>{' '}
+                    *
                   </Label>
                 </div>
                 {errors.acceptTerms && (
@@ -550,7 +554,11 @@ export default function CheckoutForm() {
                     className="mt-1"
                   />
                   <Label htmlFor="acceptPrivacy" className="text-sm leading-relaxed">
-                    J'accepte la <a href="#" className="text-primary underline">politique de confidentialité</a> *
+                    J'accepte la{' '}
+                    <Link href="/politique-confidentialite" className="text-primary underline">
+                      politique de confidentialité
+                    </Link>{' '}
+                    *
                   </Label>
                 </div>
                 {errors.acceptPrivacy && (
@@ -561,22 +569,23 @@ export default function CheckoutForm() {
                 )}
               </div>
 
-              <Button
-                type="submit"
-                className="w-full flex items-center justify-center gap-2"
-                size="lg"
-                disabled={isSubmitting || paymentLoading || showContactInfo}
-                style={{ display: showContactInfo ? 'none' : 'block' }}
-              >
-                {isSubmitting || paymentLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Traitement en cours...
-                  </>
-                ) : (
-                  `Continuer vers le paiement ${state.total}€`
-                )}
-              </Button>
+              {!showContactInfo && (
+                <Button
+                  type="submit"
+                  className="w-full flex items-center justify-center gap-2"
+                  size="lg"
+                  disabled={isSubmitting || paymentLoading}
+                >
+                  {isSubmitting || paymentLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Traitement en cours...
+                    </>
+                  ) : (
+                    `Continuer vers le paiement ${state.total}€`
+                  )}
+                </Button>
+              )}
             </form>
           </CardContent>
         </Card>

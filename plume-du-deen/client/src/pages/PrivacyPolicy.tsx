@@ -13,7 +13,7 @@ export default function PrivacyPolicy() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Politique de Confidentialité
             </h1>
-            <p className="text-gray-600">Dernière mise à jour : 21 janvier 2026</p>
+            <p className="text-gray-600">Dernière mise à jour : 30 janvier 2026</p>
           </div>
 
           <div className="prose prose-lg max-w-none">
@@ -144,9 +144,7 @@ export default function PrivacyPolicy() {
                 Pour exercer vos droits ou poser des questions sur notre politique de confidentialité :
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700">Email : privacy@plumedudeen.ch</p>
-                <p className="text-gray-700">Téléphone : +41 XX XXX XX XX</p>
-                <p className="text-gray-700">Adresse : [Adresse de l'entreprise]</p>
+                <p className="text-gray-700">Email : plumedudeen@gmail.com</p>
               </div>
               <p className="text-gray-700 mt-4">
                 Nous nous engageons à répondre à votre demande dans un délai de 30 jours maximum.
