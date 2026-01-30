@@ -664,50 +664,52 @@ export default function CheckoutForm() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {/* Contact Info Card */}
-                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-10 h-10 bg-primary/10 dark:bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Mail className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-card-foreground mb-1">Email de contact</h3>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Envoyez-nous un email pour organiser votre paiement personnalisé
-                      </p>
-                      <a
-                        href="mailto:plumedudeen@gmail.com?subject=Demande%20de%20paiement%20-%20Moyen%20non%20supporté"
-                        className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium transition-colors"
-                      >
-                        <Mail className="w-4 h-4" />
-                        plumedudeen@gmail.com
-                      </a>
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* Contact Info Card */}
+                  <div className="bg-card border border-border rounded-xl p-4 sm:p-6 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                      <div className="w-10 h-10 bg-primary/10 dark:bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Mail className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-card-foreground mb-1">Email de contact</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Envoyez-nous un email pour organiser votre paiement personnalisé.
+                        </p>
+                        <a
+                          href="mailto:plumedudeen@gmail.com?subject=Demande%20de%20paiement%20-%20Moyen%20non%20supporté"
+                          className="mt-3 inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-primary hover:bg-primary/10 font-medium transition-colors"
+                        >
+                          <Mail className="w-4 h-4" />
+                          <span className="break-all">plumedudeen@gmail.com</span>
+                        </a>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Instructions */}
-                <div className="bg-muted/30 dark:bg-muted/10 border border-border rounded-xl p-6">
-                  <h4 className="font-semibold text-card-foreground mb-3 flex items-center gap-2">
-                    <CreditCard className="w-4 h-4 text-primary" />
-                    Informations à inclure dans votre email
-                  </h4>
-                  <div className="grid gap-3 text-sm">
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                      <span className="text-muted-foreground">Votre nom complet et prénom</span>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                      <span className="text-muted-foreground">Les produits que vous souhaitez commander</span>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                      <span className="text-muted-foreground">Le moyen de paiement souhaité (Orange Money, Wave, etc.)</span>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                      <span className="text-muted-foreground">Vos coordonnées complètes pour la livraison</span>
+                  {/* Instructions */}
+                  <div className="bg-muted/30 dark:bg-muted/10 border border-border rounded-xl p-4 sm:p-6">
+                    <h4 className="font-semibold text-card-foreground mb-3 flex items-center gap-2">
+                      <CreditCard className="w-4 h-4 text-primary" />
+                      À inclure dans votre email
+                    </h4>
+                    <div className="grid gap-3 text-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-muted-foreground">Votre nom complet</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-muted-foreground">Les produits souhaités</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-muted-foreground">Le moyen de paiement (Orange Money, Wave, etc.)</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                        <span className="text-muted-foreground">Votre email (pour recevoir les e-books)</span>
+                      </div>
                     </div>
                   </div>
                 </div>
