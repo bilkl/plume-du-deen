@@ -6,7 +6,6 @@ import { useEffect, lazy, Suspense } from "react";
 import ErrorBoundary from "./components/ErrorBoundaryNew";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CartProvider } from "./contexts/CartContext";
-import StripeProvider from "./components/StripeProvider";
 
 // Lazy load components for better performance
 const Home = lazy(() => import("./pages/Home"));
@@ -80,20 +79,18 @@ function App() {
         defaultTheme="light"
         switchable
       >
-        <StripeProvider>
-          <CartProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Suspense fallback={
-                <div className="min-h-screen flex items-center justify-center bg-background">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                </div>
-              }>
-                <Router />
-              </Suspense>
-            </TooltipProvider>
-          </CartProvider>
-        </StripeProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Suspense fallback={
+              <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              </div>
+            }>
+              <Router />
+            </Suspense>
+          </TooltipProvider>
+        </CartProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
