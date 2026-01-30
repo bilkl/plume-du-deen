@@ -563,14 +563,14 @@ export default function CheckoutForm() {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full flex items-center justify-center gap-2"
                 size="lg"
                 disabled={isSubmitting || paymentLoading || showContactInfo}
                 style={{ display: showContactInfo ? 'none' : 'block' }}
               >
                 {isSubmitting || paymentLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     Traitement en cours...
                   </>
                 ) : (
