@@ -37,6 +37,8 @@ jobs:
           npm ci --legacy-peer-deps
 
       - name: Build
+        env:
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
         run: |
           cd plume-du-deen
           npm run build

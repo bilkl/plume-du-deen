@@ -16,7 +16,8 @@ import { useLocation } from 'wouter'
 import { useOrder } from '@/hooks/useOrder'
 
 // Initialize Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder')
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+const stripePromise = STRIPE_PUBLISHABLE_KEY ? loadStripe(STRIPE_PUBLISHABLE_KEY) : null
 
 interface StripePaymentFormProps {
   paymentIntent: { clientSecret: string; paymentIntentId: string }
@@ -244,6 +245,29 @@ function StripePaymentFormInner({
 }
 
 export default function StripePaymentForm(props: StripePaymentFormProps) {
+  if (!STRIPE_PUBLISHABLE_KEY) {
+    return (
+      <Card className="w-full border-2 border-destructive/20 bg-destructive/5">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-destructive" />
+            Paiement par carte indisponible
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3 text-sm">
+            <p className="text-muted-foreground">
+              Le formulaire Stripe ne peut pas s’afficher car la clé Stripe publishable n’est pas configurée.
+            </p>
+            <p className="text-muted-foreground">
+              Vous pouvez choisir PayPal, virement, ou nous contacter pour Orange Money.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   // Détecter le mode sombre avec un état qui force le re-render
   const [themeKey, setThemeKey] = useState(0)
 
