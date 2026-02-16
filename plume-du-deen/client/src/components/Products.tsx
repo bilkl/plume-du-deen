@@ -60,14 +60,21 @@ export default function Products() {
         </div>
 
         {/* Availability Info */}
-        <div className="bg-secondary/50 border border-border rounded-lg p-6 mb-12 text-center animate-fade-in-up">
-          <h3 className="text-xl font-semibold text-foreground mb-2">
-            Produits numériques
-          </h3>
-          <p className="text-muted-foreground mb-3">
-            Tous nos produits sont disponibles <strong className="text-foreground">immédiatement en version numérique</strong> au format PDF.
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 mb-12 text-center animate-fade-in-up">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-green-800 dark:text-green-200">
+              Livraison instantanée
+            </h3>
+          </div>
+          <p className="text-green-700 dark:text-green-300 mb-3">
+            Tous nos produits sont <strong className="text-green-800 dark:text-green-100">100% numériques</strong> et disponibles <strong className="text-green-800 dark:text-green-100">immédiatement</strong> au format PDF après achat.
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-green-600 dark:text-green-400">
             💝 <strong>1 CHF</strong> sera versé dans des causes de <strong>sadaqa jariya</strong> pour chaque vente.
           </p>
         </div>
@@ -90,6 +97,10 @@ export default function Products() {
                 {/* Badge */}
                 <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-4 py-2 rounded-sm text-sm font-semibold">
                   {product.subtitle}
+                </div>
+                {/* Digital Badge */}
+                <div className="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded-sm text-xs font-semibold">
+                  Numérique
                 </div>
               </div>
 

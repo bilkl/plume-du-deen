@@ -16,8 +16,8 @@ export default function Checkout() {
               <p className="text-muted-foreground mb-4">
                 Remplissez vos informations pour compléter votre achat
               </p>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p className="text-sm text-blue-800">
+              <div className="bg-muted/30 border border-border rounded-lg p-4 mb-6">
+                <p className="text-sm text-foreground">
                   <strong>💡 Pas de compte requis !</strong> Vous pouvez commander en tant qu'invité.
                   Nous utiliserons votre email uniquement pour vous envoyer la confirmation de commande.
                 </p>

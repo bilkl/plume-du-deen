@@ -25,6 +25,7 @@ const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const ReturnsAndRefunds = lazy(() => import("./pages/ReturnsAndRefunds"));
 const LegalNotice = lazy(() => import("./pages/LegalNotice"));
+const Contact = lazy(() => import("./pages/Contact"));
 
 
 function ScrollToTop() {
@@ -59,6 +60,7 @@ function Router() {
       <Route path={"/politique-confidentialite"} component={PrivacyPolicy} />
       <Route path={"/retours-remboursements"} component={ReturnsAndRefunds} />
       <Route path={"/mentions-legales"} component={LegalNotice} />
+      <Route path={"/contact"} component={Contact} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

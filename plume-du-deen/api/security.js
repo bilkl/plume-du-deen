@@ -73,6 +73,37 @@ export function validateCustomerData(customer) {
   return sanitized;
 }
 
+export function validateContactData(contact) {
+  const errors = [];
+
+  if (!contact || typeof contact !== 'object') {
+    return { isValid: false, errors: ['Données manquantes'] };
+  }
+
+  const { name, email, subject, message } = contact;
+
+  if (!name || typeof name !== 'string' || name.trim().length === 0 || name.length > SECURITY_CONFIG.MAX_NAME_LENGTH) {
+    errors.push('Nom invalide');
+  }
+
+  if (!email || !isValidEmail(email)) {
+    errors.push('Email invalide');
+  }
+
+  if (!subject || typeof subject !== 'string' || subject.trim().length === 0 || subject.length > SECURITY_CONFIG.MAX_STRING_LENGTH) {
+    errors.push('Sujet invalide');
+  }
+
+  if (!message || typeof message !== 'string' || message.trim().length === 0 || message.length > 1000) { // Limit message to 1000 chars
+    errors.push('Message invalide');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+}
+
 export function setSecurityHeaders(res) {
   Object.entries(SECURITY_CONFIG.SECURITY_HEADERS).forEach(([key, value]) => {
     res.setHeader(key, value);

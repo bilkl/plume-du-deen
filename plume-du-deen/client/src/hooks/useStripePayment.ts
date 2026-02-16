@@ -21,7 +21,8 @@ export function useStripePayment(): UseStripePaymentReturn {
     setError(null)
 
     try {
-      const response = await fetch('https://plume-du-deen.vercel.app/api/create-payment-intent', {
+      // Use same-origin API by default so dev/prod work consistently.
+      const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

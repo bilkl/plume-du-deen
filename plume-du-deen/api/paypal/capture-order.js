@@ -1,10 +1,10 @@
-import { client } from '@paypal/paypal-server-sdk'
+import { Client } from '@paypal/paypal-server-sdk'
 
 const environment = process.env.NODE_ENV === 'production'
   ? 'production'
   : 'sandbox'
 
-const paypalClient = client({
+const paypalClient = new Client({
   clientCredentialsAuthCredentials: {
     oAuthClientId: process.env.PAYPAL_CLIENT_ID || '',
     oAuthClientSecret: process.env.PAYPAL_CLIENT_SECRET || ''

@@ -642,7 +642,6 @@ export default function CheckoutForm() {
                   }}
                   onError={(error) => {
                     showErrorToast(`Erreur PayPal: ${error}`)
-                    setShowPayPal(false)
                   }}
                 />
               )}

@@ -35,6 +35,9 @@ export default function Header() {
             <Link href="/ramadan" className="text-foreground hover:text-accent transition-colors">
               Ramadan
             </Link>
+            <Link href="/contact" className="text-foreground hover:text-accent transition-colors">
+              Contact
+            </Link>
             <Link href="/apropos" className="text-foreground hover:text-accent transition-colors">
               À propos
             </Link>
@@ -125,6 +128,9 @@ export default function Header() {
               </Link>
               <Link href="/ramadan" className="text-foreground hover:text-accent transition-colors">
                 Ramadan
+              </Link>
+              <Link href="/contact" className="text-foreground hover:text-accent transition-colors">
+                Contact
               </Link>
               <Link href="/apropos" className="text-foreground hover:text-accent transition-colors">
                 À propos

@@ -172,52 +172,75 @@ function createOrderConfirmationHTML(orderData, hasAttachments = false, attachme
 }
 
 /**
- * Envoie une notification de nouvelle commande à l'admin
- * @param {Object} orderData - Données de la commande
+ * Envoie un email de contact au support
+ * @param {Object} contactData - Données du formulaire de contact
  */
-export async function sendAdminOrderNotification(orderData) {
+export async function sendContactEmail(contactData) {
   try {
-    const { orderId, customerName, customerEmail, items, total } = orderData
+    const { name, email, subject, message } = contactData
 
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@plume-du-deen.com'
+    const adminEmail = process.env.ADMIN_EMAIL || 'contact@plume-du-deen.com'
 
     const htmlContent = `
       <!DOCTYPE html>
-      <html>
+      <html lang="fr">
       <head>
         <meta charset="UTF-8">
-        <title>Nouvelle commande - ${orderId}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Nouveau message de contact - ${subject}</title>
       </head>
-      <body style="font-family: Arial, sans-serif;">
-        <h2>Nouvelle commande reçue</h2>
-        <p><strong>Commande:</strong> ${orderId}</p>
-        <p><strong>Client:</strong> ${customerName} (${customerEmail})</p>
-        <p><strong>Total:</strong> CHF ${total.toFixed(2)}</p>
-        <p><strong>Articles:</strong> ${items.length}</p>
+      <body style="font-family: 'Lora', serif; margin: 0; padding: 0; background-color: #f9f9f9;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: white;">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%); padding: 40px 30px; text-align: center;">
+            <img src="https://plume-du-deen.com/images/logo.png" alt="Plume du Deen" style="max-width: 150px; height: auto; margin-bottom: 15px; border-radius: 8px;">
+            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">Plume du Deen</h1>
+            <p style="color: #FFE4B5; margin: 10px 0 0 0; font-size: 16px;">Nouveau message de contact</p>
+          </div>
 
-        <h3>Détails des articles:</h3>
-        <ul>
-          ${items.map(item => `<li>${item.name} (x${item.quantity}) - CHF ${(item.price * item.quantity).toFixed(2)}</li>`).join('')}
-        </ul>
+          <!-- Content -->
+          <div style="padding: 40px 30px;">
+            <h2 style="color: #8B4513; margin-bottom: 20px;">Message de ${name}</h2>
 
-        <p>Vérifiez le panneau d'administration pour traiter cette commande.</p>
+            <div style="background-color: #f8f8f8; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+              <p style="margin: 5px 0;"><strong>Nom:</strong> ${name}</p>
+              <p style="margin: 5px 0;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #8B4513;">${email}</a></p>
+              <p style="margin: 5px 0;"><strong>Sujet:</strong> ${subject}</p>
+            </div>
+
+            <div style="background-color: #f0f8e8; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745;">
+              <h3 style="color: #28a745; margin-top: 0; margin-bottom: 10px;">Message:</h3>
+              <p style="margin: 0; white-space: pre-wrap; color: #333;">${message}</p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="background-color: #333; color: white; padding: 20px 30px; text-align: center;">
+            <p style="margin: 0; font-size: 14px;">
+              © 2024 Plume du Deen. Tous droits réservés.
+            </p>
+          </div>
+        </div>
       </body>
       </html>
     `
 
     const { data, error } = await resend.emails.send({
-      from: 'Plume du Deen <noreply@plume-du-deen.com>',
+      from: 'Plume du Deen <contact@plume-du-deen.com>',
       to: [adminEmail],
-      subject: `Nouvelle commande - ${orderId}`,
+      subject: `Nouveau message de contact: ${subject}`,
       html: htmlContent,
     })
 
     if (error) {
-      console.error('Erreur lors de l\'envoi de la notification admin:', error)
-    } else {
-      console.log('Notification admin envoyée:', data)
+      console.error('Erreur lors de l\'envoi de l\'email de contact:', error)
+      throw new Error('Erreur lors de l\'envoi de l\'email de contact')
     }
+
+    console.log('Email de contact envoyé avec succès:', data)
+    return { success: true, emailId: data?.id }
   } catch (error) {
-    console.error('Erreur lors de l\'envoi de la notification admin:', error)
+    console.error('Erreur lors de l\'envoi de l\'email de contact:', error)
+    throw error
   }
 }

@@ -16,8 +16,13 @@ export default function Hero() {
                 Cultiver sa foi, une page à la fois
               </h1>
               <p className="text-lg md:text-xl text-primary dark:text-foreground leading-relaxed drop-shadow-md">
-                Des créations pour nourrir la foi avec douceur.
+                Des créations spirituelles <strong className="text-amber-300">100% numériques</strong> pour nourrir la foi avec douceur.
               </p>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 inline-block">
+                <p className="text-sm text-white/90">
+                  📚 Livraison instantanée • Format PDF • Accès immédiat
+                </p>
+              </div>
             </div>
 
             {/* Separator */}

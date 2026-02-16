@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js'
-import { showSuccessToast, showErrorToast } from '@/lib/toast'
+import { showSuccessToast } from '@/lib/toast'
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface PayPalPaymentFormProps {
   amount: number
@@ -16,6 +17,10 @@ interface PayPalPaymentFormProps {
 
 export default function PayPalPaymentForm({ amount, currency, orderData, onSuccess, onError }: PayPalPaymentFormProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const { theme } = useTheme()
+
+  const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID
+  const isDark = theme === 'dark'
 
   const createOrder = async () => {
     try {
@@ -32,7 +37,7 @@ export default function PayPalPaymentForm({ amount, currency, orderData, onSucce
       })
 
       const order = await response.json()
-      if (!response.ok) throw new Error(order.error)
+      if (!response.ok) throw new Error(order.details || order.error || 'Erreur PayPal')
 
       return order.id
     } catch (error: any) {
@@ -58,32 +63,40 @@ export default function PayPalPaymentForm({ amount, currency, orderData, onSucce
       })
 
       const result = await response.json()
-      if (!response.ok) throw new Error(result.error)
+      if (!response.ok) throw new Error(result.details || result.error || 'Erreur PayPal')
 
       showSuccessToast('Paiement PayPal effectué avec succès !')
       onSuccess()
     } catch (error: any) {
-      showErrorToast(`Erreur PayPal: ${error.message}`)
       onError(error.message)
     } finally {
       setIsLoading(false)
     }
   }
 
+  if (!clientId || clientId === 'AZ...') {
+    return (
+      <div className="text-sm text-destructive">
+        PayPal n'est pas configuré (VITE_PAYPAL_CLIENT_ID manquant).
+      </div>
+    )
+  }
+
   return (
     <PayPalScriptProvider options={{
-      clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || 'AZ...',
-      currency: currency,
+      clientId,
+      currency,
+      intent: 'capture',
     }}>
       <div className="space-y-4">
         <PayPalButtons
           createOrder={createOrder}
           onApprove={onApprove}
-          onError={(error) => onError('Erreur PayPal')}
+          onError={(error) => onError((error as any)?.message || 'Erreur PayPal')}
           disabled={isLoading}
           style={{
             layout: 'vertical',
-            color: 'blue',
+            color: isDark ? 'gold' : 'blue',
             shape: 'rect',
             label: 'paypal'
           }}
