@@ -6,18 +6,18 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export const PRODUCT_EBOOKS = {
-  1: { // Les Invocations du Coran
-    filename: 'invocations-du-coran.pdf',
-    displayName: 'Les Invocations du Coran - Version PDF',
-    description: 'Votre guide complet des invocations coraniques'
+  1: { // Invocations (PDF)
+    filename: 'Les rabbana invocations.pdf',
+    displayName: 'Les Rabbana Invocations - Version PDF',
+    description: 'Vos invocations Rabbana prêtes à l\'emploi'
   },
   2: { // Planner Ramadan ALIF
-    filename: 'planner-ramadan-alif.pdf',
-    displayName: 'Planner Ramadan ALIF - Version PDF',
+    filename: 'Ramadan planner.pdf',
+    displayName: 'Ramadan Planner - Version PDF',
     description: 'Votre compagnon spirituel pour le Ramadan'
   },
   3: { // Les 99 Noms d'Allah
-    filename: '99-noms-dallah.pdf',
+    filename: 'Les 99 noms d\'Allah Azzawajel.pdf',
     displayName: 'Les 99 Noms d\'Allah - Version PDF',
     description: 'Découvrez les 99 noms divins d\'Allah'
   }

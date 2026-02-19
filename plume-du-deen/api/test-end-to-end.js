@@ -87,8 +87,9 @@ const requiredFiles = [
   'api/ebookConfig.js',
   'api/emailService.js',
   'api/orders.js',
-  'ebooks/invocations-du-coran.pdf',
-  'ebooks/99-noms-dallah.pdf'
+  'ebooks/Les rabbana invocations.pdf',
+  'ebooks/Ramadan planner.pdf',
+  "ebooks/Les 99 noms d'Allah Azzawajel.pdf"
 ];
 
 let allFilesExist = true;
