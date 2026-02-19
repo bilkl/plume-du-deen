@@ -1,7 +1,7 @@
 // Configuration de sécurité centralisée
 export const SECURITY_CONFIG = {
   // CORS
-  CORS_ORIGIN: process.env.FRONTEND_URL || 'http://localhost:3000',
+  CORS_ORIGIN: process.env.FRONTEND_URL || 'https://plume-du-deen.com,http://localhost:3000',
 
   // Limites de validation
   MAX_AMOUNT: 10000, // CHF
