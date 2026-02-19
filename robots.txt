@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Pages importantes à indexer en priorité
+Allow: /produits
+Allow: /ramadan
+Allow: /noms-allah
+Allow: /invocations
+Allow: /a-propos
+
+# Éviter l'indexation des pages d'administration et de développement
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+
+# Sitemap
+Sitemap: https://plume-du-deen.com/sitemap.xml
+
+# Crawl-delay pour être respectueux
+Crawl-delay: 1
