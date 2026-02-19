@@ -3,7 +3,23 @@
   "installCommand": "npm install",
   "builds": [
     {
-      "src": "api/**/*.js",
+      "src": "api/contact.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/orders.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/create-payment-intent.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/paypal/create-order.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/paypal/capture-order.js",
       "use": "@vercel/node"
     }
   ],
