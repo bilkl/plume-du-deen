@@ -116,10 +116,10 @@ export default function ProductRecommendations({
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-primary">
-                    {product.digitalPrice}€
+                    {product.digitalPrice === 0 ? 'Offert' : `${product.digitalPrice} CHF`}
                   </span>
                   <span className="text-sm text-muted-foreground line-through">
-                    {product.paperPrice}€
+                    {product.paperPrice === 0 ? '' : `${product.paperPrice} CHF`}
                   </span>
                 </div>
                 {product.reviewsCount && (

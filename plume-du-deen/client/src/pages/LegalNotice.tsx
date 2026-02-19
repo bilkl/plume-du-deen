@@ -21,7 +21,7 @@ export default function LegalNotice() {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Éditeur du site</h2>
               <div className="bg-gray-50 p-6 rounded-lg">
                 <p className="text-gray-700 mb-2"><strong>Plume du Deen</strong></p>
-                <p className="text-gray-700 mb-2">Email : plumedudeen@gmail.com</p>
+                <p className="text-gray-700 mb-2">Email : contact@plume-du-deen.com</p>
               </div>
             </section>
 
@@ -129,7 +129,7 @@ export default function LegalNotice() {
                 Pour toute question concernant ces mentions légales ou l'utilisation du site :
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700">Email : plumedudeen@gmail.com</p>
+                <p className="text-gray-700">Email : contact@plume-du-deen.com</p>
               </div>
             </section>
 

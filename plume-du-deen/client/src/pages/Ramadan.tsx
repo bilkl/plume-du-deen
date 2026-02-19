@@ -186,7 +186,7 @@ export default function Ramadan() {
                   </div>
                   <div className="flex flex-col sm:flex-row sm:justify-between py-2">
                     <span className="font-medium mb-1 sm:mb-0">Prix</span>
-                    <span className="text-primary font-bold text-right sm:text-left">14.99 CHF</span>
+                    <span className="text-primary font-bold text-right sm:text-left">Offert</span>
                   </div>
                 </div>
               </div>

@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2026-01-28.clover',
 });
 
 // Initialize PayPal - handled in individual API handlers

@@ -51,9 +51,9 @@ export const validateForm = <T>(schema: z.ZodSchema<T>, data: unknown): { succes
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors: Record<string, string> = {}
-      error.errors.forEach((err) => {
-        if (err.path.length > 0) {
-          errors[err.path[0] as string] = err.message
+      error.issues.forEach((issue: z.ZodIssue) => {
+        if (issue.path.length > 0) {
+          errors[issue.path[0] as string] = issue.message
         }
       })
       return { success: false, errors }

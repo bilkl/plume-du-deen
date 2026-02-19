@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { sendOrderConfirmationEmail, sendAdminOrderNotification } from './emailService.js';
 import { getEbooksForOrder } from './ebookConfig.js';
-import { validateCustomerData, isValidAmount, setSecurityHeaders } from './security.js';
+import { validateCustomerData, isValidAmount, setSecurityHeaders, SECURITY_CONFIG } from './security.js';
 
 // NOTE: Cette route tourne en serverless sur Vercel.
 // SQLite (better-sqlite3) est une dépendance native qui peut casser l'installation
@@ -31,6 +31,13 @@ function saveOrdersToStore(orders) {
   }
 }
 
+function isValidZeroOrPositiveAmount(amount) {
+  return typeof amount === 'number' &&
+    Number.isFinite(amount) &&
+    amount >= 0 &&
+    amount <= SECURITY_CONFIG.MAX_AMOUNT;
+}
+
 export default async function handler(req, res) {
   // Appliquer les headers de sécurité
   setSecurityHeaders(req, res);
@@ -50,19 +57,58 @@ export default async function handler(req, res) {
       } = req.body;
 
       // Validation des données d'entrée
-      if (!customer || !items || !total || !paymentIntentId) {
+      if (!customer || !items || total === undefined || total === null || !paymentIntentId) {
         return res.status(400).json({
           error: 'Données manquantes',
           details: 'Customer, items, total et paymentIntentId sont requis'
         });
       }
 
-      // Validation du montant
-      if (!isValidAmount(total)) {
+      if (typeof paymentIntentId !== 'string' || paymentIntentId.trim().length === 0) {
+        return res.status(400).json({
+          error: 'paymentIntentId invalide',
+          details: 'Le paymentIntentId doit être une chaîne non vide'
+        });
+      }
+
+      if (typeof total !== 'number' || !Number.isFinite(total)) {
         return res.status(400).json({
           error: 'Total invalide',
-          details: 'Le total doit être un nombre positif entre 0.01 et 10,000 CHF'
+          details: 'Le total doit être un nombre'
         });
+      }
+
+      const isFreeOrder = total === 0;
+
+      if (isFreeOrder) {
+        if (paymentIntentId !== 'FREE') {
+          return res.status(400).json({
+            error: 'Total invalide',
+            details: 'Les commandes offertes doivent utiliser paymentIntentId=FREE'
+          });
+        }
+
+        if (!isValidZeroOrPositiveAmount(total)) {
+          return res.status(400).json({
+            error: 'Total invalide',
+            details: `Le total doit être un nombre entre 0 et ${SECURITY_CONFIG.MAX_AMOUNT} CHF`
+          });
+        }
+      } else {
+        if (paymentIntentId === 'FREE') {
+          return res.status(400).json({
+            error: 'paymentIntentId invalide',
+            details: 'paymentIntentId=FREE est réservé aux commandes offertes'
+          });
+        }
+
+        // Validation du montant (paiements)
+        if (!isValidAmount(total)) {
+          return res.status(400).json({
+            error: 'Total invalide',
+            details: 'Le total doit être un nombre positif entre 0.01 et 10,000 CHF'
+          });
+        }
       }
 
       // Validation des données client
@@ -86,12 +132,20 @@ export default async function handler(req, res) {
 
       // Validation de chaque item
       for (const item of items) {
-        if (!item.id || !item.name || typeof item.price !== 'number' || item.price <= 0) {
+        if (!item.id || !item.name || typeof item.price !== 'number' || !Number.isFinite(item.price) || item.price < 0) {
           return res.status(400).json({
             error: 'Article invalide',
-            details: 'Chaque article doit avoir un ID, un nom et un prix positif'
+            details: 'Chaque article doit avoir un ID, un nom et un prix >= 0'
           });
         }
+
+        if (isFreeOrder && item.price !== 0) {
+          return res.status(400).json({
+            error: 'Article invalide',
+            details: 'Une commande offerte ne peut contenir que des articles à 0 CHF'
+          });
+        }
+
         if (item.name.length > 100) {
           return res.status(400).json({
             error: 'Nom d\'article trop long',

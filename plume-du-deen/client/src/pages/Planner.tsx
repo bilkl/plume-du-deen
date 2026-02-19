@@ -23,7 +23,7 @@ Chaque jour du Ramadan, découvrez :
 Conçu pour les hommes et les femmes qui souhaitent vivre un Ramadan transformateur,
 ce planner vous guide vers une expérience spirituelle enrichissante et mémorable.`,
     image: "/images/planner.png",
-    price: 14.99,
+    price: 0,
     features: [
       "30 jours de guidance spirituelle",
       "Invocations coraniques quotidiennes",

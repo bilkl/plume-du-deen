@@ -80,14 +80,14 @@ export function usePerformance() {
 
 // Hook pour mesurer les performances d'un composant spécifique
 export function useComponentPerformance(componentName: string) {
-  const startTimeRef = useRef<number>()
+  const startTimeRef = useRef<number | null>(null)
 
   useEffect(() => {
     startTimeRef.current = performance.now()
     console.log(`${componentName} mounted at:`, startTimeRef.current)
 
     return () => {
-      if (startTimeRef.current) {
+      if (startTimeRef.current !== null) {
         const unmountTime = performance.now()
         const duration = unmountTime - startTimeRef.current
         console.log(`${componentName} unmounted after:`, duration, 'ms')
@@ -96,7 +96,7 @@ export function useComponentPerformance(componentName: string) {
   }, [componentName])
 
   const markTime = (label: string) => {
-    if (startTimeRef.current) {
+    if (startTimeRef.current !== null) {
       const currentTime = performance.now()
       const elapsed = currentTime - startTimeRef.current
       console.log(`${componentName} - ${label}:`, elapsed, 'ms')

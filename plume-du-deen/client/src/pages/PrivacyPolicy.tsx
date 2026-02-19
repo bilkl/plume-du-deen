@@ -144,7 +144,7 @@ export default function PrivacyPolicy() {
                 Pour exercer vos droits ou poser des questions sur notre politique de confidentialité :
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700">Email : plumedudeen@gmail.com</p>
+                <p className="text-gray-700">Email : contact@plume-du-deen.com</p>
               </div>
               <p className="text-gray-700 mt-4">
                 Nous nous engageons à répondre à votre demande dans un délai de 30 jours maximum.

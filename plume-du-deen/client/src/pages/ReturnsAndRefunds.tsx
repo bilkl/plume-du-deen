@@ -42,7 +42,7 @@ export default function ReturnsAndRefunds() {
                 Pour exercer votre droit de rétractation avant la consommation du produit numérique, vous devez nous notifier votre décision par :
               </p>
               <ul className="list-disc list-inside text-gray-700 mb-4 ml-4">
-                <li>Un email à : plumedudeen@gmail.com</li>
+                <li>Un email à : contact@plume-du-deen.com</li>
               </ul>
               <p className="text-gray-700 mb-4">
                 Votre notification doit être claire et non équivoque. Pour faciliter le traitement, merci d'indiquer le nom du produit, votre email de commande et, si possible, le numéro de commande.
@@ -130,7 +130,7 @@ export default function ReturnsAndRefunds() {
                 Pour toute demande de retour ou remboursement :
               </p>
               <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                <p className="text-gray-700">Email : plumedudeen@gmail.com</p>
+                <p className="text-gray-700">Email : contact@plume-du-deen.com</p>
               </div>
               <p className="text-gray-700 mb-4">
                 Notre équipe vous accompagnera tout au long du processus de retour.

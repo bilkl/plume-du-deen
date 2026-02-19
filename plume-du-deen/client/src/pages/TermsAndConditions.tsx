@@ -151,7 +151,7 @@ export default function TermsAndConditions() {
                 Pour toute question concernant ces conditions générales, vous pouvez nous contacter :
               </p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700">Email : plumedudeen@gmail.com</p>
+                <p className="text-gray-700">Email : contact@plume-du-deen.com</p>
               </div>
             </section>
           </div>

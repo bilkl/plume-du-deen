@@ -7,6 +7,9 @@ import { useCart } from '@/contexts/CartContext';
 export default function Cart() {
   const { state, dispatch } = useCart();
 
+  const formatPrice = (price: number) => (price === 0 ? 'Offert' : `${price} CHF`);
+  const formatTotal = (total: number) => (total === 0 ? 'Offert' : `${total.toFixed(2)} CHF`);
+
   const updateQuantity = (id: number, quantity: number) => {
     dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } });
   };
@@ -76,7 +79,7 @@ export default function Cart() {
                           {item.description}
                         </p>
                         <div className="text-lg font-bold text-primary">
-                          {item.price}€
+                          {formatPrice(item.price)}
                         </div>
                       </div>
 
@@ -122,7 +125,7 @@ export default function Cart() {
                   <div className="space-y-4">
                     <div className="flex justify-between text-muted-foreground">
                       <span>Sous-total</span>
-                      <span>{state.total.toFixed(2)}€</span>
+                      <span>{formatTotal(state.total)}</span>
                     </div>
                     <div className="flex justify-between text-muted-foreground">
                       <span>Livraison</span>
@@ -131,7 +134,7 @@ export default function Cart() {
                     <div className="border-t border-border pt-4">
                       <div className="flex justify-between text-xl font-bold text-card-foreground">
                         <span>Total</span>
-                        <span>{state.total.toFixed(2)}€</span>
+                        <span>{formatTotal(state.total)}</span>
                       </div>
                     </div>
                   </div>

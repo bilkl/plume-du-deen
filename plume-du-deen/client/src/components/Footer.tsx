@@ -80,7 +80,7 @@ export default function Footer() {
             <h4 className="text-lg font-semibold">Nous contacter</h4>
             <div className="flex items-center gap-2 text-sm text-secondary-foreground/80 hover:text-secondary-foreground transition-colors cursor-pointer">
               <Mail className="w-4 h-4" />
-              <a href="mailto:plumedudeen@gmail.com">plumedudeen@gmail.com</a>
+              <a href="mailto:contact@plume-du-deen.com">contact@plume-du-deen.com</a>
             </div>
             <div className="flex gap-4 pt-4">
               <a href="https://www.instagram.com/plumedudeen.official" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground/80 hover:text-secondary-foreground transition-colors">

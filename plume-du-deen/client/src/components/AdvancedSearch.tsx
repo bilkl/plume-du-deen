@@ -36,13 +36,11 @@ export default function AdvancedSearch({ products, onResultsChange }: AdvancedSe
 
   // Get unique categories and tags
   const categories = useMemo(() => {
-    const cats = [...new Set(products.map(p => p.category))]
-    return cats
+    return Array.from(new Set(products.map(p => p.category)))
   }, [products])
 
   const allTags = useMemo(() => {
-    const tags = [...new Set(products.flatMap(p => p.tags))]
-    return tags
+    return Array.from(new Set(products.flatMap(p => p.tags)))
   }, [products])
 
   // Filter and sort products
@@ -197,9 +195,9 @@ export default function AdvancedSearch({ products, onResultsChange }: AdvancedSe
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tous les prix</SelectItem>
-                    <SelectItem value="0-15">0 - 15€</SelectItem>
-                    <SelectItem value="15-25">15 - 25€</SelectItem>
-                    <SelectItem value="25+">25€ et plus</SelectItem>
+                    <SelectItem value="0-15">0 - 15 CHF</SelectItem>
+                    <SelectItem value="15-25">15 - 25 CHF</SelectItem>
+                    <SelectItem value="25+">25 CHF et plus</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

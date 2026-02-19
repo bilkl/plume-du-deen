@@ -71,7 +71,7 @@ export default function Contact() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60"></div>
           <div className="container relative z-10 flex items-center justify-center">
             <div className="text-center space-y-4">
-              <h1 className="text-4xl md:text-5xl text-foreground font-bold">
+              <h1 className="text-4xl md:text-5xl text-white font-bold">
                 Contactez-nous
               </h1>
               <p className="text-lg text-white max-w-2xl mx-auto">

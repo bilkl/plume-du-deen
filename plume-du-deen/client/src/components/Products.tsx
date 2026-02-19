@@ -12,7 +12,7 @@ export default function Products() {
       price: product.price,
       image: product.image,
       description: product.description,
-      format: 'pdf'
+      format: 'digital'
     }});
   };
 
@@ -29,11 +29,11 @@ export default function Products() {
     {
       id: 2,
       title: 'Planner Ramadan ALIF',
-      subtitle: 'Spécial Ramadan',
+      subtitle: 'Offert',
       description: 'Le rituel guidé de 30 jours pour transformer son Ramadan de l\'intérieur.',
       image: '/images/planner.png',
       color: 'bg-amber-50 dark:bg-amber-900',
-      price: 14.99,
+      price: 0,
     },
     {
       id: 3,
@@ -126,7 +126,7 @@ export default function Products() {
                     onClick={() => addToCart({ ...product, price: product.price, format: 'digital' })}
                     className="w-full px-4 py-3 bg-primary text-primary-foreground font-semibold rounded-sm transition-all duration-300 hover:bg-primary/90 hover:shadow-lg flex items-center justify-center gap-2"
                   >
-                    Ajouter au panier - {product.price} CHF
+                    Ajouter au panier - {product.price === 0 ? 'Offert' : `${product.price} CHF`}
                   </button>
                 </div>
               </div>

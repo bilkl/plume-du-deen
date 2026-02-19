@@ -20,6 +20,8 @@ export default function CheckoutForm() {
   const { state, dispatch } = useCart()
   const { createPaymentIntent, loading: paymentLoading } = useStripePayment()
   const [, setLocation] = useLocation()
+  const isFreeOrder = state.total === 0
+  const formatLineAmount = (amount: number) => (amount === 0 ? 'Offert' : `${amount.toFixed(2)} CHF`)
   const [formData, setFormData] = useState<Partial<OrderFormData>>({
     firstName: '',
     lastName: '',
@@ -205,6 +207,33 @@ export default function CheckoutForm() {
     setIsSubmitting(true)
 
     try {
+      // Free order: no payment needed (e.g., free Planner Ramadan)
+      if (isFreeOrder) {
+        const response = await fetch(apiUrl('/api/orders'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            customer: formData,
+            items: state.items,
+            total: 0,
+            paymentIntentId: 'FREE',
+            status: 'completed'
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Erreur lors de la création de la commande offerte')
+        }
+
+        const result = await response.json()
+        dispatch({ type: 'CLEAR_CART' })
+        showSuccessToast(`Commande offerte créée ! ID: ${result.orderId}`)
+        setLocation('/paiement-succes')
+        return
+      }
+
       if (formData.paymentMethod === 'card') {
         // Create payment intent for Stripe
         const intent = await createPaymentIntent({
@@ -324,7 +353,7 @@ export default function CheckoutForm() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold">{item.price * item.quantity}€</p>
+                    <p className="font-semibold">{item.price * item.quantity === 0 ? 'Offert' : `${(item.price * item.quantity).toFixed(2)} CHF`}</p>
                   </div>
                 </div>
               ))}
@@ -332,7 +361,7 @@ export default function CheckoutForm() {
               <div className="border-t pt-4">
                 <div className="flex justify-between items-center text-lg font-semibold">
                   <span>Total</span>
-                  <span>{state.total}€</span>
+                  <span>{state.total === 0 ? 'Offert' : `${state.total.toFixed(2)} CHF`}</span>
                 </div>
               </div>
             </div>
@@ -504,23 +533,35 @@ export default function CheckoutForm() {
                 </Select>
               </div>
 
-              <div>
-                <Label>Méthode de paiement *</Label>
-                <Select
-                  value={formData.paymentMethod || 'card'}
-                  onValueChange={(value) => handleInputChange('paymentMethod', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="card">Carte bancaire</SelectItem>
-                    <SelectItem value="paypal">PayPal</SelectItem>
-                    <SelectItem value="bank-transfer">Virement bancaire</SelectItem>
-                    <SelectItem value="contact">Autre moyen de paiement (Orange Money, etc.)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {!isFreeOrder ? (
+                <div>
+                  <Label>Méthode de paiement *</Label>
+                  <Select
+                    value={formData.paymentMethod || 'card'}
+                    onValueChange={(value) => handleInputChange('paymentMethod', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="card">Carte bancaire</SelectItem>
+                      <SelectItem value="paypal">PayPal</SelectItem>
+                      <SelectItem value="bank-transfer">Virement bancaire</SelectItem>
+                      <SelectItem value="contact">Autre moyen de paiement (Orange Money, etc.)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="rounded-lg border border-border bg-muted/30 p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="font-medium text-card-foreground">Commande offerte</span>
+                    <Badge variant="secondary">Aucun paiement requis</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Vous recevrez votre ebook par email après validation du formulaire.
+                  </p>
+                </div>
+              )}
 
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
@@ -583,7 +624,9 @@ export default function CheckoutForm() {
                       Traitement en cours...
                     </>
                   ) : (
-                    `Continuer vers le paiement ${state.total}€`
+                    isFreeOrder
+                      ? 'Valider la commande (offert)'
+                      : `Continuer vers le paiement ${state.total.toFixed(2)} CHF`
                   )}
                 </Button>
               )}
@@ -592,7 +635,7 @@ export default function CheckoutForm() {
         </Card>
 
         {/* Payment Form */}
-        {(paymentIntent || showPayPal) && (
+        {!isFreeOrder && (paymentIntent || showPayPal) && (
           <Card className="mt-6">
             <CardHeader>
               <CardTitle>Paiement sécurisé</CardTitle>
@@ -677,11 +720,11 @@ export default function CheckoutForm() {
                           Envoyez-nous un email pour organiser votre paiement personnalisé.
                         </p>
                         <a
-                          href="mailto:plumedudeen@gmail.com?subject=Demande%20de%20paiement%20-%20Moyen%20non%20supporté"
+                          href="mailto:contact@plume-du-deen.com?subject=Demande%20de%20paiement%20-%20Moyen%20non%20supporté"
                           className="mt-3 inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-primary hover:bg-primary/10 font-medium transition-colors"
                         >
                           <Mail className="w-4 h-4" />
-                          <span className="break-all">plumedudeen@gmail.com</span>
+                          <span className="break-all">contact@plume-du-deen.com</span>
                         </a>
                       </div>
                     </div>

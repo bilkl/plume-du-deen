@@ -12,7 +12,7 @@ export default function About() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60"></div>
           <div className="container relative z-10 flex items-center justify-center">
             <div className="text-center space-y-4">
-              <h1 className="text-4xl md:text-5xl text-foreground">
+              <h1 className="text-4xl md:text-5xl text-white">
                 À propos
               </h1>
               <p className="text-lg text-white max-w-2xl mx-auto">
