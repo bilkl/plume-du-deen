@@ -1,13 +1,5 @@
-import { config } from 'dotenv'
 import { Resend } from 'resend'
-import path from 'path'
-import { fileURLToPath } from 'url'
 import fs from 'fs'
-
-// Charger les variables d'environnement
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-config({ path: path.join(__dirname, '../.env') })
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 if (!RESEND_API_KEY) {
