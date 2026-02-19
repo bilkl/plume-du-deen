@@ -1,42 +1,35 @@
-import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { sendOrderConfirmationEmail, sendAdminOrderNotification } from './emailService.js';
 import { getEbooksForOrder } from './ebookConfig.js';
 import { validateCustomerData, isValidAmount, setSecurityHeaders } from './security.js';
 
-const dbPath = path.join(process.cwd(), 'database.sqlite');
-const db = new Database(dbPath);
+// NOTE: Cette route tourne en serverless sur Vercel.
+// SQLite (better-sqlite3) est une dépendance native qui peut casser l'installation
+// selon la version Node côté Vercel. Pour garantir l'envoi des ebooks et le flow
+// checkout, on stocke les commandes dans un petit store JSON (mémoire + /tmp).
+const ORDER_STORE_PATH = process.env.VERCEL
+  ? path.join('/tmp', 'orders.json')
+  : path.join(process.cwd(), 'orders.json');
 
-// Créer la table des commandes si elle n'existe pas
-db.exec(`
-  CREATE TABLE IF NOT EXISTS orders (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_id TEXT UNIQUE NOT NULL,
-    customer_email TEXT NOT NULL,
-    customer_name TEXT NOT NULL,
-    customer_phone TEXT,
-    customer_address TEXT,
-    customer_city TEXT,
-    customer_postal_code TEXT,
-    customer_country TEXT,
-    items TEXT NOT NULL, -- JSON string
-    total REAL NOT NULL,
-    payment_intent_id TEXT NOT NULL,
-    status TEXT DEFAULT 'completed',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`);
+function loadOrdersFromStore() {
+  try {
+    if (!fs.existsSync(ORDER_STORE_PATH)) return [];
+    const raw = fs.readFileSync(ORDER_STORE_PATH, 'utf8');
+    const data = JSON.parse(raw);
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
 
-// Créer un index pour les recherches par email
-db.exec(`
-  CREATE INDEX IF NOT EXISTS idx_orders_customer_email ON orders(customer_email)
-`);
-
-db.exec(`
-  CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC)
-`);
+function saveOrdersToStore(orders) {
+  try {
+    fs.writeFileSync(ORDER_STORE_PATH, JSON.stringify(orders, null, 2), 'utf8');
+  } catch (error) {
+    console.error('Unable to persist orders store:', error);
+  }
+}
 
 export default async function handler(req, res) {
   // Appliquer les headers de sécurité
@@ -110,29 +103,29 @@ export default async function handler(req, res) {
       // Générer un ID de commande unique
       const orderId = `PLUME-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
-      // Insérer la commande
-      const stmt = db.prepare(`
-        INSERT INTO orders (
-          order_id, customer_email, customer_name, customer_phone,
-          customer_address, customer_city, customer_postal_code, customer_country,
-          items, total, payment_intent_id, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `);
-
-      stmt.run(
+      // Enregistrer la commande dans un store léger (serverless-friendly)
+      const orderRecord = {
         orderId,
-        validatedCustomer.email,
-        `${validatedCustomer.firstName} ${validatedCustomer.lastName}`,
-        validatedCustomer.phone,
-        validatedCustomer.address,
-        validatedCustomer.city,
-        validatedCustomer.postalCode,
-        validatedCustomer.country,
-        JSON.stringify(items),
+        customer: {
+          firstName: validatedCustomer.firstName,
+          lastName: validatedCustomer.lastName,
+          email: validatedCustomer.email,
+          phone: validatedCustomer.phone || null,
+          address: validatedCustomer.address || null,
+          city: validatedCustomer.city || null,
+          postalCode: validatedCustomer.postalCode || null,
+          country: validatedCustomer.country || null
+        },
+        items,
         total,
         paymentIntentId,
-        'completed'
-      );
+        status: 'completed',
+        createdAt: new Date().toISOString()
+      };
+
+      const existingOrders = loadOrdersFromStore();
+      existingOrders.push(orderRecord);
+      saveOrdersToStore(existingOrders);
 
       // Préparer les données pour l'email de confirmation
       const orderEmailData = {
@@ -141,7 +134,7 @@ export default async function handler(req, res) {
         customerEmail: validatedCustomer.email,
         items,
         total,
-        createdAt: new Date().toISOString(),
+        createdAt: orderRecord.createdAt,
         customerAddress: validatedCustomer.address,
         customerCity: validatedCustomer.city,
         customerPostalCode: validatedCustomer.postalCode,
@@ -212,35 +205,27 @@ export default async function handler(req, res) {
         });
       }
 
-      const stmt = db.prepare(`
-        SELECT
-          order_id as orderId,
-          customer_name as customerName,
-          customer_email as customerEmail,
-          items,
-          total,
-          status,
-          created_at as createdAt,
-          payment_intent_id as paymentIntentId
-        FROM orders
-        WHERE customer_email = ?
-        ORDER BY created_at DESC
-        LIMIT 50
-      `);
+      const orders = loadOrdersFromStore();
+      const filtered = orders
+        .filter(order => order?.customer?.email === email)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 50);
 
-      const orders = stmt.all(email);
-
-      // Parser les items JSON
-      const formattedOrders = orders.map(order => ({
-        ...order,
-        items: JSON.parse(order.items),
+      const formattedOrders = filtered.map(order => ({
+        orderId: order.orderId,
+        customerName: `${order.customer.firstName} ${order.customer.lastName}`,
+        customerEmail: order.customer.email,
+        items: Array.isArray(order.items) ? order.items : [],
+        total: order.total,
+        status: order.status || 'completed',
         createdAt: new Date(order.createdAt).toLocaleDateString('fr-FR', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
           hour: '2-digit',
           minute: '2-digit'
-        })
+        }),
+        paymentIntentId: order.paymentIntentId
       }));
 
       res.json({
