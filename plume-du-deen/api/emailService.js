@@ -9,7 +9,12 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 config({ path: path.join(__dirname, '../.env') })
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const RESEND_API_KEY = process.env.RESEND_API_KEY
+if (!RESEND_API_KEY) {
+  console.warn('RESEND_API_KEY not set. Email sending is disabled. Add RESEND_API_KEY to .env or to your environment variables for production.')
+}
+
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null
 
 /**
  * Envoie un email de confirmation de commande au client
@@ -18,6 +23,9 @@ const resend = new Resend(process.env.RESEND_API_KEY)
  */
 export async function sendOrderConfirmationEmail(orderData, attachments = []) {
   try {
+    if (!resend) {
+      throw new Error('RESEND_API_KEY not configured. Set RESEND_API_KEY to enable email sending.')
+    }
     const { orderId, customerName, customerEmail, items, total, createdAt } = orderData
 
     // Créer le contenu HTML de l'email
@@ -177,6 +185,10 @@ function createOrderConfirmationHTML(orderData, hasAttachments = false, attachme
  */
 export async function sendContactEmail(contactData) {
   try {
+    if (!resend) {
+      throw new Error('RESEND_API_KEY not configured. Set RESEND_API_KEY to enable email sending.')
+    }
+
     const { name, email, subject, message } = contactData
 
     const adminEmail = process.env.ADMIN_EMAIL || 'contact@plume-du-deen.com'

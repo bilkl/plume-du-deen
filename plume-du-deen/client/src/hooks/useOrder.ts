@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
+import { apiUrl } from '@/lib/api'
 
 interface OrderData {
   customer: any
@@ -23,7 +24,7 @@ export function useOrder(): UseOrderReturn {
     setError(null)
 
     try {
-      const response = await fetch('/api/orders', {
+      const response = await fetch(apiUrl('/api/orders'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

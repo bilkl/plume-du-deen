@@ -3,7 +3,7 @@ import { validateContactData, setSecurityHeaders } from './security.js';
 
 export default async function handler(req, res) {
   // Appliquer les headers de sécurité
-  setSecurityHeaders(res);
+  setSecurityHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();

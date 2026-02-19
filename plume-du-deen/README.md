@@ -135,4 +135,16 @@ pnpm run build
 
 ## Déploiement
 
-Le site se déploie automatiquement sur GitHub Pages à chaque push sur la branche `main` via GitHub Actions.
+Le frontend se déploie automatiquement sur GitHub Pages à chaque push sur la branche `main` via GitHub Actions.
+
+### GitHub Pages + API Vercel
+
+Si le frontend est sur GitHub Pages et l'API sur Vercel, configurez :
+
+- **Côté frontend (build GitHub Pages)** : définissez `VITE_API_BASE_URL` vers votre backend Vercel.
+   - Exemple : `VITE_API_BASE_URL=https://plume-du-deen.vercel.app`
+   - En local, laissez vide pour utiliser le proxy Vite (`/api` → `http://localhost:3001`).
+
+- **Côté Vercel (backend)** : définissez `FRONTEND_URL` à l'origine GitHub Pages (sans chemin).
+   - Exemple : `https://<user>.github.io`
+   - Plusieurs origines possibles via une liste séparée par des virgules.

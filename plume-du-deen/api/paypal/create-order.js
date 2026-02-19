@@ -1,4 +1,5 @@
 import { Client } from '@paypal/paypal-server-sdk'
+import { setSecurityHeaders } from '../security.js'
 
 const environment = process.env.NODE_ENV === 'production'
   ? 'production'
@@ -13,17 +14,8 @@ const paypalClient = new Client({
 })
 
 export default async function handler(req, res) {
-  // Enable CORS avec restrictions
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:3000');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Max-Age', '86400');
-
-  // Headers de sécurité
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  // Headers de sécurité + CORS
+  setSecurityHeaders(req, res)
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -103,8 +95,8 @@ export default async function handler(req, res) {
         brand_name: 'Plume du Deen',
         landing_page: 'BILLING',
         user_action: 'PAY_NOW',
-        return_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/paiement-succes`,
-        cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/panier`
+        return_url: `${(process.env.FRONTEND_URL || 'http://localhost:3000').split(',')[0].trim()}/paiement-succes`,
+        cancel_url: `${(process.env.FRONTEND_URL || 'http://localhost:3000').split(',')[0].trim()}/panier`
       }
     })
 

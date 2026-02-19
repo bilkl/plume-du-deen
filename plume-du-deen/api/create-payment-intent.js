@@ -1,20 +1,16 @@
 import Stripe from 'stripe';
 import { setSecurityHeaders, isValidAmount, isValidEmail, sanitizeString } from './security.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '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');
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeSecretKey) {
+  console.warn('STRIPE_SECRET_KEY not set. Stripe payment intents cannot be created.')
+}
+
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
 
 export default async function handler(req, res) {
-  // Enable CORS avec restrictions
-  res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || 'http://localhost:3000');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
-
-  // Headers de sécurité
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  // Headers de sécurité + CORS
+  setSecurityHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -28,6 +24,13 @@ export default async function handler(req, res) {
   }
 
   try {
+    if (!stripe) {
+      return res.status(500).json({
+        error: 'Erreur de configuration',
+        details: 'STRIPE_SECRET_KEY manquante'
+      });
+    }
+
     const { amount, currency = 'chf', metadata } = req.body;
 
     // Validation et sanitisation des données d'entrée

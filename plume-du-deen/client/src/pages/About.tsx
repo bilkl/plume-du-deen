@@ -6,12 +6,26 @@ export default function About() {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       <main className="flex-1 pt-20">
-        <section className="py-20 md:py-32">
-          <div className="container">
-            <div className="text-center mb-16 md:mb-20 space-y-4">
+        {/* Banner Section with Title */}
+        <section className="py-20 md:py-32 relative overflow-hidden bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/images/aboutbanner.png)' }}>
+          {/* Background overlay for readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60"></div>
+          <div className="container relative z-10 flex items-center justify-center">
+            <div className="text-center space-y-4">
               <h1 className="text-4xl md:text-5xl text-foreground">
                 À propos
               </h1>
+              <p className="text-lg text-white max-w-2xl mx-auto">
+                Découvrez l'intention derrière Plume du Deen et notre mission d'accompagner la foi avec douceur.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* About Content Section */}
+        <section className="py-20 md:py-32">
+          <div className="container">
+            <div className="text-center mb-16 md:mb-20 space-y-4">
               <div className="mb-8">
                 <img
                   src="/images/logo.png"

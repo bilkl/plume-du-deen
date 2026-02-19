@@ -1,18 +1,32 @@
 {
-  "version": 2,
-  "buildCommand": null,
-  "devCommand": null,
   "installCommand": "npm install",
+}
   "builds": [
     {
-      "src": "api/create-payment-intent.js",
+      "src": "api/**/*.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "client/dist/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "api/create-payment-intent.js"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "^/favicon.ico$",
+      "dest": "/client/dist/favicon.ico"
+    },
+    {
+      "src": "^/$",
+      "dest": "/client/dist/index.html"
+    },
+    {
+      "src": "^/(.*)$",
+      "dest": "/client/dist/$1"
     }
   ]
 }

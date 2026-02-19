@@ -1,4 +1,5 @@
 import { Client } from '@paypal/paypal-server-sdk'
+import { setSecurityHeaders } from '../security.js'
 
 const environment = process.env.NODE_ENV === 'production'
   ? 'production'
@@ -13,10 +14,8 @@ const paypalClient = new Client({
 })
 
 export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  // Headers de sécurité + CORS
+  setSecurityHeaders(req, res)
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end()
@@ -27,7 +26,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { orderId, orderData } = req.body
+    const { orderId, orderData, customer, items, total } = req.body
+
+    const normalizedOrderData = orderData || (customer ? { customer, items, total } : null)
 
     // Validation des données
     if (!orderId) {
@@ -52,17 +53,18 @@ export default async function handler(req, res) {
     }
 
     // Créer la commande dans notre base de données si orderData est fourni
-    if (orderData) {
+    if (normalizedOrderData) {
       try {
-        const orderResponse = await fetch(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/api/orders`, {
+        const apiBaseUrl = process.env.API_BASE_URL || `https://${req.headers.host}`
+        const orderResponse = await fetch(`${apiBaseUrl}/api/orders`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            customer: orderData.customer,
-            items: orderData.items,
-            total: orderData.total,
+            customer: normalizedOrderData.customer,
+            items: normalizedOrderData.items,
+            total: normalizedOrderData.total,
             paymentIntentId: `paypal_${orderId}`,
             paymentMethod: 'paypal'
           })

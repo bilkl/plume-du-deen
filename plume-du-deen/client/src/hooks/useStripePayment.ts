@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
+import { apiUrl } from '@/lib/api'
 
 interface UseStripePaymentReturn {
   createPaymentIntent: (data: { amount: number; currency?: string; metadata?: any }) => Promise<any>
@@ -22,7 +23,7 @@ export function useStripePayment(): UseStripePaymentReturn {
 
     try {
       // Use same-origin API by default so dev/prod work consistently.
-      const response = await fetch('/api/create-payment-intent', {
+      const response = await fetch(apiUrl('/api/create-payment-intent'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

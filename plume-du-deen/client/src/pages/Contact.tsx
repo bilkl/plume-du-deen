@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mail } from 'lucide-react';
+import { Mail, User, AtSign, MessageSquare, Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import { apiUrl } from '@/lib/api';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -31,7 +32,7 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/contact', {
+      const response = await fetch(apiUrl('/api/contact'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,13 +66,15 @@ export default function Contact() {
       <Header />
       <main className="flex-1 pt-20">
         {/* Hero Section */}
-        <section className="py-20 md:py-32 bg-primary">
-          <div className="container">
-            <div className="text-center mb-16 md:mb-20 space-y-4">
+        <section className="py-20 md:py-32 relative overflow-hidden bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/images/contactbanner.jpeg)' }}>
+          {/* Background overlay for readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60"></div>
+          <div className="container relative z-10 flex items-center justify-center">
+            <div className="text-center space-y-4">
               <h1 className="text-4xl md:text-5xl text-foreground font-bold">
                 Contactez-nous
               </h1>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-lg text-white max-w-2xl mx-auto">
                 Nous sommes là pour vous accompagner dans votre cheminement spirituel.
                 N'hésitez pas à nous contacter pour toute question ou suggestion.
               </p>
@@ -94,9 +97,30 @@ export default function Contact() {
                   <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                     <Mail className="w-5 h-5 text-primary" />
                   </div>
-                  <div className="text-left">
+                  <div className="text-left flex-1">
                     <h3 className="font-semibold text-foreground text-sm">Email</h3>
-                    <p className="text-muted-foreground text-sm">contact@plume-du-deen.com</p>
+                    <div className="flex items-center gap-3">
+                      <a href="mailto:contact@plume-du-deen.com?subject=Contact%20from%20website" className="text-primary hover:underline text-sm">
+                        contact@plume-du-deen.com
+                      </a>
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          try {
+                            navigator.clipboard?.writeText('contact@plume-du-deen.com');
+                            toast.success('Adresse copiée');
+                          } catch (err) {
+                            console.error(err);
+                            toast.error('Impossible de copier');
+                          }
+                        }}
+                        aria-label="Copier l'adresse email"
+                        className="h-8 px-2 rounded-md inline-flex items-center"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <p className="text-muted-foreground text-xs mt-2">Réponse généralement sous 24 heures.</p>
                   </div>
                 </div>
               </div>
@@ -112,7 +136,9 @@ export default function Contact() {
                   <form onSubmit={handleSubmit} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-3">
-                        <Label htmlFor="name" className="text-sm font-medium">Nom complet *</Label>
+                        <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
+                          <User className="w-4 h-4" /> Nom complet *
+                        </Label>
                         <Input
                           id="name"
                           name="name"
@@ -125,7 +151,9 @@ export default function Contact() {
                         />
                       </div>
                       <div className="space-y-3">
-                        <Label htmlFor="email" className="text-sm font-medium">Email *</Label>
+                        <Label htmlFor="email" className="text-sm font-medium flex items-center gap-2">
+                          <AtSign className="w-4 h-4" /> Email *
+                        </Label>
                         <Input
                           id="email"
                           name="email"
@@ -140,7 +168,9 @@ export default function Contact() {
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="subject" className="text-sm font-medium">Sujet *</Label>
+                      <Label htmlFor="subject" className="text-sm font-medium flex items-center gap-2">
+                        <MessageSquare className="w-4 h-4" /> Sujet *
+                      </Label>
                       <Input
                         id="subject"
                         name="subject"
@@ -154,7 +184,9 @@ export default function Contact() {
                     </div>
 
                     <div className="space-y-3">
-                      <Label htmlFor="message" className="text-sm font-medium">Message *</Label>
+                      <Label htmlFor="message" className="text-sm font-medium flex items-center gap-2">
+                        <MessageSquare className="w-4 h-4" /> Message *
+                      </Label>
                       <Textarea
                         id="message"
                         name="message"
@@ -203,38 +235,38 @@ export default function Contact() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              <div className="space-y-4">
-                <div className="bg-background rounded-lg p-6 shadow-sm border">
+              <div className="flex flex-col space-y-4">
+                <div className="bg-background rounded-lg p-6 shadow-sm border flex-1">
                   <h3 className="font-semibold text-foreground mb-3">Comment commander un produit ?</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
-                    Parcourez notre collection, ajoutez les articles à votre panier,
-                    puis procédez au paiement. Vous recevrez un email de confirmation.
+                    Parcourez notre collection de produits numériques, ajoutez les articles à votre panier,
+                    puis procédez au paiement. Vous recevrez un accès instantané par email après confirmation.
                   </p>
                 </div>
 
-                <div className="bg-background rounded-lg p-6 shadow-sm border">
-                  <h3 className="font-semibold text-foreground mb-3">Quels sont les délais de livraison ?</h3>
+                <div className="bg-background rounded-lg p-6 shadow-sm border flex-1">
+                  <h3 className="font-semibold text-foreground mb-3">Comment accéder à mes achats ?</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
-                    Les délais varient de 3 à 7 jours ouvrés en France métropolitaine,
-                    et jusqu'à 10 jours pour les autres destinations.
+                    Après paiement, vous recevrez un email avec un lien de téléchargement sécurisé
+                    et vos identifiants d'accès aux ressources numériques.
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="bg-background rounded-lg p-6 shadow-sm border">
-                  <h3 className="font-semibold text-foreground mb-3">Puis-je retourner un produit ?</h3>
+              <div className="flex flex-col space-y-4">
+                <div className="bg-background rounded-lg p-6 shadow-sm border flex-1">
+                  <h3 className="font-semibold text-foreground mb-3">Quels formats sont disponibles ?</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
-                    Oui, vous disposez de 14 jours pour retourner un produit.
-                    Consultez notre politique de retours pour plus d'informations.
+                    Nos produits sont disponibles en PDF, ePub et formats audio,
+                    compatibles avec la plupart des appareils et applications de lecture.
                   </p>
                 </div>
 
-                <div className="bg-background rounded-lg p-6 shadow-sm border">
-                  <h3 className="font-semibold text-foreground mb-3">Comment suivre ma commande ?</h3>
+                <div className="bg-background rounded-lg p-6 shadow-sm border flex-1">
+                  <h3 className="font-semibold text-foreground mb-3">Puis-je partager mes achats ?</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
-                    Un email de suivi vous sera envoyé dès l'expédition de votre commande,
-                    avec un lien pour suivre l'acheminement en temps réel.
+                    Les produits numériques sont personnels. Pour partager avec d'autres,
+                    nous recommandons l'achat individuel pour respecter les droits d'auteur.
                   </p>
                 </div>
               </div>

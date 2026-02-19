@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js'
 import { showSuccessToast } from '@/lib/toast'
 import { useTheme } from '@/contexts/ThemeContext'
+import { apiUrl } from '@/lib/api'
 
 interface PayPalPaymentFormProps {
   amount: number
@@ -24,7 +25,7 @@ export default function PayPalPaymentForm({ amount, currency, orderData, onSucce
 
   const createOrder = async () => {
     try {
-      const response = await fetch('/api/paypal/create-order', {
+      const response = await fetch(apiUrl('/api/paypal/create-order'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,7 +50,7 @@ export default function PayPalPaymentForm({ amount, currency, orderData, onSucce
   const onApprove = async (data: any) => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/paypal/capture-order', {
+      const response = await fetch(apiUrl('/api/paypal/capture-order'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -11,6 +11,7 @@ import { Link, useLocation } from 'wouter'
 import { useCart } from '@/contexts/CartContext'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
 import { validateForm, type OrderFormData, orderSchema } from '@/lib/validation'
+import { apiUrl } from '@/lib/api'
 import StripePaymentForm from './StripePaymentForm'
 import PayPalPaymentForm from './PayPalPaymentForm'
 import { useStripePayment } from '@/hooks/useStripePayment'
@@ -236,7 +237,7 @@ export default function CheckoutForm() {
 
       // For bank-transfer, save order with pending status
       if (formData.paymentMethod === 'bank-transfer') {
-        const response = await fetch('/api/orders', {
+        const response = await fetch(apiUrl('/api/orders'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

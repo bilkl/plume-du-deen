@@ -29,6 +29,14 @@ export const SECURITY_CONFIG = {
   }
 };
 
+function parseAllowedOrigins(value) {
+  if (!value || typeof value !== 'string') return [];
+  return value
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
 // Fonctions utilitaires de validation
 export function isValidEmail(email) {
   if (!email || typeof email !== 'string' || email.length > SECURITY_CONFIG.MAX_EMAIL_LENGTH) {
@@ -104,13 +112,26 @@ export function validateContactData(contact) {
   };
 }
 
-export function setSecurityHeaders(res) {
+export function setSecurityHeaders(arg1, arg2) {
+  // Backward compatible signature:
+  // - setSecurityHeaders(res)
+  // - setSecurityHeaders(req, res)
+  const req = arg2 ? arg1 : undefined;
+  const res = arg2 ? arg2 : arg1;
+
   Object.entries(SECURITY_CONFIG.SECURITY_HEADERS).forEach(([key, value]) => {
     res.setHeader(key, value);
   });
 
   // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', SECURITY_CONFIG.CORS_ORIGIN);
+  const allowedOrigins = parseAllowedOrigins(SECURITY_CONFIG.CORS_ORIGIN);
+  const requestOrigin = req?.headers?.origin;
+  const corsOrigin = requestOrigin && allowedOrigins.includes(requestOrigin)
+    ? requestOrigin
+    : (allowedOrigins[0] || 'http://localhost:3000');
+
+  res.setHeader('Access-Control-Allow-Origin', corsOrigin);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }

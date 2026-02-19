@@ -29,9 +29,13 @@ Dans le dashboard Vercel :
 1. Allez dans votre projet
 2. Settings → Environment Variables
 3. Ajoutez :
-   - `STRIPE_SECRET_KEY` : `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`
-   - `PAYPAL_CLIENT_ID` : Votre clé PayPal (optionnel)
-   - `PAYPAL_CLIENT_SECRET` : Votre secret PayPal (optionnel)
+   - `STRIPE_SECRET_KEY` : votre clé secrète Stripe (`sk_live_...`)
+   - `PAYPAL_CLIENT_ID` : votre clé PayPal (optionnel)
+   - `PAYPAL_CLIENT_SECRET` : votre secret PayPal (optionnel)
+   - `RESEND_API_KEY` : votre clé Resend (`re_...`)
+   - `ADMIN_EMAIL` : email qui reçoit les messages de contact (ex: `contact@plume-du-deen.com`)
+   - `FROM_EMAIL` : expéditeur (ex: `Plume du Deen <contact@plume-du-deen.com>`)
+   - `FRONTEND_URL` : origine GitHub Pages (ex: `https://<user>.github.io`) — peut être une liste séparée par des virgules
 
 ### Étape 6 : Redéployer
 ```bash
@@ -39,14 +43,12 @@ vercel --prod
 ```
 
 ### Étape 7 : Mettre à jour l'URL de l'API
-Dans `client/src/hooks/useStripePayment.ts`, changez :
-```javascript
-const response = await fetch('/api/create-payment-intent', {
-```
-en :
-```javascript
-const response = await fetch('https://votre-domaine.vercel.app/api/create-payment-intent', {
-```
+Pour un frontend hébergé sur GitHub Pages, configurez l'URL de l'API via une variable Vite :
+
+1. Définissez `VITE_API_BASE_URL` lors du build du frontend (GitHub Actions / variables de repo) :
+   - Exemple : `VITE_API_BASE_URL=https://votre-projet.vercel.app`
+
+2. Le frontend utilisera automatiquement cette base pour tous les appels `/api/...`.
 
 ## 🧪 Tester les paiements
 

@@ -8,11 +8,11 @@ export default function Products() {
   const addToCart = (product: any) => {
     dispatch({ type: 'ADD_ITEM', payload: {
       id: product.id,
-      name: `${product.title} - Version numérique`,
+      name: `${product.title} - PDF`,
       price: product.price,
       image: product.image,
       description: product.description,
-      format: 'digital'
+      format: 'pdf'
     }});
   };
 
@@ -72,7 +72,7 @@ export default function Products() {
             </h3>
           </div>
           <p className="text-green-700 dark:text-green-300 mb-3">
-            Tous nos produits sont <strong className="text-green-800 dark:text-green-100">100% numériques</strong> et disponibles <strong className="text-green-800 dark:text-green-100">immédiatement</strong> au format PDF après achat.
+            Tous nos produits sont des <strong className="text-green-800 dark:text-green-100">PDFs</strong> et disponibles <strong className="text-green-800 dark:text-green-100">immédiatement</strong> après achat.
           </p>
           <p className="text-sm text-green-600 dark:text-green-400">
             💝 <strong>1 CHF</strong> sera versé dans des causes de <strong>sadaqa jariya</strong> pour chaque vente.
@@ -100,7 +100,7 @@ export default function Products() {
                 </div>
                 {/* Digital Badge */}
                 <div className="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded-sm text-xs font-semibold">
-                  Numérique
+                  PDF
                 </div>
               </div>
 
