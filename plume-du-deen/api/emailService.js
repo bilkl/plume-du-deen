@@ -44,6 +44,101 @@ export async function sendOrderConfirmationEmail(orderData, attachments = []) {
   }
 }
 
+function createAdminOrderNotificationHTML(orderData) {
+  const {
+    orderId,
+    customerName,
+    customerEmail,
+    items = [],
+    total,
+    createdAt,
+    customerAddress,
+    customerCity,
+    customerPostalCode,
+    customerCountry
+  } = orderData
+
+  const itemsHTML = items
+    .map(item => {
+      const qty = Number(item.quantity || 1)
+      const price = Number(item.price || 0)
+      return `<li><strong>${item.name}</strong> — Qté: ${qty} — CHF ${(price * qty).toFixed(2)}</li>`
+    })
+    .join('')
+
+  return `
+    <!DOCTYPE html>
+    <html lang="fr">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Nouvelle commande - ${orderId}</title>
+    </head>
+    <body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; padding: 20px; background-color: #f9f9f9;">
+      <div style="max-width: 720px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 10px;">
+        <h2 style="margin-top: 0;">Nouvelle commande reçue</h2>
+        <p style="margin: 6px 0;"><strong>Commande:</strong> ${orderId}</p>
+        <p style="margin: 6px 0;"><strong>Date:</strong> ${createdAt ? new Date(createdAt).toLocaleString('fr-FR') : ''}</p>
+        <p style="margin: 6px 0;"><strong>Client:</strong> ${customerName} — <a href="mailto:${customerEmail}">${customerEmail}</a></p>
+
+        <h3>Articles</h3>
+        <ul>
+          ${itemsHTML}
+        </ul>
+
+        <p style="margin: 6px 0;"><strong>Total:</strong> CHF ${Number(total || 0).toFixed(2)}</p>
+
+        ${(customerAddress || customerCity || customerPostalCode || customerCountry)
+          ? `
+        <h3>Adresse</h3>
+        <p style="margin: 6px 0;">
+          ${customerAddress || ''}<br />
+          ${(customerPostalCode || '').toString()} ${(customerCity || '').toString()}<br />
+          ${customerCountry || ''}
+        </p>
+        `
+          : ''}
+      </div>
+    </body>
+    </html>
+  `
+}
+
+/**
+ * Envoie une notification de nouvelle commande à l'admin
+ * @param {Object} orderData - Données de la commande
+ */
+export async function sendAdminOrderNotification(orderData) {
+  try {
+    if (!resend) {
+      throw new Error('RESEND_API_KEY not configured. Set RESEND_API_KEY to enable email sending.')
+    }
+
+    const adminEmail = process.env.ADMIN_EMAIL || 'contact@plume-du-deen.com'
+    const { orderId } = orderData
+
+    const htmlContent = createAdminOrderNotificationHTML(orderData)
+
+    const { data, error } = await resend.emails.send({
+      from: 'Plume du Deen <commandes@plume-du-deen.com>',
+      to: [adminEmail],
+      subject: `Nouvelle commande - ${orderId}`,
+      html: htmlContent,
+    })
+
+    if (error) {
+      console.error("Erreur lors de l'envoi de la notification admin:", error)
+      throw new Error("Erreur lors de l'envoi de la notification admin")
+    }
+
+    console.log('Notification admin envoyée avec succès:', data)
+    return { success: true, emailId: data?.id }
+  } catch (error) {
+    console.error("Erreur lors de l'envoi de la notification admin:", error)
+    throw error
+  }
+}
+
 function createOrderConfirmationHTML(orderData, hasAttachments = false, attachments = []) {
   const { orderId, customerName, items, total, createdAt } = orderData
 
