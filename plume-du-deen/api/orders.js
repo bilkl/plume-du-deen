@@ -38,6 +38,46 @@ function isValidZeroOrPositiveAmount(amount) {
     amount <= SECURITY_CONFIG.MAX_AMOUNT;
 }
 
+async function parseJsonBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+
+  if (typeof req.body === 'string') {
+    try {
+      return JSON.parse(req.body);
+    } catch {
+      return {};
+    }
+  }
+
+  const chunks = [];
+  let totalSize = 0;
+  const maxSizeBytes = 1_000_000; // 1MB
+
+  await new Promise((resolve, reject) => {
+    req.on('data', chunk => {
+      totalSize += chunk.length;
+      if (totalSize > maxSizeBytes) {
+        reject(new Error('Payload trop volumineux'));
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', resolve);
+    req.on('error', reject);
+  });
+
+  if (chunks.length === 0) return {};
+
+  const raw = Buffer.concat(chunks).toString('utf8');
+  if (!raw) return {};
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
 export default async function handler(req, res) {
   // Appliquer les headers de sécurité
   setSecurityHeaders(req, res);
@@ -49,12 +89,13 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'POST') {
       // Créer une nouvelle commande
+      const body = await parseJsonBody(req);
       const {
         customer,
         items,
         total,
         paymentIntentId
-      } = req.body;
+      } = body;
 
       // Validation des données d'entrée
       if (!customer || !items || total === undefined || total === null || !paymentIntentId) {
