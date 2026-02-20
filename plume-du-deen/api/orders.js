@@ -39,7 +39,25 @@ function isValidZeroOrPositiveAmount(amount) {
 }
 
 async function parseJsonBody(req) {
-  if (req.body && typeof req.body === 'object') return req.body;
+  if (req.body) {
+    if (Buffer.isBuffer(req.body)) {
+      try {
+        return JSON.parse(req.body.toString('utf8'));
+      } catch {
+        return {};
+      }
+    }
+
+    if (req.body instanceof Uint8Array) {
+      try {
+        return JSON.parse(Buffer.from(req.body).toString('utf8'));
+      } catch {
+        return {};
+      }
+    }
+
+    if (typeof req.body === 'object') return req.body;
+  }
 
   if (typeof req.body === 'string') {
     try {
