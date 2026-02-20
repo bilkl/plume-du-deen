@@ -275,6 +275,7 @@ export default function CheckoutForm() {
             customer: formData,
             items: state.items,
             total: state.total,
+            paymentIntentId: 'MANUAL',
             paymentMethod: 'bank-transfer',
             status: 'pending'
           }),
