@@ -39,32 +39,55 @@ function isValidZeroOrPositiveAmount(amount) {
 }
 
 async function parseJsonBody(req) {
-  if (req.body) {
-    if (Buffer.isBuffer(req.body)) {
+  const tryParse = (value) => {
+    if (!value) return undefined;
+
+    if (Buffer.isBuffer(value)) {
       try {
-        return JSON.parse(req.body.toString('utf8'));
+        return JSON.parse(value.toString('utf8'));
       } catch {
-        return {};
+        return undefined;
       }
     }
 
-    if (req.body instanceof Uint8Array) {
+    if (value instanceof Uint8Array) {
       try {
-        return JSON.parse(Buffer.from(req.body).toString('utf8'));
+        return JSON.parse(Buffer.from(value).toString('utf8'));
       } catch {
-        return {};
+        return undefined;
       }
     }
 
-    if (typeof req.body === 'object') return req.body;
-  }
-
-  if (typeof req.body === 'string') {
-    try {
-      return JSON.parse(req.body);
-    } catch {
-      return {};
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return undefined;
+      }
     }
+
+    if (typeof value === 'object') {
+      try {
+        return Object.keys(value).length > 0 ? value : undefined;
+      } catch {
+        return undefined;
+      }
+    }
+
+    return undefined;
+  };
+
+  const candidates = [
+    req.body,
+    req.rawBody,
+    req.bodyRaw,
+    req._body,
+    req._rawBody
+  ];
+
+  for (const candidate of candidates) {
+    const parsed = tryParse(candidate);
+    if (parsed) return parsed;
   }
 
   const chunks = [];
