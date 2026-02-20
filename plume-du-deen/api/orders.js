@@ -123,6 +123,10 @@ export default async function handler(req, res) {
   // Appliquer les headers de sécurité
   setSecurityHeaders(req, res);
 
+  if (process.env.VERCEL_GIT_COMMIT_SHA) {
+    res.setHeader('X-Plume-Commit', process.env.VERCEL_GIT_COMMIT_SHA);
+  }
+
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
