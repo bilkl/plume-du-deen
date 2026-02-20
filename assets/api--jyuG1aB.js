@@ -1,0 +1,1 @@
+function i(){if(typeof window>"u")return"";const e=window.location.hostname,n=e==="plume-du-deen.com"||e==="www.plume-du-deen.com",o=e.endsWith(".github.io");return n||o?"https://plume-du-deen.vercel.app":""}const t=i().replace(/\/+$/,"");function r(e){const n=e.startsWith("/")?e:`/${e}`;return t?`${t}${n}`:n}export{r as a};
