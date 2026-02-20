@@ -25,8 +25,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lora:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
     <!-- Favicon et manifest -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+    <link rel="apple-touch-icon" href="/images/logo.png" />
 
     <!-- Meta tags SEO de base -->
     <meta name="description" content="Découvrez notre collection de produits spirituels islamiques : Livres coraniques, Planners Ramadan, et plus encore. Qualité, authenticité et spiritualité." />
@@ -44,6 +44,15 @@
   </head>
 
   <body>
+    <script>
+      ;(() => {
+        const redirect = sessionStorage.getItem('spa:redirect')
+        if (redirect) {
+          sessionStorage.removeItem('spa:redirect')
+          history.replaceState(null, '', redirect)
+        }
+      })()
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- Analytics temporarily disabled to avoid 400 errors -->
