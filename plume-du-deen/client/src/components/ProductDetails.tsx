@@ -100,7 +100,7 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
       {/* Price Display */}
       <div className="bg-secondary/50 border border-border rounded-lg p-6 text-center">
         <div className="text-3xl font-bold text-primary mb-2">
-          {product.price === 0 ? 'Offert' : `${product.price} CHF`}
+          {product.price === 0 ? 'Offert' : `${product.price.toFixed(2)} CHF`}
         </div>
         <p className="text-sm text-muted-foreground">
           Version numérique - PDF

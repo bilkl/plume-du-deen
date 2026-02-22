@@ -126,7 +126,7 @@ export default function Products() {
                     onClick={() => addToCart({ ...product, price: product.price, format: 'digital' })}
                     className="w-full px-4 py-3 bg-primary text-primary-foreground font-semibold rounded-sm transition-all duration-300 hover:bg-primary/90 hover:shadow-lg flex items-center justify-center gap-2"
                   >
-                    Ajouter au panier - {product.price === 0 ? 'Offert' : `${product.price} CHF`}
+                    Ajouter au panier - {product.price === 0 ? 'Offert' : `${product.price.toFixed(2)} CHF`}
                   </button>
                 </div>
               </div>
