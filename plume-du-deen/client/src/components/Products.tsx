@@ -24,7 +24,7 @@ export default function Products() {
       description: 'Dossier de 30 cartes avec les invocations du Coran pour accompagner votre quotidien.',
       image: '/images/invocations.png',
       color: 'bg-blue-50 dark:bg-blue-900',
-      price: 9.99,
+      price: 4.9,
     },
     {
       id: 2,
@@ -42,7 +42,7 @@ export default function Products() {
       description: 'Entrer en relation avec les Noms d\'Allah à travers 99 cartes spirituelles.',
       image: '/images/99noms.png',
       color: 'bg-rose-50 dark:bg-rose-900',
-      price: 12.99,
+      price: 9.9,
     },
   ];
 

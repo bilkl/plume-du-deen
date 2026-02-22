@@ -23,7 +23,7 @@ Ses Noms les plus beaux.
 Parfait comme cadeau pour les occasions spéciales ou pour enrichir votre pratique
 quotidienne, ce jeu de cartes devient un compagnon précieux dans votre quête spirituelle.`,
     image: "/images/99noms.png",
-    price: 12.99,
+    price: 9.9,
     features: [
       "99 cartes avec les Noms d'Allah",
       "Significations détaillées",

@@ -19,7 +19,7 @@ constant de la présence divine dans votre vie.
 Que vous soyez débutant ou pratiquant expérimenté, ces cartes vous accompagneront dans
 vos moments de prière, de méditation ou de simple recueillement spirituel.`,
     image: "/images/invocations.png",
-    price: 9.99,
+    price: 4.9,
     features: [
       "30 cartes d'invocations sélectionnées",
       "Traductions claires et accessibles",
