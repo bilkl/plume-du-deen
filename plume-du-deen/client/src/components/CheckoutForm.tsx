@@ -26,14 +26,7 @@ export default function CheckoutForm() {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    country: 'France',
-    paymentMethod: 'card',
-    acceptTerms: false,
-    acceptPrivacy: false
+    paymentMethod: 'card'
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -84,28 +77,7 @@ export default function CheckoutForm() {
         if (!value) error = 'L\'email est requis'
         else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value as string)) error = 'Adresse email invalide'
         break
-      case 'phone':
-        if (!value) error = 'Le numéro de téléphone est requis'
-        else if (!/^(\+33|0)[1-9](\d{2}){4}$/.test(value as string)) error = 'Numéro de téléphone invalide (format: 06 12 34 56 78)'
-        break
-      case 'address':
-        if (!value || (value as string).length < 5) error = 'L\'adresse doit contenir au moins 5 caractères'
-        break
-      case 'city':
-        if (!value || (value as string).length < 2) error = 'La ville doit contenir au moins 2 caractères'
-        break
-      case 'postalCode':
-        if (!value) error = 'Le code postal est requis'
-        else if (!/^\d{5}$/.test(value as string)) error = 'Code postal invalide (5 chiffres)'
-        break
-      case 'country':
-        if (!value || (value as string).length < 2) error = 'Le pays est requis'
-        break
-      case 'acceptTerms':
-        if (!value) error = 'Vous devez accepter les conditions générales'
-        break
-      case 'acceptPrivacy':
-        if (!value) error = 'Vous devez accepter la politique de confidentialité'
+      default:
         break
     }
 
@@ -122,11 +94,10 @@ export default function CheckoutForm() {
 
   const validateAllFields = () => {
     const newErrors: Record<string, string> = {}
-    
     const fieldsToValidate: (keyof OrderFormData)[] = [
-      'firstName', 'lastName', 'email', 'phone', 'address', 'city', 'postalCode', 'country', 'acceptTerms', 'acceptPrivacy'
+      'firstName', 'lastName', 'email'
     ]
-    
+
     fieldsToValidate.forEach(field => {
       const value = formData[field]
       let error: string | undefined
@@ -144,28 +115,7 @@ export default function CheckoutForm() {
           if (!value) error = 'L\'email est requis'
           else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value as string)) error = 'Adresse email invalide'
           break
-        case 'phone':
-          if (!value) error = 'Le numéro de téléphone est requis'
-          else if (!/^\+?[\d\s\-\(\)]{7,20}$/.test(value as string)) error = 'Numéro de téléphone invalide (format international accepté)'
-          break
-        case 'address':
-          if (!value || (value as string).length < 5) error = 'L\'adresse doit contenir au moins 5 caractères'
-          break
-        case 'city':
-          if (!value || (value as string).length < 2) error = 'La ville doit contenir au moins 2 caractères'
-          break
-        case 'postalCode':
-          if (!value) error = 'Le code postal est requis'
-          else if (!/^\d{5}$/.test(value as string)) error = 'Code postal invalide (5 chiffres)'
-          break
-        case 'country':
-          if (!value || (value as string).length < 2) error = 'Le pays est requis'
-          break
-        case 'acceptTerms':
-          if (value !== true) error = 'Vous devez accepter les conditions générales'
-          break
-        case 'acceptPrivacy':
-          if (value !== true) error = 'Vous devez accepter la politique de confidentialité'
+        default:
           break
       }
 
@@ -446,93 +396,6 @@ export default function CheckoutForm() {
                 )}
               </div>
 
-              <div>
-                <Label htmlFor="phone">Téléphone *</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone || ''}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  onBlur={() => validateField('phone')}
-                  placeholder="06 12 34 56 78"
-                  className={errors.phone ? 'border-destructive' : ''}
-                />
-                {errors.phone && (
-                  <p className="text-sm text-destructive mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.phone}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="address">Adresse *</Label>
-                <Textarea
-                  id="address"
-                  value={formData.address || ''}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                  onBlur={() => validateField('address')}
-                  className={errors.address ? 'border-destructive' : ''}
-                />
-                {errors.address && (
-                  <p className="text-sm text-destructive mt-1 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.address}
-                  </p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="postalCode">Code postal *</Label>
-                  <Input
-                    id="postalCode"
-                    value={formData.postalCode || ''}
-                    onChange={(e) => handleInputChange('postalCode', e.target.value)}
-                    onBlur={() => validateField('postalCode')}
-                    className={errors.postalCode ? 'border-destructive' : ''}
-                  />
-                  {errors.postalCode && (
-                    <p className="text-sm text-destructive mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.postalCode}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="city">Ville *</Label>
-                  <Input
-                    id="city"
-                    value={formData.city || ''}
-                    onChange={(e) => handleInputChange('city', e.target.value)}
-                    onBlur={() => validateField('city')}
-                    className={errors.city ? 'border-destructive' : ''}
-                  />
-                  {errors.city && (
-                    <p className="text-sm text-destructive mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      {errors.city}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="country">Pays *</Label>
-                <Select
-                  value={formData.country || 'France'}
-                  onValueChange={(value) => handleInputChange('country', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="France">France</SelectItem>
-                    <SelectItem value="Belgique">Belgique</SelectItem>
-                    <SelectItem value="Suisse">Suisse</SelectItem>
-                    <SelectItem value="Canada">Canada</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
               {!isFreeOrder ? (
                 <div>
@@ -564,53 +427,7 @@ export default function CheckoutForm() {
                 </div>
               )}
 
-              <div className="space-y-3">
-                <div className="flex items-start gap-2">
-                  <input
-                    type="checkbox"
-                    id="acceptTerms"
-                    checked={formData.acceptTerms || false}
-                    onChange={(e) => handleInputChange('acceptTerms', e.target.checked)}
-                    className="mt-1"
-                  />
-                  <Label htmlFor="acceptTerms" className="text-sm leading-relaxed">
-                    J'accepte les{' '}
-                    <Link href="/conditions-generales" className="text-primary underline">
-                      conditions générales de vente
-                    </Link>{' '}
-                    *
-                  </Label>
-                </div>
-                {errors.acceptTerms && (
-                  <p className="text-sm text-destructive flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.acceptTerms}
-                  </p>
-                )}
-
-                <div className="flex items-start gap-2">
-                  <input
-                    type="checkbox"
-                    id="acceptPrivacy"
-                    checked={formData.acceptPrivacy || false}
-                    onChange={(e) => handleInputChange('acceptPrivacy', e.target.checked)}
-                    className="mt-1"
-                  />
-                  <Label htmlFor="acceptPrivacy" className="text-sm leading-relaxed">
-                    J'accepte la{' '}
-                    <Link href="/politique-confidentialite" className="text-primary underline">
-                      politique de confidentialité
-                    </Link>{' '}
-                    *
-                  </Label>
-                </div>
-                {errors.acceptPrivacy && (
-                  <p className="text-sm text-destructive flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {errors.acceptPrivacy}
-                  </p>
-                )}
-              </div>
+              
 
               {!showContactInfo && (
                 <Button
