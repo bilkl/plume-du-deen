@@ -25,6 +25,8 @@ interface ProductReviewsProps {
   productId: number
   reviews: Review[]
   onAddReview?: (review: Omit<Review, 'id' | 'date' | 'helpful'>) => void
+  onHelpful?: (reviewId: string) => void
+  onReport?: (reviewId: string, reason: string) => void
   className?: string
 }
 
@@ -275,11 +277,24 @@ export default function ProductReviews({
                       </div>
 
                       <div className="flex items-center gap-4 pt-2">
-                        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-muted-foreground hover:text-foreground"
+                          onClick={() => onHelpful?.(review.id)}
+                        >
                           <ThumbsUp className="w-4 h-4 mr-1" />
                           Utile ({review.helpful})
                         </Button>
-                        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-muted-foreground hover:text-foreground"
+                          onClick={() => {
+                            const reason = prompt('Motif du signalement (facultatif)') || 'inapproprié'
+                            onReport?.(review.id, reason)
+                          }}
+                        >
                           <Flag className="w-4 h-4 mr-1" />
                           Signaler
                         </Button>

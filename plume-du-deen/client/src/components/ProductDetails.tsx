@@ -28,7 +28,7 @@ interface ProductDetailsProps {
 
 export default function ProductDetails({ product, className }: ProductDetailsProps) {
   const { dispatch } = useCart()
-  const { reviews, addReview } = useReviews(product.id)
+  const { reviews, addReview, updateReviewHelpful, reportReview } = useReviews(product.id)
 
   const handleAddToCart = () => {
     const cartItem = {
@@ -147,6 +147,8 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
         productId={product.id}
         reviews={reviews}
         onAddReview={addReview}
+        onHelpful={updateReviewHelpful}
+        onReport={reportReview}
       />
     </div>
   )
