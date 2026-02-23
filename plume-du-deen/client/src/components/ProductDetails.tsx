@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { ShoppingCart, Heart, Share2, Star } from 'lucide-react'
+import { ShoppingCart, Share2 } from 'lucide-react'
 import { useCart } from '@/contexts/CartContext'
-import { useFavorites } from '@/hooks/useFavorites'
 import { analytics } from '@/lib/analytics'
 import { showSuccessToast } from '@/lib/toast'
 import ProductReviews from './ProductReviews'
@@ -29,7 +28,6 @@ interface ProductDetailsProps {
 
 export default function ProductDetails({ product, className }: ProductDetailsProps) {
   const { dispatch } = useCart()
-  const { isFavorite, toggleFavorite } = useFavorites()
   const { reviews, addReview } = useReviews(product.id)
 
   const handleAddToCart = () => {
@@ -46,18 +44,6 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
     analytics.cartAdd(product.id, product.name, 1)
   }
 
-  const handleToggleFavorite = () => {
-    toggleFavorite({
-      id: product.id,
-      name: product.name,
-      image: product.image,
-      price: product.price
-    })
-
-    if (!isFavorite(product.id)) {
-      showSuccessToast(`${product.name} ajouté aux favoris`)
-    }
-  }
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -118,18 +104,6 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
         </button>
 
         <div className="flex gap-3">
-          <button
-            onClick={handleToggleFavorite}
-            className={cn(
-              "p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-center",
-              isFavorite(product.id)
-                ? "border-red-500 bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400"
-                : "border-border hover:border-red-300 text-muted-foreground hover:text-red-500"
-            )}
-          >
-            <Heart className={cn("w-5 h-5", isFavorite(product.id) && "fill-current")} />
-          </button>
-
           <button
             onClick={handleShare}
             className="p-4 rounded-lg border-2 border-border hover:border-primary text-muted-foreground hover:text-primary transition-all duration-200 flex items-center justify-center"

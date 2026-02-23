@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X, Heart, ShoppingCart, Sun, Moon } from 'lucide-react';
+import { Menu, X, ShoppingCart, Sun, Moon } from 'lucide-react';
 import { Link } from 'wouter';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useCart } from '@/contexts/CartContext';
@@ -55,9 +55,7 @@ export default function Header() {
                 <Sun className="w-5 h-5 text-foreground" />
               )}
             </button>
-            <button className="p-2 hover:bg-secondary rounded-sm transition-colors">
-              <Heart className="w-5 h-5 text-foreground" />
-            </button>
+            {/* favorites removed */}
             <Link href="/panier">
               <button className="relative p-2 hover:bg-secondary rounded-sm transition-colors">
                 <ShoppingCart className="w-5 h-5 text-foreground" />

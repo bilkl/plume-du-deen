@@ -1,7 +1,7 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Link } from 'wouter';
-import { Star, Heart, BookOpen, Calendar, Users, Award } from 'lucide-react';
+import { Star, BookOpen, Calendar, Users, Award } from 'lucide-react';
 
 export default function Ramadan() {
   return (
@@ -64,7 +64,7 @@ export default function Ramadan() {
               </div>
 
               <div className="text-center p-4 sm:p-6 rounded-lg border border-border hover:shadow-lg transition-shadow">
-                <Heart className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-primary mx-auto mb-3 sm:mb-4" />
+                <Star className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-primary mx-auto mb-3 sm:mb-4" />
                 <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2">Connexion Intérieure</h3>
                 <p className="text-sm sm:text-base text-muted-foreground">
                   Des méditations, invocations et réflexions guidées pour approfondir votre relation avec Allah.
