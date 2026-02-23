@@ -34,6 +34,8 @@ export default function ProductReviews({
   productId,
   reviews,
   onAddReview,
+  onHelpful,
+  onReport,
   className
 }: ProductReviewsProps) {
   const [showReviewForm, setShowReviewForm] = useState(false)

@@ -7,6 +7,10 @@
       "use": "@vercel/node"
     },
     {
+      "src": "api/reviews.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "api/orders.js",
       "use": "@vercel/node"
     },
@@ -27,6 +31,10 @@
     {
       "src": "^/api/contact$",
       "dest": "/api/contact.js"
+    },
+    {
+      "src": "^/api/reviews$",
+      "dest": "/api/reviews.js"
     },
     {
       "src": "^/api/orders$",

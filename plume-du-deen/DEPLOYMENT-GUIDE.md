@@ -60,9 +60,11 @@ Une fois déployé :
 
 ⚠️ **Attention** : Les clés sont maintenant en PRODUCTION. Tout paiement sera réel !
 
-## 📧 Clés API Stripe
+## 🔑 Clés API Stripe
 
-- **Publishable Key** : `pk_live_51SsJv4GfdpOmitJuOQD2ZvlcHL24bsV7mVjlLx7RNKbAY5OHgQKj8wixXxH7DcuVJB4lED7A4Cz7EW3UFDC6P34U00lX0uMjMU`
-- **Secret Key** : `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`
+- **Publishable Key** : commence par `pk_` (ex: `pk_live_...` ou `pk_test_...`)
+- **Secret Key** : commence par `sk_` (ex: `sk_live_...` ou `sk_test_...`)
 
-⚠️ **Important** : Ces clés sont pour la production. Pour les tests, utilisez des clés test depuis votre dashboard Stripe.
+Récupérez-les dans votre dashboard Stripe (Developers → API keys).
+
+⚠️ **Sécurité** : ne mettez jamais de clés réelles dans Git (docs, code, screenshots). Si une clé a été exposée publiquement, régénérez-la immédiatement dans Stripe et mettez à jour Vercel.

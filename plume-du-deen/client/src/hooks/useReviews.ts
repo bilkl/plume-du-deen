@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
+import { apiUrl } from '@/lib/api'
 
 export interface Review {
   id: string
@@ -58,9 +59,25 @@ export function useReviews(productId: number): UseReviewsReturn {
       setLoading(true)
       setError(null)
 
-      // Simulate small delay
-      await new Promise(resolve => setTimeout(resolve, 250))
+      // Try server first
+      try {
+        const res = await fetch(apiUrl(`/api/reviews?productId=${productId}`))
+        if (res.ok) {
+          const payload = await res.json()
+          if (payload && Array.isArray(payload.reviews)) {
+            setReviews(payload.reviews)
+            // cache locally as fallback
+            const all = loadAllReviewsFromStorage()
+            all[productId] = payload.reviews
+            saveAllReviewsToStorage(all)
+            return
+          }
+        }
+      } catch (err) {
+        console.warn('Reviews API unavailable, falling back to localStorage', err)
+      }
 
+      // Fallback to localStorage
       const all = loadAllReviewsFromStorage()
       const productReviews = all[productId] || []
       setReviews(productReviews)
@@ -74,9 +91,33 @@ export function useReviews(productId: number): UseReviewsReturn {
 
   const addReview = useCallback(async (reviewData: Omit<Review, 'id' | 'date' | 'helpful'>) => {
     try {
-      // Simulate API call / processing delay
-      await new Promise(resolve => setTimeout(resolve, 500))
+      // Send to server
+      try {
+        const res = await fetch(apiUrl('/api/reviews'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...reviewData, productId, action: 'add' })
+        })
 
+        if (res.ok) {
+          const payload = await res.json()
+          const created = payload.review
+          setReviews(prev => {
+            const updated = [created, ...prev]
+            // cache locally
+            const all = loadAllReviewsFromStorage()
+            all[productId] = updated
+            saveAllReviewsToStorage(all)
+            return updated
+          })
+          showSuccessToast('Avis ajouté avec succès !')
+          return
+        }
+      } catch (err) {
+        console.warn('Failed to post review to API, falling back to local', err)
+      }
+
+      // Fallback: persist locally if server unavailable
       const newReview: Review = {
         ...reviewData,
         id: Date.now().toString(),
@@ -86,13 +127,12 @@ export function useReviews(productId: number): UseReviewsReturn {
 
       setReviews(prev => {
         const updated = [newReview, ...prev]
-        // persist
         const all = loadAllReviewsFromStorage()
         all[productId] = updated
         saveAllReviewsToStorage(all)
         return updated
       })
-      showSuccessToast('Avis ajouté avec succès !')
+      showSuccessToast('Avis ajouté (enregistré localement)')
     } catch (err) {
       showErrorToast('Erreur lors de l\'ajout de l\'avis')
       console.error('Error adding review:', err)
@@ -102,9 +142,30 @@ export function useReviews(productId: number): UseReviewsReturn {
 
   const updateReviewHelpful = useCallback(async (reviewId: string) => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300))
+      // Try server
+      try {
+        const res = await fetch(apiUrl('/api/reviews'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'helpful', reviewId })
+        })
+        if (res.ok) {
+          const payload = await res.json()
+          const updatedReview = payload.review
+          setReviews(prev => {
+            const updated = prev.map(r => r.id === updatedReview.id ? updatedReview : r)
+            const all = loadAllReviewsFromStorage()
+            all[productId] = updated
+            saveAllReviewsToStorage(all)
+            return updated
+          })
+          return
+        }
+      } catch (err) {
+        console.warn('Failed to update helpful on server, falling back to local', err)
+      }
 
+      // Fallback local increment
       setReviews(prev => {
         const updated = prev.map(review =>
           review.id === reviewId
@@ -123,11 +184,23 @@ export function useReviews(productId: number): UseReviewsReturn {
 
   const reportReview = useCallback(async (reviewId: string, reason: string) => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300))
+      // Try server
+      try {
+        const res = await fetch(apiUrl('/api/reviews'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'report', reviewId, reason })
+        })
+        if (res.ok) {
+          showSuccessToast('Signalement envoyé. Merci pour votre contribution.')
+          return
+        }
+      } catch (err) {
+        console.warn('Failed to send report to server, logging locally', err)
+      }
 
-      showSuccessToast('Signalement envoyé. Merci pour votre contribution.')
-      console.log('Review reported:', { reviewId, reason })
+      showSuccessToast('Signalement enregistré localement. Merci.')
+      console.log('Review reported (local):', { reviewId, reason })
     } catch (err) {
       showErrorToast('Erreur lors du signalement')
       console.error('Error reporting review:', err)
