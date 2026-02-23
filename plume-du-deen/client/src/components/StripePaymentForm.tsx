@@ -260,7 +260,7 @@ export default function StripePaymentForm(props: StripePaymentFormProps) {
               Le formulaire Stripe ne peut pas s’afficher car la clé Stripe publishable n’est pas configurée.
             </p>
             <p className="text-muted-foreground">
-              Vous pouvez choisir PayPal, virement, ou nous contacter pour Orange Money.
+              Vous pouvez choisir PayPal ou nous contacter pour Orange Money.
             </p>
           </div>
         </CardContent>

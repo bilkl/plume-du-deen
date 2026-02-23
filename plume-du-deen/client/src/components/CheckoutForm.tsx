@@ -214,31 +214,7 @@ export default function CheckoutForm() {
         return
       }
 
-      // For bank-transfer, save order with pending status
-      if (formData.paymentMethod === 'bank-transfer') {
-        const response = await fetch(apiUrl('/api/orders'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            customer: formData,
-            items: state.items,
-            total: state.total,
-            paymentIntentId: 'MANUAL',
-            paymentMethod: 'bank-transfer',
-            status: 'pending'
-          }),
-        })
-
-        if (!response.ok) throw new Error('Erreur lors de la création de la commande')
-
-        const result = await response.json()
-        dispatch({ type: 'CLEAR_CART' })
-        showSuccessToast(`Commande créée ! ID: ${result.orderId}. Instructions de paiement envoyées par email.`)
-        setIsSubmitting(false)
-        return
-      }
+      // 'Virement bancaire' removed — other payment flows handled above
 
       // Create order object
       const order = {
@@ -410,7 +386,7 @@ export default function CheckoutForm() {
                     <SelectContent>
                       <SelectItem value="card">Carte bancaire</SelectItem>
                       <SelectItem value="paypal">PayPal</SelectItem>
-                      <SelectItem value="bank-transfer">Virement bancaire</SelectItem>
+                      {/* Virement bancaire option removed */}
                       <SelectItem value="contact">Autre moyen de paiement (Orange Money, etc.)</SelectItem>
                     </SelectContent>
                   </Select>
