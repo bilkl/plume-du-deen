@@ -66,8 +66,8 @@ export default function TermsAndConditions() {
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Paiement</h2>
-              <p className="text-gray-700 mb-4">
-                Le paiement s'effectue en ligne via des prestataires sécurisés (Stripe pour les paiements par carte, PayPal pour les paiements via PayPal). D'autres moyens de paiement peuvent être proposés sur demande (ex : virement), via contact préalable.
+                <p className="text-gray-700 mb-4">
+                Le paiement s'effectue en ligne via des prestataires sécurisés (Stripe pour les paiements par carte, PayPal pour les paiements via PayPal). D'autres moyens de paiement peuvent être proposés sur demande, via contact préalable.
               </p>
               <p className="text-gray-700 mb-4">
                 Le débit de la carte n'est effectué qu'après confirmation de la commande et vérification des informations de paiement.

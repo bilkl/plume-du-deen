@@ -75,7 +75,6 @@ export default function ReturnsAndRefunds() {
               </p>
               <ul className="list-disc list-inside text-gray-700 mb-4 ml-4">
                 <li>Carte bancaire : remboursement sur la carte utilisée</li>
-                <li>Virement bancaire si nécessaire</li>
               </ul>
             </section>
 
