@@ -31,8 +31,7 @@ export default function PaymentSuccess() {
 
           <div className="text-sm text-muted-foreground space-y-2">
             <p>📧 Un email de confirmation vous a été envoyé</p>
-            <p>📦 Préparation de votre commande en cours</p>
-            <p>🚚 Livraison estimée : 3-5 jours ouvrés</p>
+            <p>📚 Vos produits numériques sont livrés par email</p>
           </div>
 
           <div className="flex flex-col gap-3 pt-4">
