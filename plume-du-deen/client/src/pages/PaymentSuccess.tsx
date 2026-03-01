@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLocation } from 'wouter'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, Home, ShoppingBag, UserPlus } from 'lucide-react'
+import { CheckCircle, Home, ShoppingBag } from 'lucide-react'
 
 export default function PaymentSuccess() {
   const [, setLocation] = useLocation()
@@ -33,11 +33,6 @@ export default function PaymentSuccess() {
             <p>📧 Un email de confirmation vous a été envoyé</p>
             <p>📦 Préparation de votre commande en cours</p>
             <p>🚚 Livraison estimée : 3-5 jours ouvrés</p>
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-4">
-              <p className="text-sm text-amber-800">
-                <strong>💡 Conseil :</strong> Créez un compte pour suivre vos commandes et bénéficier de réductions futures !
-              </p>
-            </div>
           </div>
 
           <div className="flex flex-col gap-3 pt-4">
@@ -48,14 +43,6 @@ export default function PaymentSuccess() {
             >
               <ShoppingBag className="w-4 h-4 mr-2" />
               Continuer mes achats
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setLocation('/creer-compte')}
-              className="w-full"
-            >
-              <UserPlus className="w-4 h-4 mr-2" />
-              Créer un compte (optionnel)
             </Button>
             <Button
               variant="ghost"
