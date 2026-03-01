@@ -25,7 +25,7 @@ async function testEmailSystem() {
       },
       {
         id: '2',
-        name: 'Planner Ramadan 2024',
+        name: 'Planner Ramadan 2026',
         price: 25.00,
         quantity: 2,
         image: 'https://example.com/planner.jpg'

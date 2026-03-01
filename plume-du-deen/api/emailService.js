@@ -1,6 +1,33 @@
 import { Resend } from 'resend'
 import fs from 'fs'
 
+const FRONTEND_ORIGIN = (process.env.FRONTEND_URL || 'https://plume-du-deen.com')
+  .split(',')[0]
+  .trim()
+  .replace(/\/+$/, '')
+
+function toPublicAbsoluteUrl(maybeUrl) {
+  if (!maybeUrl || typeof maybeUrl !== 'string') return ''
+
+  const raw = maybeUrl.trim()
+  if (!raw) return ''
+
+  // Already absolute
+  if (raw.startsWith('https://')) return raw
+  if (raw.startsWith('http://')) {
+    // Some email clients block http images; upgrade our own domain to https.
+    if (raw.startsWith('http://plume-du-deen.com/')) return raw.replace('http://plume-du-deen.com/', 'https://plume-du-deen.com/')
+    return raw
+  }
+
+  // Protocol-relative
+  if (raw.startsWith('//')) return `https:${raw}`
+
+  // Root-relative or relative path
+  if (raw.startsWith('/')) return `${FRONTEND_ORIGIN}${raw}`
+  return `${FRONTEND_ORIGIN}/${raw}`
+}
+
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 if (!RESEND_API_KEY) {
   console.warn('RESEND_API_KEY not set. Email sending is disabled. Add RESEND_API_KEY to .env or to your environment variables for production.')
@@ -146,7 +173,7 @@ function createOrderConfirmationHTML(orderData, hasAttachments = false, attachme
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #eee;">
         <div style="display: flex; align-items: center;">
-          ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 4px;">` : ''}
+          ${item.image ? `<img src="${toPublicAbsoluteUrl(item.image)}" alt="${item.name}" width="50" height="50" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px; border-radius: 4px;">` : ''}
           <div>
             <strong>${item.name}</strong>
             <br>
@@ -254,7 +281,7 @@ function createOrderConfirmationHTML(orderData, hasAttachments = false, attachme
         <!-- Footer -->
         <div style="background-color: #333; color: white; padding: 20px 30px; text-align: center;">
           <p style="margin: 0; font-size: 14px;">
-            © 2024 Plume du Deen. Tous droits réservés.
+            © 2026 Plume du Deen. Tous droits réservés.
           </p>
           <p style="margin: 10px 0 0 0; font-size: 12px; color: #ccc;">
             Cet email a été envoyé automatiquement. Merci de ne pas y répondre directement.
@@ -316,7 +343,7 @@ export async function sendContactEmail(contactData) {
           <!-- Footer -->
           <div style="background-color: #333; color: white; padding: 20px 30px; text-align: center;">
             <p style="margin: 0; font-size: 14px;">
-              © 2024 Plume du Deen. Tous droits réservés.
+              © 2026 Plume du Deen. Tous droits réservés.
             </p>
           </div>
         </div>
