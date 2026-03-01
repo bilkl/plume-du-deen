@@ -1,10 +1,25 @@
 import { Resend } from 'resend'
 import fs from 'fs'
 
-const FRONTEND_ORIGIN = (process.env.FRONTEND_URL || 'https://plume-du-deen.com')
-  .split(',')[0]
-  .trim()
-  .replace(/\/+$/, '')
+function normalizeOrigin(origin) {
+  if (!origin || typeof origin !== 'string') return ''
+  return origin.trim().replace(/\/+$/, '')
+}
+
+function pickPublicOrigin(frontendUrlEnv) {
+  const candidates = String(frontendUrlEnv || '')
+    .split(',')
+    .map(normalizeOrigin)
+    .filter(Boolean)
+
+  // Prefer the custom domain if present anywhere in the list.
+  const preferred = candidates.find((u) => u === 'https://plume-du-deen.com' || u === 'http://plume-du-deen.com')
+  if (preferred) return preferred.replace(/^http:\/\//, 'https://')
+
+  return candidates[0] || 'https://plume-du-deen.com'
+}
+
+const FRONTEND_ORIGIN = pickPublicOrigin(process.env.FRONTEND_URL)
 
 function toPublicAbsoluteUrl(maybeUrl) {
   if (!maybeUrl || typeof maybeUrl !== 'string') return ''
@@ -17,6 +32,7 @@ function toPublicAbsoluteUrl(maybeUrl) {
   if (raw.startsWith('http://')) {
     // Some email clients block http images; upgrade our own domain to https.
     if (raw.startsWith('http://plume-du-deen.com/')) return raw.replace('http://plume-du-deen.com/', 'https://plume-du-deen.com/')
+    if (raw.startsWith('http://www.plume-du-deen.com/')) return raw.replace('http://www.plume-du-deen.com/', 'https://www.plume-du-deen.com/')
     return raw
   }
 
