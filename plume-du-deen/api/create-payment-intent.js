@@ -166,6 +166,8 @@ export default async function handler(req, res) {
           ? sanitizeString(raw.customer_email)
           : undefined,
         customer_name: raw.customer_name ? sanitizeString(raw.customer_name) : undefined,
+        currency: raw.currency ? sanitizeString(String(raw.currency), 10) : undefined,
+        total_chf: raw.total_chf ? sanitizeString(String(raw.total_chf), 20) : undefined,
         order_items: raw.order_items ? sanitizeString(String(raw.order_items), 2000) : undefined,
         orderId: raw.orderId ? sanitizeString(raw.orderId) : undefined,
         productName: raw.productName ? sanitizeString(raw.productName) : undefined

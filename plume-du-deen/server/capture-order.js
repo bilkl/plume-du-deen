@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { orderId, customer, items, total } = req.body
+    const { orderId, customer, items, total, currency, totalChf } = req.body
 
     // Validation des données
     if (!orderId) {
@@ -66,6 +66,8 @@ export default async function handler(req, res) {
           customer,
           items,
           total,
+          currency,
+          totalChf,
           paymentIntentId: `paypal_${orderId}`,
           status: 'confirmed'
         }

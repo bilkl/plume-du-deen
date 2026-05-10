@@ -3,6 +3,9 @@ import { Star, TrendingUp } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Link } from 'wouter'
+import { getProductById } from '@/data/products'
+import { useCurrency } from '@/contexts/CurrencyContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface Product {
   id: number
@@ -10,7 +13,8 @@ interface Product {
   subtitle: string
   description: string
   image: string
-  digitalPrice: number
+  href?: string
+  digitalPrice: number | null
   paperPrice: number
   category: string
   tags: string[]
@@ -31,6 +35,9 @@ export default function ProductRecommendations({
   maxRecommendations = 3,
   className
 }: ProductRecommendationsProps) {
+  const { formatPrice } = useCurrency()
+  const { language } = useLanguage()
+  const isEnglish = language === 'en'
   const recommendations = useMemo(() => {
     // Filter out current product
     const otherProducts = allProducts.filter(p => p.id !== currentProduct.id)
@@ -49,8 +56,8 @@ export default function ProductRecommendations({
       score += sharedTags.length * 3
 
       // Price similarity (closer prices get higher scores)
-      const currentPrice = currentProduct.digitalPrice
-      const productPrice = product.digitalPrice
+      const currentPrice = currentProduct.digitalPrice ?? 0
+      const productPrice = product.digitalPrice ?? 0
       const priceDiff = Math.abs(currentPrice - productPrice)
       const priceScore = Math.max(0, 5 - (priceDiff / 5)) // Max 5 points for very close prices
       score += priceScore
@@ -78,7 +85,7 @@ export default function ProductRecommendations({
       <div className="flex items-center gap-2 mb-6">
         <TrendingUp className="w-5 h-5 text-primary" />
         <h2 className="text-2xl font-semibold text-foreground">
-          Vous pourriez aussi aimer
+          {isEnglish ? 'You may also like' : 'Vous pourriez aussi aimer'}
         </h2>
       </div>
 
@@ -116,26 +123,26 @@ export default function ProductRecommendations({
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-primary">
-                    {product.digitalPrice === 0 ? 'Offert' : `${product.digitalPrice} CHF`}
+                    {product.digitalPrice === null
+                      ? isEnglish ? 'Price to confirm' : 'Prix à confirmer'
+                      : product.digitalPrice === 0
+                        ? isEnglish ? 'Free' : 'Offert'
+                        : formatPrice(product.digitalPrice)}
                   </span>
                   <span className="text-sm text-muted-foreground line-through">
-                    {product.paperPrice === 0 ? '' : `${product.paperPrice} CHF`}
+                    {product.paperPrice === 0 ? '' : formatPrice(product.paperPrice)}
                   </span>
                 </div>
                 {product.reviewsCount && (
                   <span className="text-xs text-muted-foreground">
-                    {product.reviewsCount} avis
+                    {product.reviewsCount} {isEnglish ? 'reviews' : 'avis'}
                   </span>
                 )}
               </div>
 
-              <Link href={
-                product.id === 1 ? "/invocations" :
-                product.id === 2 ? "/planner" :
-                "/99noms"
-              }>
+              <Link href={product.href || getProductById(product.id)?.href || '/collection'}>
                 <button className="w-full px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors">
-                  Voir le produit
+                  {isEnglish ? 'View product' : 'Voir le produit'}
                 </button>
               </Link>
             </CardContent>

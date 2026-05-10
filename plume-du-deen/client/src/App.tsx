@@ -4,8 +4,12 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
 import { useEffect, lazy, Suspense } from "react";
 import ErrorBoundary from "./components/ErrorBoundaryNew";
+import ScrollProgress from "./components/ScrollProgress";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CartProvider } from "./contexts/CartContext";
+import { CurrencyProvider } from "./contexts/CurrencyContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
+import { AuthProvider } from "./contexts/AuthContext";
 
 // Lazy load components for better performance
 const Home = lazy(() => import("./pages/Home"));
@@ -15,6 +19,7 @@ const Ramadan = lazy(() => import("./pages/Ramadan"));
 const Invocations = lazy(() => import("./pages/Invocations"));
 const Planner = lazy(() => import("./pages/Planner"));
 const NomsAllah = lazy(() => import("./pages/NomsAllah"));
+const ProductPage = lazy(() => import("./pages/ProductPage"));
 const Cart = lazy(() => import("./pages/Cart"));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
@@ -45,11 +50,14 @@ function Router() {
       <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/collection"} component={ProductsPage} />
+      <Route path={"/produit"} component={ProductsPage} />
+      <Route path={"/produits"} component={ProductsPage} />
       <Route path={"/ramadan"} component={Ramadan} />
       <Route path={"/apropos"} component={About} />
       <Route path={"/invocations"} component={Invocations} />
       <Route path={"/planner"} component={Planner} />
       <Route path={"/99noms"} component={NomsAllah} />
+      <Route path={"/produit/:slug"} component={ProductPage} />
       <Route path={"/panier"} component={Cart} />
       <Route path={"/checkout"} component={Checkout} />
       <Route path={"/paiement-succes"} component={PaymentSuccess} />
@@ -81,18 +89,25 @@ function App() {
         defaultTheme="light"
         switchable
       >
-        <CartProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Suspense fallback={
-              <div className="min-h-screen flex items-center justify-center bg-background">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              </div>
-            }>
-              <Router />
-            </Suspense>
-          </TooltipProvider>
-        </CartProvider>
+        <LanguageProvider>
+          <CurrencyProvider>
+            <AuthProvider>
+              <CartProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <ScrollProgress />
+                  <Suspense fallback={
+                    <div className="min-h-screen flex items-center justify-center bg-background">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    </div>
+                  }>
+                    <Router />
+                  </Suspense>
+                </TooltipProvider>
+              </CartProvider>
+            </AuthProvider>
+          </CurrencyProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
+import { useCurrency } from '@/contexts/CurrencyContext'
 
 interface Product {
   id: number
@@ -26,6 +27,7 @@ interface AdvancedSearchProps {
 }
 
 export default function AdvancedSearch({ products, onResultsChange }: AdvancedSearchProps) {
+  const { formatPrice } = useCurrency()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [priceRange, setPriceRange] = useState<string>('all')
@@ -195,9 +197,9 @@ export default function AdvancedSearch({ products, onResultsChange }: AdvancedSe
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tous les prix</SelectItem>
-                    <SelectItem value="0-15">0 - 15 CHF</SelectItem>
-                    <SelectItem value="15-25">15 - 25 CHF</SelectItem>
-                    <SelectItem value="25+">25 CHF et plus</SelectItem>
+                    <SelectItem value="0-15">0 - {formatPrice(15)}</SelectItem>
+                    <SelectItem value="15-25">{formatPrice(15)} - {formatPrice(25)}</SelectItem>
+                    <SelectItem value="25+">{formatPrice(25)} et plus</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

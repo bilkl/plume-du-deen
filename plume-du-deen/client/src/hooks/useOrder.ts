@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
 import { apiUrl } from '@/lib/api'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface OrderData {
   customer: any
   items: any[]
   total: number
+  currency?: string
+  totalChf?: number
   paymentIntentId: string
 }
 
@@ -16,6 +19,8 @@ interface UseOrderReturn {
 }
 
 export function useOrder(): UseOrderReturn {
+  const { language } = useLanguage()
+  const isEnglish = language === 'en'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -33,14 +38,14 @@ export function useOrder(): UseOrderReturn {
       })
 
       if (!response.ok) {
-        throw new Error('Erreur lors de l\'enregistrement de la commande')
+        throw new Error(isEnglish ? 'Error while saving the order' : 'Erreur lors de l\'enregistrement de la commande')
       }
 
       const result = await response.json()
-      showSuccessToast('Commande confirmée !')
+      showSuccessToast(isEnglish ? 'Order confirmed.' : 'Commande confirmée !')
       return result.orderId
     } catch (err: any) {
-      const errorMessage = err.message || 'Erreur lors de l\'enregistrement de la commande'
+      const errorMessage = err.message || (isEnglish ? 'Error while saving the order' : 'Erreur lors de l\'enregistrement de la commande')
       setError(errorMessage)
       showErrorToast(errorMessage)
       return null

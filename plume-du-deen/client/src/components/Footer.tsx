@@ -1,5 +1,6 @@
-import { Mail, Instagram, Facebook } from 'lucide-react';
+import { Mail, Instagram } from 'lucide-react';
 import { Link } from 'wouter';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // TikTok Icon Component
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -14,92 +15,117 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 );
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
-    <footer className="bg-secondary text-secondary-foreground py-16 md:py-20">
-      <div className="container">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+    <footer className="bg-primary text-primary-foreground pt-24 pb-12 px-4 md:px-0 relative overflow-hidden">
+      {/* Decorative orbs */}
+      <div className="orb orb-1 w-[28rem] h-[28rem] bg-accent/10 -top-32 -left-32"></div>
+      <div className="orb orb-2 w-[24rem] h-[24rem] bg-accent/10 -bottom-24 -right-32"></div>
+
+      <div className="container relative z-10 bg-primary/90 backdrop-blur-xl rounded-[2.5rem] p-10 md:p-16 border border-white/10 shadow-premium-lg -mt-6">
+        {/* Top decorative gold line */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-accent to-transparent"></div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 mb-16">
           {/* Brand */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold">Plume du Deen</h3>
-            <p className="text-sm text-secondary-foreground/80">
-              Des pages pour le cœur et l’âme.
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20">
+                <img src="/images/logo.png" alt="" className="h-12 w-auto drop-shadow-md brightness-0 invert" />
+              </div>
+              <h3 className="text-2xl font-playfair font-semibold tracking-wide">Plume du Deen</h3>
+            </div>
+            <p className="text-lg text-primary-foreground/75 leading-relaxed font-light italic font-playfair">
+              {t('footer.tagline', "Des pages pour le cœur et l'âme.")}
             </p>
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold">Liens rapides</h4>
-            <ul className="space-y-2 text-sm">
+          <div className="space-y-6">
+            <h4 className="text-xl font-semibold tracking-wide font-playfair">{t('footer.quickLinks', 'Liens rapides')}</h4>
+            <ul className="space-y-3.5 text-base">
               <li>
-                <Link href="/collection" className="text-secondary-foreground/80 hover:text-secondary-foreground transition-colors">
-                  Collection
+                <Link href="/collection" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
+                  {t('nav.collection', 'Collection')}
                 </Link>
               </li>
               <li>
-                <Link href="/ramadan" className="text-secondary-foreground/80 hover:text-secondary-foreground transition-colors">
+                <Link href="/ramadan" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
                   Ramadan
                 </Link>
               </li>
               <li>
-                <Link href="/apropos" className="text-secondary-foreground/80 hover:text-secondary-foreground transition-colors">
-                  À propos
+                <Link href="/apropos" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
+                  {t('nav.about', 'À propos')}
                 </Link>
               </li>
             </ul>
           </div>
 
           {/* Information */}
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold">Information</h4>
-            <ul className="space-y-2 text-sm">
+          <div className="space-y-6">
+            <h4 className="text-xl font-semibold tracking-wide font-playfair">{t('footer.information', 'Information')}</h4>
+            <ul className="space-y-3.5 text-base">
               <li>
-                <Link href="/conditions-generales" className="text-secondary-foreground/80 hover:text-secondary-foreground transition-colors">
-                  Conditions générales
+                <Link href="/conditions-generales" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
+                  {t('footer.terms', 'Conditions générales')}
                 </Link>
               </li>
               <li>
-                <Link href="/politique-confidentialite" className="text-secondary-foreground/80 hover:text-secondary-foreground transition-colors">
-                  Politique de confidentialité
+                <Link href="/politique-confidentialite" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
+                  {t('footer.privacy', 'Politique de confidentialité')}
                 </Link>
               </li>
               <li>
-                <Link href="/retours-remboursements" className="text-secondary-foreground/80 hover:text-secondary-foreground transition-colors">
-                  Retours & Remboursements
+                <Link href="/retours-remboursements" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
+                  {t('footer.returns', 'Retours & Remboursements')}
                 </Link>
               </li>
               <li>
-                <Link href="/mentions-legales" className="text-secondary-foreground/80 hover:text-secondary-foreground transition-colors">
-                  Mentions légales
+                <Link href="/mentions-legales" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
+                  {t('footer.legal', 'Mentions légales')}
                 </Link>
               </li>
             </ul>
           </div>
 
           {/* Contact & Social */}
-          <div className="space-y-4">
-            <h4 className="text-lg font-semibold">Nous contacter</h4>
-            <div className="flex items-center gap-2 text-sm text-secondary-foreground/80 hover:text-secondary-foreground transition-colors cursor-pointer">
-              <Mail className="w-4 h-4" />
+          <div className="space-y-6">
+            <h4 className="text-xl font-semibold tracking-wide font-playfair">{t('footer.contact', 'Nous contacter')}</h4>
+            <div className="flex items-center gap-3 text-base text-primary-foreground/80 hover:text-accent transition-colors cursor-pointer p-3.5 bg-white/5 rounded-2xl border border-white/10 w-fit">
+              <Mail className="w-5 h-5" />
               <a href="mailto:contact@plume-du-deen.com">contact@plume-du-deen.com</a>
             </div>
-            <div className="flex gap-4 pt-4">
-              <a href="https://www.instagram.com/plumedudeen.official" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground/80 hover:text-secondary-foreground transition-colors">
-                <Instagram className="w-5 h-5" />
+            <div className="flex gap-4 pt-2">
+              <a href="https://www.instagram.com/plumedudeen.official" target="_blank" rel="noopener noreferrer" className="p-3.5 bg-white/5 rounded-full border border-white/10 text-primary-foreground/75 hover:text-primary hover:bg-accent hover:border-accent transition-all duration-300 hover:-translate-y-1" aria-label="Instagram">
+                <Instagram className="w-6 h-6" />
               </a>
-              <a href="https://www.tiktok.com/@fleurrose146" target="_blank" rel="noopener noreferrer" className="text-secondary-foreground/80 hover:text-secondary-foreground transition-colors">
-                <TikTokIcon className="w-5 h-5" />
+              <a href="https://www.tiktok.com/@fleurrose146" target="_blank" rel="noopener noreferrer" className="p-3.5 bg-white/5 rounded-full border border-white/10 text-primary-foreground/75 hover:text-primary hover:bg-accent hover:border-accent transition-all duration-300 hover:-translate-y-1" aria-label="TikTok">
+                <TikTokIcon className="w-6 h-6" />
               </a>
             </div>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-secondary-foreground/20 mb-8"></div>
+        <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-8"></div>
 
         {/* Bottom */}
-        <div className="flex flex-col md:flex-row items-center justify-between text-sm text-secondary-foreground/70">
-          <p>© 2026 Plume du Deen. Tous droits réservés.</p>
-          <p>Créé avec intention et douceur</p>
+        <div className="flex flex-col md:flex-row items-center justify-between text-base text-primary-foreground/60 gap-4">
+          <p>© 2026 Plume du Deen.</p>
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-px bg-accent/60"></span>
+            <p className="font-playfair italic text-base">{t('footer.made', 'Créé avec intention et douceur')}</p>
+            <span className="w-10 h-px bg-accent/60"></span>
+          </div>
         </div>
       </div>
     </footer>

@@ -43,12 +43,12 @@ Veuillez décrire ce que vous faisiez quand l'erreur s'est produite:
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-2xl">
+      <Card className="w-full max-w-2xl border-border/70 bg-card/88 shadow-premium">
         <CardHeader className="text-center pb-4">
-          <div className="mx-auto mb-4 w-20 h-20 bg-red-100 dark:bg-red-950/20 rounded-full flex items-center justify-center">
-            <AlertTriangle className="w-10 h-10 text-red-600 dark:text-red-400" />
+          <div className="mx-auto mb-4 w-20 h-20 bg-destructive/10 rounded-full flex items-center justify-center">
+            <AlertTriangle className="w-10 h-10 text-destructive" />
           </div>
-          <CardTitle className="text-2xl text-red-700 dark:text-red-400">
+          <CardTitle className="text-2xl text-foreground">
             Oups ! Une erreur inattendue s'est produite
           </CardTitle>
         </CardHeader>
@@ -57,7 +57,7 @@ Veuillez décrire ce que vous faisiez quand l'erreur s'est produite:
             <p className="text-muted-foreground mb-4">
               Nous sommes désolés pour la gêne occasionnée. Notre équipe a été notifiée de ce problème.
             </p>
-            <div className="bg-secondary/50 dark:bg-secondary/20 p-4 rounded-lg">
+            <div className="bg-secondary/45 dark:bg-secondary/20 p-4 rounded-lg border border-border/70">
               <p className="text-sm font-medium mb-2">Que faire maintenant ?</p>
               <ul className="text-sm text-muted-foreground space-y-1 text-left">
                 <li>• Actualisez la page</li>
@@ -111,7 +111,7 @@ Veuillez décrire ce que vous faisiez quand l'erreur s'est produite:
                 </Button>
 
                 {showDetails && (
-                  <div className="mt-3 p-3 bg-secondary/30 rounded-lg">
+                  <div className="mt-3 p-3 bg-secondary/35 rounded-lg border border-border/70">
                     <pre className="text-xs text-muted-foreground whitespace-pre-wrap break-all">
                       {error.message}
                       {errorInfo && (

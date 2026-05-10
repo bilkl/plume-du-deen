@@ -44,6 +44,19 @@ function toPublicAbsoluteUrl(maybeUrl) {
   return `${FRONTEND_ORIGIN}/${raw}`
 }
 
+function formatOrderMoney(amount, currency = 'CHF') {
+  const normalizedCurrency = ['CHF', 'EUR', 'USD'].includes(String(currency).toUpperCase())
+    ? String(currency).toUpperCase()
+    : 'CHF'
+
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: normalizedCurrency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number(amount || 0))
+}
+
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 if (!RESEND_API_KEY) {
   console.warn('RESEND_API_KEY not set. Email sending is disabled. Add RESEND_API_KEY to .env or to your environment variables for production.')
@@ -98,14 +111,15 @@ function createAdminOrderNotificationHTML(orderData) {
     customerAddress,
     customerCity,
     customerPostalCode,
-    customerCountry
+    customerCountry,
+    currency = 'CHF'
   } = orderData
 
   const itemsHTML = items
     .map(item => {
       const qty = Number(item.quantity || 1)
       const price = Number(item.price || 0)
-      return `<li><strong>${item.name}</strong> — Qté: ${qty} — CHF ${(price * qty).toFixed(2)}</li>`
+      return `<li><strong>${item.name}</strong> — Qté: ${qty} — ${formatOrderMoney(price * qty, currency)}</li>`
     })
     .join('')
 
@@ -129,7 +143,7 @@ function createAdminOrderNotificationHTML(orderData) {
           ${itemsHTML}
         </ul>
 
-        <p style="margin: 6px 0;"><strong>Total:</strong> CHF ${Number(total || 0).toFixed(2)}</p>
+        <p style="margin: 6px 0;"><strong>Total:</strong> ${formatOrderMoney(total, currency)}</p>
 
         ${(customerAddress || customerCity || customerPostalCode || customerCountry)
           ? `
@@ -183,7 +197,7 @@ export async function sendAdminOrderNotification(orderData) {
 }
 
 function createOrderConfirmationHTML(orderData, hasAttachments = false, attachments = []) {
-  const { orderId, customerName, items, total, createdAt } = orderData
+  const { orderId, customerName, items, total, createdAt, currency = 'CHF' } = orderData
 
   const itemsHTML = items.map(item => `
     <tr>
@@ -198,7 +212,7 @@ function createOrderConfirmationHTML(orderData, hasAttachments = false, attachme
         </div>
       </td>
       <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">
-        CHF ${(item.price * item.quantity).toFixed(2)}
+        ${formatOrderMoney(item.price * item.quantity, currency)}
       </td>
     </tr>
   `).join('')
@@ -251,7 +265,7 @@ function createOrderConfirmationHTML(orderData, hasAttachments = false, attachme
               <tr style="background-color: #f8f8f8; font-weight: bold;">
                 <td style="padding: 15px; text-align: right; border-top: 2px solid #8B4513;">Total</td>
                 <td style="padding: 15px; text-align: right; border-top: 2px solid #8B4513; color: #8B4513; font-size: 18px;">
-                  CHF ${total.toFixed(2)}
+                  ${formatOrderMoney(total, currency)}
                 </td>
               </tr>
             </tbody>

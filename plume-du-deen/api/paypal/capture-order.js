@@ -26,9 +26,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { orderId, orderData, customer, items, total } = req.body
+    const { orderId, orderData, customer, items, total, currency, totalChf } = req.body
 
-    const normalizedOrderData = orderData || (customer ? { customer, items, total } : null)
+    const normalizedOrderData = orderData || (customer ? { customer, items, total, currency, totalChf } : null)
 
     // Validation des données
     if (!orderId) {
@@ -65,6 +65,8 @@ export default async function handler(req, res) {
             customer: normalizedOrderData.customer,
             items: normalizedOrderData.items,
             total: normalizedOrderData.total,
+            currency: normalizedOrderData.currency,
+            totalChf: normalizedOrderData.totalChf,
             paymentIntentId: `paypal_${orderId}`,
             paymentMethod: 'paypal'
           })

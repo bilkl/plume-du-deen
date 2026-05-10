@@ -27,6 +27,13 @@ interface RegisterData {
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
+const authMessage = (english: string, french: string) => {
+  if (typeof window !== 'undefined' && localStorage.getItem('plume-du-deen-language') === 'en') {
+    return english
+  }
+  return french
+}
+
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {
@@ -78,12 +85,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           createdAt: new Date().toISOString()
         }
         setUser(mockUser)
-        showSuccessToast('Connexion réussie !')
+        showSuccessToast(authMessage('Signed in successfully.', 'Connexion réussie !'))
       } else {
-        throw new Error('Email ou mot de passe incorrect')
+        throw new Error(authMessage('Incorrect email or password', 'Email ou mot de passe incorrect'))
       }
     } catch (error) {
-      showErrorToast(error instanceof Error ? error.message : 'Erreur de connexion')
+      showErrorToast(error instanceof Error ? error.message : authMessage('Login error', 'Erreur de connexion'))
       throw error
     } finally {
       setIsLoading(false)
@@ -106,9 +113,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setUser(newUser)
-      showSuccessToast('Compte créé avec succès !')
+      showSuccessToast(authMessage('Account created successfully.', 'Compte créé avec succès !'))
     } catch (error) {
-      showErrorToast('Erreur lors de la création du compte')
+      showErrorToast(authMessage('Error while creating the account', 'Erreur lors de la création du compte'))
       throw error
     } finally {
       setIsLoading(false)
@@ -117,7 +124,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setUser(null)
-    showSuccessToast('Déconnexion réussie')
+    showSuccessToast(authMessage('Signed out successfully.', 'Déconnexion réussie'))
   }
 
   const updateProfile = async (userData: Partial<User>) => {
@@ -130,9 +137,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       const updatedUser = { ...user, ...userData }
       setUser(updatedUser)
-      showSuccessToast('Profil mis à jour')
+      showSuccessToast(authMessage('Profile updated', 'Profil mis à jour'))
     } catch (error) {
-      showErrorToast('Erreur lors de la mise à jour')
+      showErrorToast(authMessage('Error while updating', 'Erreur lors de la mise à jour'))
       throw error
     } finally {
       setIsLoading(false)

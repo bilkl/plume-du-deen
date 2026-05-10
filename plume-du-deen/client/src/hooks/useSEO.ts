@@ -14,7 +14,7 @@ export function useSEO({
   title = 'Plume du Deen - Produits Spirituels Islamiques',
   description = 'Découvrez notre collection de produits spirituels islamiques : Livres coraniques, Planners Ramadan, et plus encore. Qualité, authenticité et spiritualité.',
   keywords = ['islam', 'coran', 'spirituel', 'ramadan', 'livres religieux', 'planner', 'musulman'],
-  image = '/logo.png',
+  image = '/images/logo.png',
   url,
   type = 'website',
   structuredData
@@ -151,7 +151,7 @@ export function useArticleSEO(article: {
       name: 'Plume du Deen',
       logo: {
         '@type': 'ImageObject',
-        url: `${window.location.origin}/logo.png`
+        url: `${window.location.origin}/images/logo.png`
       }
     },
     datePublished: article.publishedTime,

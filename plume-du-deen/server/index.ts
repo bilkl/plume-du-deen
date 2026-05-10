@@ -10,6 +10,7 @@ import db, { saveOrder, updateOrderStatus } from './database.js';
 import createPayPalOrder from './create-order.js';
 import capturePayPalOrder from './capture-order.js';
 import contactHandler from '../api/contact.js';
+import reviewsHandler from '../api/reviews.js';
 
 // Load environment variables
 dotenv.config();
@@ -89,13 +90,15 @@ async function startServer() {
   // Save order after successful payment
   app.post('/api/orders', async (req, res) => {
     try {
-      const { customer, items, total, paymentIntentId } = req.body;
+      const { customer, items, total, paymentIntentId, currency = 'CHF', totalChf } = req.body;
 
       const order = {
         id: `ORD-${Date.now()}`,
         customer,
         items,
         total,
+        currency,
+        totalChf,
         paymentIntentId,
         status: 'confirmed',
       };
@@ -191,6 +194,11 @@ async function startServer() {
 
   // Contact API Route
   app.post('/api/contact', contactHandler);
+
+  // Reviews API Route
+  app.get('/api/reviews', reviewsHandler);
+  app.post('/api/reviews', reviewsHandler);
+  app.options('/api/reviews', reviewsHandler);
 
   // Handle client-side routing - serve index.html for all routes
   app.get("*", (_req, res) => {

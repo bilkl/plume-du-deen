@@ -1,21 +1,9 @@
-import React from 'react'
 import { Link } from 'wouter'
+import { LegalDocument } from '@/components/PageLayout'
 
 export default function LegalNotice() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow-lg rounded-lg p-8">
-          <div className="mb-8">
-            <Link href="/" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
-              ← Retour à l'accueil
-            </Link>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Mentions Légales
-            </h1>
-            <p className="text-gray-600">Dernière mise à jour : 30 janvier 2026</p>
-          </div>
-
+    <LegalDocument title="Mentions légales" updated="30 janvier 2026">
           <div className="prose prose-lg max-w-none">
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Éditeur du site</h2>
@@ -143,8 +131,6 @@ export default function LegalNotice() {
               </p>
             </section>
           </div>
-        </div>
-      </div>
-    </div>
+    </LegalDocument>
   )
 }

@@ -14,19 +14,26 @@ import { Loader2, CreditCard, Shield, Lock, CheckCircle, AlertTriangle, Globe } 
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
 import { useLocation } from 'wouter'
 import { useOrder } from '@/hooks/useOrder'
+import { formatPaymentAmount, type CurrencyCode } from '@/contexts/CurrencyContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 // Initialize Stripe
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 const stripePromise = STRIPE_PUBLISHABLE_KEY ? loadStripe(STRIPE_PUBLISHABLE_KEY) : null
 
+const isEnglishLanguage = () =>
+  typeof window !== 'undefined' && localStorage.getItem('plume-du-deen-language') === 'en'
+
 interface StripePaymentFormProps {
   paymentIntent: { clientSecret: string; paymentIntentId: string }
   amount: number
-  currency: string
+  currency: CurrencyCode
   orderData?: {
     customer: any
     items: any[]
     total: number
+    currency?: CurrencyCode
+    totalChf?: number
   }
   onSuccess: (paymentIntent: any) => void
   onError: (error: any) => void
@@ -46,8 +53,11 @@ function StripePaymentFormInner({
   const elements = useElements()
   const [, setLocation] = useLocation()
   const { saveOrder } = useOrder()
+  const { language } = useLanguage()
+  const isEnglish = language === 'en'
   const [isProcessing, setIsProcessing] = useState(false)
   const [message, setMessage] = useState<string>('')
+  const successMessage = isEnglish ? 'Payment successful.' : 'Paiement réussi !'
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -69,13 +79,13 @@ function StripePaymentFormInner({
       })
 
       if (error) {
-        setMessage(error.message || 'Une erreur est survenue')
-        showErrorToast(error.message || 'Erreur de paiement')
+        setMessage(error.message || (isEnglish ? 'An error occurred' : 'Une erreur est survenue'))
+        showErrorToast(error.message || (isEnglish ? 'Payment error' : 'Erreur de paiement'))
         onError(error)
         setLocation('/paiement-erreur')
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        setMessage('Paiement réussi !')
-        showSuccessToast('Paiement traité avec succès !')
+        setMessage(successMessage)
+        showSuccessToast(isEnglish ? 'Payment processed successfully.' : 'Paiement traité avec succès !')
 
         // Save order if order data is provided
         if (orderData) {
@@ -88,11 +98,11 @@ function StripePaymentFormInner({
         onSuccess(paymentIntent)
         setLocation('/paiement-succes')
       } else {
-        setMessage('Paiement en cours de traitement...')
+        setMessage(isEnglish ? 'Payment is being processed...' : 'Paiement en cours de traitement...')
       }
     } catch (err: any) {
-      setMessage('Une erreur inattendue est survenue')
-      showErrorToast('Erreur inattendue lors du paiement')
+      setMessage(isEnglish ? 'An unexpected error occurred' : 'Une erreur inattendue est survenue')
+      showErrorToast(isEnglish ? 'Unexpected error during payment' : 'Erreur inattendue lors du paiement')
       onError(err)
     }
 
@@ -104,18 +114,18 @@ function StripePaymentFormInner({
   }
 
   return (
-    <Card className="w-full border-2 border-border/50 shadow-lg bg-card">
+    <Card className="w-full border border-border/70 shadow-premium bg-card/88">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-3 text-xl">
           <div className="p-2 bg-primary/10 rounded-full">
             <CreditCard className="w-6 h-6 text-primary" />
           </div>
-          Paiement sécurisé
+          {isEnglish ? 'Secure payment' : 'Paiement sécurisé'}
         </CardTitle>
         <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
           <Badge variant="secondary" className="flex items-center gap-1">
             <Shield className="w-3 h-3" />
-            SSL chiffré
+            {isEnglish ? 'Encrypted SSL' : 'SSL chiffré'}
           </Badge>
           <Badge variant="secondary" className="flex items-center gap-1">
             <Lock className="w-3 h-3" />
@@ -123,7 +133,7 @@ function StripePaymentFormInner({
           </Badge>
           <Badge variant="secondary" className="flex items-center gap-1">
             <Globe className="w-3 h-3" />
-            Stripe protégé
+            {isEnglish ? 'Protected by Stripe' : 'Stripe protégé'}
           </Badge>
         </div>
       </CardHeader>
@@ -133,9 +143,9 @@ function StripePaymentFormInner({
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-foreground flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-green-500" />
-              Adresse de facturation
+              {isEnglish ? 'Billing address' : 'Adresse de facturation'}
             </label>
-            <div className="border border-border rounded-lg p-1 bg-background dark:bg-card min-h-[120px]">
+            <div className="border border-border/70 rounded-lg p-1 bg-background dark:bg-card min-h-[120px]">
               <AddressElement
                 options={{
                   mode: 'billing',
@@ -155,9 +165,9 @@ function StripePaymentFormInner({
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-foreground flex items-center gap-2">
               <CreditCard className="w-4 h-4 text-primary" />
-              Informations de paiement
+              {isEnglish ? 'Payment information' : 'Informations de paiement'}
             </label>
-            <div className="border border-border rounded-lg p-1 bg-background dark:bg-card min-h-[220px]">
+            <div className="border border-border/70 rounded-lg p-1 bg-background dark:bg-card min-h-[220px]">
               <PaymentElement
                 options={paymentElementOptions}
                 className="min-h-[200px]"
@@ -166,27 +176,27 @@ function StripePaymentFormInner({
           </div>
 
           {/* Order Summary */}
-          <div className="bg-secondary/30 dark:bg-secondary/20 border border-border rounded-lg p-4 space-y-3">
+          <div className="bg-secondary/40 dark:bg-secondary/20 border border-border/70 rounded-lg p-4 space-y-3">
             <div className="flex justify-between items-center">
-              <span className="font-semibold text-foreground">Total à payer :</span>
+              <span className="font-semibold text-foreground">{isEnglish ? 'Total to pay:' : 'Total à payer :'}</span>
               <span className="text-2xl font-bold text-primary">
-                {amount.toFixed(2)} {currency.toUpperCase()}
+                {formatPaymentAmount(amount, currency)}
               </span>
             </div>
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
               <CheckCircle className="w-3 h-3 text-green-500" />
-              TVA incluse • Paiement sécurisé par Stripe
+              {isEnglish ? 'VAT included · Secure payment by Stripe' : 'TVA incluse • Paiement sécurisé par Stripe'}
             </div>
           </div>
 
           {/* Error Message */}
           {message && (
             <div className={`p-4 rounded-lg border flex items-start gap-3 ${
-              message.includes('réussi')
+              message === successMessage
                 ? 'bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
                 : 'bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
             }`}>
-              {message.includes('réussi') ? (
+              {message === successMessage ? (
                 <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
               ) : (
                 <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
@@ -199,40 +209,40 @@ function StripePaymentFormInner({
           <Button
             type="submit"
             disabled={!stripe || !elements || isProcessing || disabled}
-            className="w-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="w-full h-14 text-base font-semibold bg-primary hover:bg-primary/90 transition-all duration-200 shadow-gold hover:-translate-y-0.5"
             size="lg"
           >
             {isProcessing ? (
               <>
                 <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                Traitement du paiement en cours...
+                {isEnglish ? 'Processing payment...' : 'Traitement du paiement en cours...'}
               </>
             ) : (
               <>
                 <Lock className="w-5 h-5 mr-3" />
-                Payer {amount.toFixed(2)} {currency.toUpperCase()}
+                {isEnglish ? 'Pay' : 'Payer'} {formatPaymentAmount(amount, currency)}
               </>
             )}
           </Button>
 
           {/* Security Notice */}
-          <div className="bg-muted/30 dark:bg-muted/10 border border-border rounded-lg p-4">
+          <div className="bg-secondary/35 dark:bg-muted/10 border border-border/70 rounded-lg p-4">
             <div className="flex items-start gap-3">
               <Shield className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
               <div className="text-sm text-muted-foreground space-y-2">
-                <p className="font-medium text-foreground">Vos données sont protégées</p>
+                <p className="font-medium text-foreground">{isEnglish ? 'Your data is protected' : 'Vos données sont protégées'}</p>
                 <ul className="space-y-1 text-xs">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-3 h-3 text-green-500" />
-                    Chiffrement SSL 256-bit
+                    {isEnglish ? '256-bit SSL encryption' : 'Chiffrement SSL 256-bit'}
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-3 h-3 text-green-500" />
-                    Conformité PCI DSS
+                    {isEnglish ? 'PCI DSS compliant' : 'Conformité PCI DSS'}
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="w-3 h-3 text-green-500" />
-                    Données non stockées sur nos serveurs
+                    {isEnglish ? 'Data not stored on our servers' : 'Données non stockées sur nos serveurs'}
                   </li>
                 </ul>
               </div>
@@ -246,21 +256,24 @@ function StripePaymentFormInner({
 
 export default function StripePaymentForm(props: StripePaymentFormProps) {
   if (!STRIPE_PUBLISHABLE_KEY) {
+    const isEnglish = isEnglishLanguage()
     return (
-      <Card className="w-full border-2 border-destructive/20 bg-destructive/5">
+      <Card className="w-full border border-destructive/20 bg-card/88 shadow-premium">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-destructive" />
-            Paiement par carte indisponible
+            {isEnglish ? 'Card payment unavailable' : 'Paiement par carte indisponible'}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3 text-sm">
             <p className="text-muted-foreground">
-              Le formulaire Stripe ne peut pas s’afficher car la clé Stripe publishable n’est pas configurée.
+              {isEnglish
+                ? 'The Stripe form cannot be displayed because the publishable Stripe key is not configured.'
+                : 'Le formulaire Stripe ne peut pas s’afficher car la clé Stripe publishable n’est pas configurée.'}
             </p>
             <p className="text-muted-foreground">
-              Vous pouvez choisir PayPal ou nous contacter pour Orange Money.
+              {isEnglish ? 'You can choose PayPal or contact us for Orange Money.' : 'Vous pouvez choisir PayPal ou nous contacter pour Orange Money.'}
             </p>
           </div>
         </CardContent>

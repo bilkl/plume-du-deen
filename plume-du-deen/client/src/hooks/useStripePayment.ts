@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
 import { apiUrl } from '@/lib/api'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface UseStripePaymentReturn {
   createPaymentIntent: (data: { amount: number; currency?: string; metadata?: any }) => Promise<any>
@@ -10,6 +11,8 @@ interface UseStripePaymentReturn {
 }
 
 export function useStripePayment(): UseStripePaymentReturn {
+  const { language } = useLanguage()
+  const isEnglish = language === 'en'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -36,13 +39,13 @@ export function useStripePayment(): UseStripePaymentReturn {
       })
 
       if (!response.ok) {
-        throw new Error('Erreur lors de la création du paiement')
+        throw new Error(isEnglish ? 'Error while creating the payment' : 'Erreur lors de la création du paiement')
       }
 
       const result = await response.json()
       return result
     } catch (err: any) {
-      const errorMessage = err.message || 'Erreur lors de la création du paiement'
+      const errorMessage = err.message || (isEnglish ? 'Error while creating the payment' : 'Erreur lors de la création du paiement')
       setError(errorMessage)
       showErrorToast(errorMessage)
       return null

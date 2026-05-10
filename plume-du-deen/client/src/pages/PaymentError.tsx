@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { useLocation } from 'wouter'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle, Home, RefreshCw, ShoppingBag } from 'lucide-react'
+import { PageShell, PremiumCard } from '@/components/PageLayout'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function PaymentError() {
   const [, setLocation] = useLocation()
+  const { language } = useLanguage()
+  const isEnglish = language === 'en'
   const [retrying, setRetrying] = useState(false)
 
   const handleRetry = () => {
@@ -17,35 +20,34 @@ export default function PaymentError() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md text-center">
-        <CardHeader className="pb-4">
-          <div className="mx-auto mb-4 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-            <AlertTriangle className="w-8 h-8 text-red-600" />
+    <PageShell>
+      <section className="container flex min-h-[calc(100vh-5rem)] items-center justify-center py-16">
+        <PremiumCard className="w-full max-w-md p-6 md:p-8 text-center">
+          <div className="mx-auto mb-5 w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
+            <AlertTriangle className="w-8 h-8 text-destructive" />
           </div>
-          <CardTitle className="text-2xl text-red-700">
-            Paiement échoué
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
+          <h1 className="text-2xl md:text-3xl text-foreground">
+            {isEnglish ? 'Payment failed' : 'Paiement échoué'}
+          </h1>
+        <div className="mt-6 space-y-6">
           <div>
             <p className="text-muted-foreground mb-4">
-              Une erreur s'est produite lors du traitement de votre paiement.
+              {isEnglish ? 'An error occurred while processing your payment.' : "Une erreur s'est produite lors du traitement de votre paiement."}
             </p>
-            <div className="text-sm text-muted-foreground space-y-2 bg-secondary/50 p-4 rounded-lg">
-              <p>🔍 <strong>Raisons possibles :</strong></p>
+            <div className="text-sm text-muted-foreground space-y-2 bg-secondary/50 p-4 rounded-lg border border-border/70">
+              <p><strong>{isEnglish ? 'Possible reasons:' : 'Raisons possibles :'}</strong></p>
               <ul className="text-left space-y-1 ml-4">
-                <li>• Fonds insuffisants</li>
-                <li>• Carte expirée</li>
-                <li>• Informations incorrectes</li>
-                <li>• Problème technique temporaire</li>
+                <li>{isEnglish ? 'Insufficient funds' : 'Fonds insuffisants'}</li>
+                <li>{isEnglish ? 'Expired card' : 'Carte expirée'}</li>
+                <li>{isEnglish ? 'Incorrect information' : 'Informations incorrectes'}</li>
+                <li>{isEnglish ? 'Temporary technical issue' : 'Problème technique temporaire'}</li>
               </ul>
             </div>
           </div>
 
           <div className="text-sm text-muted-foreground">
-            <p>💳 Vos informations de paiement n'ont pas été débitées</p>
-            <p>📞 Contactez-nous si le problème persiste</p>
+            <p>{isEnglish ? 'Your payment information has not been charged.' : "Vos informations de paiement n'ont pas été débitées."}</p>
+            <p>{isEnglish ? 'Contact us if the issue persists.' : 'Contactez-nous si le problème persiste.'}</p>
           </div>
 
           <div className="flex flex-col gap-3 pt-4">
@@ -58,12 +60,12 @@ export default function PaymentError() {
               {retrying ? (
                 <>
                   <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Redirection...
+                  {isEnglish ? 'Redirecting...' : 'Redirection...'}
                 </>
               ) : (
                 <>
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  Réessayer le paiement
+                  {isEnglish ? 'Try payment again' : 'Réessayer le paiement'}
                 </>
               )}
             </Button>
@@ -73,7 +75,7 @@ export default function PaymentError() {
               className="w-full"
             >
               <ShoppingBag className="w-4 h-4 mr-2" />
-              Retour au panier
+              {isEnglish ? 'Back to cart' : 'Retour au panier'}
             </Button>
             <Button
               variant="ghost"
@@ -81,11 +83,12 @@ export default function PaymentError() {
               className="w-full"
             >
               <Home className="w-4 h-4 mr-2" />
-              Retour à l'accueil
+              {isEnglish ? 'Back to home' : "Retour à l'accueil"}
             </Button>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+        </PremiumCard>
+      </section>
+    </PageShell>
   )
 }

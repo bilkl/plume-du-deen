@@ -3,10 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Loader2, Package, Calendar, CreditCard, MapPin, Phone, Mail } from 'lucide-react'
+import { Loader2, Package, Calendar, CreditCard, MapPin, Mail } from 'lucide-react'
 import { showErrorToast } from '@/lib/toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSEO } from '@/hooks/useSEO'
+import { PageHero, PageShell, PremiumCard } from '@/components/PageLayout'
+import { formatPaymentAmount, type CurrencyCode } from '@/contexts/CurrencyContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface Order {
   orderId: string
@@ -20,6 +23,7 @@ interface Order {
     image?: string
   }>
   total: number
+  currency?: CurrencyCode
   status: string
   createdAt: string
   paymentIntentId: string
@@ -27,14 +31,16 @@ interface Order {
 
 export default function Orders() {
   const { user } = useAuth()
+  const { language } = useLanguage()
+  const isEnglish = language === 'en'
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useSEO({
-    title: 'Mes Commandes - Plume du Deen | Historique des Achats',
-    description: 'Consultez l\'historique de vos commandes et suivez vos achats de produits spirituels islamiques. Livres coraniques, Planners Ramadan et articles religieux.',
-    keywords: ['commandes', 'historique achats', 'suivi commande', 'produits islamiques', 'livres coraniques'],
+    title: isEnglish ? 'My Orders - Plume du Deen | Purchase History' : 'Mes Commandes - Plume du Deen | Historique des Achats',
+    description: isEnglish ? 'View your order history and follow your spiritual product purchases.' : 'Consultez l\'historique de vos commandes et suivez vos achats de produits spirituels islamiques. Livres coraniques, Planners Ramadan et articles religieux.',
+    keywords: isEnglish ? ['orders', 'purchase history', 'order tracking', 'islamic products'] : ['commandes', 'historique achats', 'suivi commande', 'produits islamiques', 'livres coraniques'],
     type: 'website'
   });
 
@@ -54,13 +60,13 @@ export default function Orders() {
       const response = await fetch(`/api/orders?email=${encodeURIComponent(user!.email)}`)
 
       if (!response.ok) {
-        throw new Error('Erreur lors du chargement des commandes')
+        throw new Error(isEnglish ? 'Error while loading orders' : 'Erreur lors du chargement des commandes')
       }
 
       const data = await response.json()
       setOrders(data.orders || [])
     } catch (err: any) {
-      const errorMessage = err.message || 'Erreur lors du chargement des commandes'
+      const errorMessage = err.message || (isEnglish ? 'Error while loading orders' : 'Erreur lors du chargement des commandes')
       setError(errorMessage)
       showErrorToast(errorMessage)
     } finally {
@@ -71,99 +77,100 @@ export default function Orders() {
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
       case 'completed':
-        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Confirmée</Badge>
+        return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">{isEnglish ? 'Confirmed' : 'Confirmée'}</Badge>
       case 'pending':
-        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">En attente</Badge>
+        return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">{isEnglish ? 'Pending' : 'En attente'}</Badge>
       case 'cancelled':
-        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">Annulée</Badge>
+        return <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">{isEnglish ? 'Cancelled' : 'Annulée'}</Badge>
       default:
         return <Badge variant="secondary">{status}</Badge>
     }
   }
+  const formatOrderAmount = (amount: number, currency: CurrencyCode = 'CHF') => {
+    return formatPaymentAmount(amount, currency)
+  }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md text-center">
-          <CardHeader>
-            <CardTitle>Connexion requise</CardTitle>
-          </CardHeader>
-          <CardContent>
+      <PageShell>
+        <section className="container flex min-h-[calc(100vh-5rem)] items-center justify-center py-16">
+          <PremiumCard className="w-full max-w-md p-6 md:p-8 text-center">
+            <h1 className="text-2xl md:text-3xl text-foreground">{isEnglish ? 'Login required' : 'Connexion requise'}</h1>
             <p className="text-muted-foreground mb-4">
-              Vous devez être connecté pour voir vos commandes.
+              {isEnglish ? 'You must be logged in to view your orders.' : 'Vous devez être connecté pour voir vos commandes.'}
             </p>
             <Button asChild>
-              <a href="/creer-compte">Se connecter</a>
+              <a href="/creer-compte">{isEnglish ? 'Sign in' : 'Se connecter'}</a>
             </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </PremiumCard>
+        </section>
+      </PageShell>
     )
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Chargement de vos commandes...</p>
+      <PageShell>
+        <section className="container flex min-h-[calc(100vh-5rem)] items-center justify-center py-16">
+        <div className="text-center rounded-lg border border-border/70 bg-card/80 p-8 shadow-premium">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">{isEnglish ? 'Loading your orders...' : 'Chargement de vos commandes...'}</p>
         </div>
-      </div>
+        </section>
+      </PageShell>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md text-center">
-          <CardHeader>
-            <CardTitle className="text-red-600">Erreur</CardTitle>
-          </CardHeader>
-          <CardContent>
+      <PageShell>
+        <section className="container flex min-h-[calc(100vh-5rem)] items-center justify-center py-16">
+          <PremiumCard className="w-full max-w-md p-6 md:p-8 text-center">
+            <h1 className="text-2xl md:text-3xl text-destructive">{isEnglish ? 'Error' : 'Erreur'}</h1>
             <p className="text-muted-foreground mb-4">{error}</p>
             <Button onClick={fetchOrders} variant="outline">
-              Réessayer
+              {isEnglish ? 'Try again' : 'Réessayer'}
             </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </PremiumCard>
+        </section>
+      </PageShell>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Mes Commandes</h1>
-            <p className="text-muted-foreground">
-              Historique de vos achats sur Plume du Deen
-            </p>
-          </div>
-
+    <PageShell>
+      <PageHero
+        eyebrow={isEnglish ? 'Customer space' : 'Espace client'}
+        title={isEnglish ? 'My orders' : 'Mes commandes'}
+        description={isEnglish ? 'View your purchase history and find useful order information.' : "Consultez l'historique de vos achats et retrouvez les informations utiles."}
+        className="pb-10 md:pb-14"
+      />
+      <section className="pb-16 md:pb-24">
+      <div className="container">
+        <div className="max-w-[22rem] sm:max-w-4xl mx-auto">
           {orders.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-12">
-                <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Aucune commande</h3>
+            <PremiumCard className="text-center p-8 md:p-12">
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-accent/12 text-primary">
+                  <Package className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{isEnglish ? 'No orders' : 'Aucune commande'}</h3>
                 <p className="text-muted-foreground mb-6">
-                  Vous n'avez pas encore passé de commande.
+                  {isEnglish ? 'You have not placed any orders yet.' : "Vous n'avez pas encore passé de commande."}
                 </p>
                 <Button asChild>
-                  <a href="/collection">Commencer vos achats</a>
+                  <a href="/collection">{isEnglish ? 'Start shopping' : 'Commencer vos achats'}</a>
                 </Button>
-              </CardContent>
-            </Card>
+            </PremiumCard>
           ) : (
             <div className="space-y-6">
               {orders.map((order) => (
-                <Card key={order.orderId} className="overflow-hidden">
-                  <CardHeader className="bg-secondary/30 dark:bg-secondary/20">
+                <Card key={order.orderId} className="overflow-hidden border-border/70 bg-card/88 shadow-premium">
+                  <CardHeader className="bg-secondary/45 dark:bg-secondary/20">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
                         <CardTitle className="text-lg flex items-center gap-2">
                           <Package className="w-5 h-5" />
-                          Commande {order.orderId}
+                          {isEnglish ? 'Order' : 'Commande'} {order.orderId}
                         </CardTitle>
                         <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
@@ -179,8 +186,8 @@ export default function Orders() {
                       <div className="flex flex-col items-end gap-2">
                         {getStatusBadge(order.status)}
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-primary">
-                            {order.total.toFixed(2)} CHF
+                        <div className="text-2xl font-bold text-primary">
+                            {formatOrderAmount(order.total, order.currency)}
                           </div>
                         </div>
                       </div>
@@ -191,7 +198,7 @@ export default function Orders() {
                     <div className="space-y-4">
                       {/* Articles */}
                       <div>
-                        <h4 className="font-semibold mb-3">Articles commandés</h4>
+                        <h4 className="font-semibold mb-3">{isEnglish ? 'Ordered items' : 'Articles commandés'}</h4>
                         <div className="space-y-3">
                           {order.items.map((item, index) => (
                             <div key={index} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
@@ -202,13 +209,13 @@ export default function Orders() {
                                 <div>
                                   <p className="font-medium">{item.name}</p>
                                   <p className="text-sm text-muted-foreground">
-                                    Quantité: {item.quantity} × {item.price.toFixed(2)} CHF
+                                    {isEnglish ? 'Quantity' : 'Quantité'}: {item.quantity} × {formatOrderAmount(item.price, order.currency)}
                                   </p>
                                 </div>
                               </div>
                               <div className="text-right">
                                 <p className="font-semibold">
-                                  {(item.price * item.quantity).toFixed(2)} CHF
+                                  {formatOrderAmount(item.price * item.quantity, order.currency)}
                                 </p>
                               </div>
                             </div>
@@ -222,9 +229,9 @@ export default function Orders() {
                       <div>
                         <h4 className="font-semibold mb-3 flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
-                          Informations de livraison
+                          {isEnglish ? 'Delivery information' : 'Informations de livraison'}
                         </h4>
-                        <div className="bg-secondary/30 dark:bg-secondary/20 rounded-lg p-4">
+                        <div className="bg-secondary/40 dark:bg-secondary/20 rounded-lg border border-border/70 p-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
                               <p className="font-medium">{order.customerName}</p>
@@ -234,7 +241,7 @@ export default function Orders() {
                               </p>
                             </div>
                             <div className="text-muted-foreground">
-                              <p>Livraison à l'adresse indiquée lors de la commande</p>
+                              <p>{isEnglish ? 'Delivery to the address provided during checkout' : "Livraison à l'adresse indiquée lors de la commande"}</p>
                             </div>
                           </div>
                         </div>
@@ -243,10 +250,10 @@ export default function Orders() {
                       {/* Actions */}
                       <div className="flex flex-col sm:flex-row gap-3 pt-4">
                         <Button variant="outline" size="sm" className="flex-1">
-                          Télécharger la facture
+                          {isEnglish ? 'Download invoice' : 'Télécharger la facture'}
                         </Button>
                         <Button variant="outline" size="sm" className="flex-1">
-                          Contacter le support
+                          {isEnglish ? 'Contact support' : 'Contacter le support'}
                         </Button>
                       </div>
                     </div>
@@ -257,6 +264,7 @@ export default function Orders() {
           )}
         </div>
       </div>
-    </div>
+      </section>
+    </PageShell>
   )
 }

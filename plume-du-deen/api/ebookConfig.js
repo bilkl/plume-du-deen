@@ -20,6 +20,11 @@ export const PRODUCT_EBOOKS = {
     filename: 'Les 99 noms d\'Allah Azzawajel.pdf',
     displayName: 'Les 99 Noms d\'Allah - Version PDF',
     description: 'Découvrez les 99 noms divins d\'Allah'
+  },
+  4: { // Invocations des Prophètes
+    filename: 'invocations-des-prophetes.pdf',
+    displayName: 'Invocations des Prophètes - Version PDF',
+    description: 'Votre compagnon quotidien de rappel et d\'invocations prophétiques'
   }
 }
 

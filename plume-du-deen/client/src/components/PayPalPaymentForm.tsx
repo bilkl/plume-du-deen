@@ -3,14 +3,18 @@ import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js'
 import { showSuccessToast } from '@/lib/toast'
 import { useTheme } from '@/contexts/ThemeContext'
 import { apiUrl } from '@/lib/api'
+import type { CurrencyCode } from '@/contexts/CurrencyContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface PayPalPaymentFormProps {
   amount: number
-  currency: string
+  currency: CurrencyCode
   orderData: {
     customer: any
     items: any[]
     total: number
+    currency?: CurrencyCode
+    totalChf?: number
   }
   onSuccess: () => void
   onError: (error: string) => void
@@ -19,6 +23,8 @@ interface PayPalPaymentFormProps {
 export default function PayPalPaymentForm({ amount, currency, orderData, onSuccess, onError }: PayPalPaymentFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const { theme } = useTheme()
+  const { language } = useLanguage()
+  const isEnglish = language === 'en'
 
   const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID
   const isDark = theme === 'dark'
@@ -38,7 +44,7 @@ export default function PayPalPaymentForm({ amount, currency, orderData, onSucce
       })
 
       const order = await response.json()
-      if (!response.ok) throw new Error(order.details || order.error || 'Erreur PayPal')
+      if (!response.ok) throw new Error(order.details || order.error || (isEnglish ? 'PayPal error' : 'Erreur PayPal'))
 
       return order.id
     } catch (error: any) {
@@ -60,13 +66,15 @@ export default function PayPalPaymentForm({ amount, currency, orderData, onSucce
           customer: orderData.customer,
           items: orderData.items,
           total: orderData.total,
+          currency: orderData.currency,
+          totalChf: orderData.totalChf,
         }),
       })
 
       const result = await response.json()
-      if (!response.ok) throw new Error(result.details || result.error || 'Erreur PayPal')
+      if (!response.ok) throw new Error(result.details || result.error || (isEnglish ? 'PayPal error' : 'Erreur PayPal'))
 
-      showSuccessToast('Paiement PayPal effectué avec succès !')
+      showSuccessToast(isEnglish ? 'PayPal payment completed successfully.' : 'Paiement PayPal effectué avec succès !')
       onSuccess()
     } catch (error: any) {
       onError(error.message)
@@ -78,7 +86,7 @@ export default function PayPalPaymentForm({ amount, currency, orderData, onSucce
   if (!clientId || clientId === 'AZ...') {
     return (
       <div className="text-sm text-destructive">
-        PayPal n'est pas configuré (VITE_PAYPAL_CLIENT_ID manquant).
+        {isEnglish ? 'PayPal is not configured (missing VITE_PAYPAL_CLIENT_ID).' : "PayPal n'est pas configuré (VITE_PAYPAL_CLIENT_ID manquant)."}
       </div>
     )
   }
@@ -93,7 +101,7 @@ export default function PayPalPaymentForm({ amount, currency, orderData, onSucce
         <PayPalButtons
           createOrder={createOrder}
           onApprove={onApprove}
-          onError={(error) => onError((error as any)?.message || 'Erreur PayPal')}
+          onError={(error) => onError((error as any)?.message || (isEnglish ? 'PayPal error' : 'Erreur PayPal'))}
           disabled={isLoading}
           style={{
             layout: 'vertical',

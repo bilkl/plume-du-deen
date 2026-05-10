@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { useLocation } from 'wouter'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
+import { PageHero, PageShell, PremiumCard } from '@/components/PageLayout'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function CreateAccount() {
   const [, setLocation] = useLocation()
+  const { language } = useLanguage()
+  const isEnglish = language === 'en'
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -21,12 +22,12 @@ export default function CreateAccount() {
     e.preventDefault()
 
     if (formData.password !== formData.confirmPassword) {
-      showErrorToast('Les mots de passe ne correspondent pas')
+      showErrorToast(isEnglish ? 'Passwords do not match' : 'Les mots de passe ne correspondent pas')
       return
     }
 
     if (formData.password.length < 6) {
-      showErrorToast('Le mot de passe doit contenir au moins 6 caractères')
+      showErrorToast(isEnglish ? 'Password must contain at least 6 characters' : 'Le mot de passe doit contenir au moins 6 caractères')
       return
     }
 
@@ -36,10 +37,10 @@ export default function CreateAccount() {
       // TODO: Implement actual account creation
       await new Promise(resolve => setTimeout(resolve, 1000))
 
-      showSuccessToast('Compte créé avec succès !')
+      showSuccessToast(isEnglish ? 'Account created successfully.' : 'Compte créé avec succès !')
       setLocation('/')
     } catch (error) {
-      showErrorToast('Erreur lors de la création du compte')
+      showErrorToast(isEnglish ? 'Error while creating the account' : 'Erreur lors de la création du compte')
     } finally {
       setIsSubmitting(false)
     }
@@ -50,19 +51,23 @@ export default function CreateAccount() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      <main className="flex-1 pt-20 pb-12">
+    <PageShell>
+      <PageHero
+        eyebrow={isEnglish ? 'Account' : 'Compte'}
+        title={isEnglish ? 'Create an account' : 'Créer un compte'}
+        description={isEnglish ? 'Track your orders and find your information more easily.' : 'Suivez vos commandes et retrouvez vos informations plus facilement.'}
+        className="pb-10 md:pb-14"
+      />
+      <section className="pb-16 md:pb-24">
         <div className="container">
-          <div className="max-w-md mx-auto">
-            <Card>
-              <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Créer un compte</CardTitle>
-                <p className="text-muted-foreground">
-                  Suivez vos commandes et bénéficiez d'avantages exclusifs
-                </p>
-              </CardHeader>
-              <CardContent>
+          <div className="max-w-[22rem] sm:max-w-md mx-auto">
+            <PremiumCard className="p-6 md:p-8">
+                <div className="mb-6 text-center">
+                  <h2 className="text-2xl md:text-3xl text-foreground">{isEnglish ? 'Your access' : 'Vos accès'}</h2>
+                  <p className="mt-2 text-muted-foreground">
+                    {isEnglish ? 'A few details are enough to prepare your space.' : 'Quelques informations suffisent pour préparer votre espace.'}
+                  </p>
+                </div>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <Label htmlFor="email">Email</Label>
@@ -76,7 +81,7 @@ export default function CreateAccount() {
                   </div>
 
                   <div>
-                    <Label htmlFor="password">Mot de passe</Label>
+                    <Label htmlFor="password">{isEnglish ? 'Password' : 'Mot de passe'}</Label>
                     <Input
                       id="password"
                       type="password"
@@ -88,7 +93,7 @@ export default function CreateAccount() {
                   </div>
 
                   <div>
-                    <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                    <Label htmlFor="confirmPassword">{isEnglish ? 'Confirm password' : 'Confirmer le mot de passe'}</Label>
                     <Input
                       id="confirmPassword"
                       type="password"
@@ -103,7 +108,9 @@ export default function CreateAccount() {
                     className="w-full"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? 'Création en cours...' : 'Créer mon compte'}
+                    {isSubmitting
+                      ? isEnglish ? 'Creating account...' : 'Création en cours...'
+                      : isEnglish ? 'Create my account' : 'Créer mon compte'}
                   </Button>
                 </form>
 
@@ -113,15 +120,13 @@ export default function CreateAccount() {
                     onClick={() => setLocation('/')}
                     className="text-sm"
                   >
-                    Plus tard, retourner à l'accueil
+                    {isEnglish ? 'Later, return home' : "Plus tard, retourner à l'accueil"}
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+            </PremiumCard>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </section>
+    </PageShell>
   )
 }

@@ -1,21 +1,8 @@
-import React from 'react'
-import { Link } from 'wouter'
+import { LegalDocument } from '@/components/PageLayout'
 
 export default function TermsAndConditions() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow-lg rounded-lg p-8">
-          <div className="mb-8">
-            <Link href="/" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
-              ← Retour à l'accueil
-            </Link>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Conditions Générales de Vente
-            </h1>
-            <p className="text-gray-600">Dernière mise à jour : 30 janvier 2026</p>
-          </div>
-
+    <LegalDocument title="Conditions générales de vente" updated="30 janvier 2026">
           <div className="prose prose-lg max-w-none">
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Objet</h2>
@@ -40,7 +27,7 @@ export default function TermsAndConditions() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Prix</h2>
               <p className="text-gray-700 mb-4">
-                Les prix sont indiqués en francs suisses (CHF) toutes taxes comprises (TTC). Aucun frais de port n'est appliqué pour les produits numériques.
+                Les prix de référence sont indiqués en francs suisses (CHF) toutes taxes comprises (TTC). Le site peut afficher et encaisser les commandes en CHF, EUR ou USD selon la devise sélectionnée. Aucun frais de port n'est appliqué pour les produits numériques.
               </p>
               <p className="text-gray-700 mb-4">
                 Plume du Deen se réserve le droit de modifier ses prix à tout moment, mais les produits seront facturés sur la base des tarifs en vigueur au moment de l'enregistrement de la commande.
@@ -155,8 +142,6 @@ export default function TermsAndConditions() {
               </div>
             </section>
           </div>
-        </div>
-      </div>
-    </div>
+    </LegalDocument>
   )
 }

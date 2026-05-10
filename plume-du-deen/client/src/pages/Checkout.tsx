@@ -1,34 +1,35 @@
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import CheckoutForm from '@/components/CheckoutForm';
+import { PageHero, PageShell, PremiumCard } from '@/components/PageLayout';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Checkout() {
+  const { language } = useLanguage();
+  const isEnglish = language === 'en';
+
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      <main className="flex-1 pt-20 pb-12">
+    <PageShell>
+      <PageHero
+        eyebrow={isEnglish ? 'Order' : 'Commande'}
+        title={isEnglish ? 'Complete my order' : 'Finaliser ma commande'}
+        description={isEnglish ? 'Enter your details to receive your confirmation and access.' : 'Renseignez vos informations pour recevoir votre confirmation et vos accès.'}
+        className="pb-10 md:pb-14"
+      />
+      <section className="pb-16 md:pb-24">
         <div className="container">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl text-foreground mb-4">
-                Finaliser ma commande
-              </h1>
-              <p className="text-muted-foreground mb-4">
-                Remplissez vos informations pour compléter votre achat
-              </p>
-              <div className="bg-muted/30 border border-border rounded-lg p-4 mb-6">
+          <div className="max-w-[22rem] sm:max-w-6xl mx-auto">
+              <PremiumCard className="mb-8 p-4 md:p-5">
                 <p className="text-sm text-foreground">
-                  <strong>💡 Pas de compte requis !</strong> Vous pouvez commander en tant qu'invité.
-                  Nous utiliserons votre email uniquement pour vous envoyer la confirmation de commande.
+                  <strong>{isEnglish ? 'No account required.' : 'Pas de compte requis.'}</strong>{' '}
+                  {isEnglish
+                    ? 'You can order as a guest. We will only use your email to send your order confirmation.'
+                    : "Vous pouvez commander en tant qu'invité. Nous utiliserons votre email uniquement pour vous envoyer la confirmation de commande."}
                 </p>
-              </div>
-            </div>
+              </PremiumCard>
 
             <CheckoutForm />
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </section>
+    </PageShell>
   );
 }

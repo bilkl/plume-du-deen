@@ -137,8 +137,12 @@ export default async function handler(req, res) {
         customer,
         items,
         total,
+        currency = 'CHF',
+        totalChf,
         paymentIntentId
       } = body;
+      const normalizedCurrency = String(currency || 'CHF').toUpperCase();
+      const allowedCurrencies = ['CHF', 'EUR', 'USD'];
 
       // Validation des données d'entrée
       if (!customer || !items || total === undefined || total === null || !paymentIntentId) {
@@ -159,6 +163,13 @@ export default async function handler(req, res) {
         return res.status(400).json({
           error: 'Total invalide',
           details: 'Le total doit être un nombre'
+        });
+      }
+
+      if (!allowedCurrencies.includes(normalizedCurrency)) {
+        return res.status(400).json({
+          error: 'Devise invalide',
+          details: 'Les devises acceptées sont CHF, EUR et USD'
         });
       }
 
@@ -256,6 +267,8 @@ export default async function handler(req, res) {
         },
         items,
         total,
+        currency: normalizedCurrency,
+        totalChf: typeof totalChf === 'number' && Number.isFinite(totalChf) ? totalChf : null,
         paymentIntentId,
         status: 'completed',
         createdAt: new Date().toISOString()
@@ -272,6 +285,8 @@ export default async function handler(req, res) {
         customerEmail: validatedCustomer.email,
         items,
         total,
+        currency: normalizedCurrency,
+        totalChf: orderRecord.totalChf,
         createdAt: orderRecord.createdAt,
         customerAddress: validatedCustomer.address,
         customerCity: validatedCustomer.city,
@@ -355,6 +370,7 @@ export default async function handler(req, res) {
         customerEmail: order.customer.email,
         items: Array.isArray(order.items) ? order.items : [],
         total: order.total,
+        currency: order.currency || 'CHF',
         status: order.status || 'completed',
         createdAt: new Date(order.createdAt).toLocaleDateString('fr-FR', {
           year: 'numeric',

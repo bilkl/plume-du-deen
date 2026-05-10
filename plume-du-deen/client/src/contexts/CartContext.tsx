@@ -28,6 +28,13 @@ type CartAction =
   | { type: 'CLEAR_CART' }
   | { type: 'LOAD_CART'; payload: CartState };
 
+const cartMessage = (english: string, french: string) => {
+  if (typeof window !== 'undefined' && localStorage.getItem('plume-du-deen-language') === 'en') {
+    return english;
+  }
+  return french;
+};
+
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_ITEM': {
@@ -42,7 +49,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
           items: updatedItems,
           total: updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
         };
-        showSuccessToast(`Quantité mise à jour : ${action.payload.name}`);
+        showSuccessToast(cartMessage(`Quantity updated: ${action.payload.name}`, `Quantité mise à jour : ${action.payload.name}`));
         return newState;
       } else {
         const newItem: CartItem = { ...action.payload, quantity: 1 };
@@ -51,7 +58,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
           items: newItems,
           total: newItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
         };
-        showSuccessToast(`${action.payload.name} ajouté au panier !`);
+        showSuccessToast(cartMessage(`${action.payload.name} added to cart.`, `${action.payload.name} ajouté au panier !`));
         return newState;
       }
     }
@@ -63,7 +70,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         total: newItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
       };
       if (itemToRemove) {
-        showSuccessToast(`${itemToRemove.name} retiré du panier`);
+        showSuccessToast(cartMessage(`${itemToRemove.name} removed from cart`, `${itemToRemove.name} retiré du panier`));
       }
       return newState;
     }
@@ -76,7 +83,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
           total: newItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
         };
         if (itemToRemove) {
-          showSuccessToast(`${itemToRemove.name} retiré du panier`);
+          showSuccessToast(cartMessage(`${itemToRemove.name} removed from cart`, `${itemToRemove.name} retiré du panier`));
         }
         return newState;
       }
@@ -91,12 +98,12 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       };
       const updatedItem = updatedItems.find(item => item.id === action.payload.id);
       if (updatedItem) {
-        showSuccessToast(`Quantité mise à jour : ${updatedItem.name} (${action.payload.quantity})`);
+        showSuccessToast(cartMessage(`Quantity updated: ${updatedItem.name} (${action.payload.quantity})`, `Quantité mise à jour : ${updatedItem.name} (${action.payload.quantity})`));
       }
       return newState;
     }
     case 'CLEAR_CART':
-      showSuccessToast('Panier vidé');
+      showSuccessToast(cartMessage('Cart cleared', 'Panier vidé'));
       return { items: [], total: 0 };
     case 'LOAD_CART':
       return action.payload;

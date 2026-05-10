@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
 import { useReviewStats } from '@/hooks/useReviewStats'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface Review {
   id: string
@@ -38,6 +39,8 @@ export default function ProductReviews({
   onReport,
   className
 }: ProductReviewsProps) {
+  const { language } = useLanguage()
+  const isEnglish = language === 'en'
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [newReview, setNewReview] = useState({
     rating: 5,
@@ -60,7 +63,7 @@ export default function ProductReviews({
 
   const handleSubmitReview = () => {
     if (!newReview.title.trim() || !newReview.comment.trim()) {
-      showErrorToast('Veuillez remplir tous les champs')
+      showErrorToast(isEnglish ? 'Please fill in all fields' : 'Veuillez remplir tous les champs')
       return
     }
 
@@ -78,7 +81,7 @@ export default function ProductReviews({
 
     setNewReview({ rating: 5, title: '', comment: '' })
     setShowReviewForm(false)
-    showSuccessToast('Avis ajouté avec succès !')
+    showSuccessToast(isEnglish ? 'Review added successfully.' : 'Avis ajouté avec succès !')
   }
 
   const StarRating = ({ rating, interactive = false, onChange }: {
@@ -113,7 +116,7 @@ export default function ProductReviews({
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div>
           <h2 className="text-2xl font-semibold text-foreground mb-2">
-            Avis clients ({reviews.length})
+            {isEnglish ? 'Customer reviews' : 'Avis clients'} ({reviews.length})
           </h2>
           {reviews.length > 0 && (
             <div className="flex items-center gap-4">
@@ -122,7 +125,7 @@ export default function ProductReviews({
                 <span className="font-medium">{averageRating.toFixed(1)}</span>
               </div>
               <span className="text-muted-foreground">
-                {reviews.length} avis
+                {reviews.length} {isEnglish ? 'reviews' : 'avis'}
               </span>
             </div>
           )}
@@ -133,7 +136,7 @@ export default function ProductReviews({
           variant="outline"
         >
           <MessageCircle className="w-4 h-4 mr-2" />
-          Écrire un avis
+          {isEnglish ? 'Write a review' : 'Écrire un avis'}
         </Button>
       </div>
 
@@ -168,11 +171,11 @@ export default function ProductReviews({
       {showReviewForm && (
         <Card>
           <CardHeader>
-            <h3 className="text-lg font-semibold">Écrire un avis</h3>
+            <h3 className="text-lg font-semibold">{isEnglish ? 'Write a review' : 'Écrire un avis'}</h3>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Note</label>
+              <label className="block text-sm font-medium mb-2">{isEnglish ? 'Rating' : 'Note'}</label>
               <StarRating
                 rating={newReview.rating}
                 interactive
@@ -181,23 +184,23 @@ export default function ProductReviews({
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Titre</label>
+              <label className="block text-sm font-medium mb-2">{isEnglish ? 'Title' : 'Titre'}</label>
               <input
                 type="text"
                 value={newReview.title}
                 onChange={(e) => setNewReview(prev => ({ ...prev, title: e.target.value }))}
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Résumez votre avis..."
+                placeholder={isEnglish ? 'Summarize your review...' : 'Résumez votre avis...'}
                 maxLength={100}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Commentaire</label>
+              <label className="block text-sm font-medium mb-2">{isEnglish ? 'Comment' : 'Commentaire'}</label>
               <Textarea
                 value={newReview.comment}
                 onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
-                placeholder="Partagez votre expérience avec ce produit..."
+                placeholder={isEnglish ? 'Share your experience with this product...' : 'Partagez votre expérience avec ce produit...'}
                 rows={4}
                 maxLength={1000}
               />
@@ -205,13 +208,13 @@ export default function ProductReviews({
 
             <div className="flex gap-3">
               <Button onClick={handleSubmitReview}>
-                Publier l'avis
+                {isEnglish ? 'Publish review' : "Publier l'avis"}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setShowReviewForm(false)}
               >
-                Annuler
+                {isEnglish ? 'Cancel' : 'Annuler'}
               </Button>
             </div>
           </CardContent>
@@ -223,12 +226,12 @@ export default function ProductReviews({
         <div className="space-y-6">
           {/* Sort options */}
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium">Trier par :</span>
+            <span className="text-sm font-medium">{isEnglish ? 'Sort by:' : 'Trier par :'}</span>
             <div className="flex gap-2">
               {[
-                { value: 'recent', label: 'Plus récent' },
-                { value: 'rating', label: 'Note' },
-                { value: 'helpful', label: 'Utile' }
+                { value: 'recent', label: isEnglish ? 'Most recent' : 'Plus récent' },
+                { value: 'rating', label: isEnglish ? 'Rating' : 'Note' },
+                { value: 'helpful', label: isEnglish ? 'Helpful' : 'Utile' }
               ].map(({ value, label }) => (
                 <Button
                   key={value}
@@ -260,12 +263,12 @@ export default function ProductReviews({
                           <span className="font-medium">{review.userName}</span>
                           {review.verified && (
                             <Badge variant="secondary" className="text-xs">
-                              Achat vérifié
+                              {isEnglish ? 'Verified purchase' : 'Achat vérifié'}
                             </Badge>
                           )}
                         </div>
                         <span className="text-sm text-muted-foreground">
-                          {new Date(review.date).toLocaleDateString('fr-FR')}
+                          {new Date(review.date).toLocaleDateString(isEnglish ? 'en-US' : 'fr-FR')}
                         </span>
                       </div>
 
@@ -286,19 +289,19 @@ export default function ProductReviews({
                           onClick={() => onHelpful?.(review.id)}
                         >
                           <ThumbsUp className="w-4 h-4 mr-1" />
-                          Utile ({review.helpful})
+                          {isEnglish ? 'Helpful' : 'Utile'} ({review.helpful})
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           className="text-muted-foreground hover:text-foreground"
                           onClick={() => {
-                            const reason = prompt('Motif du signalement (facultatif)') || 'inapproprié'
+                            const reason = prompt(isEnglish ? 'Reason for report (optional)' : 'Motif du signalement (facultatif)') || (isEnglish ? 'inappropriate' : 'inapproprié')
                             onReport?.(review.id, reason)
                           }}
                         >
                           <Flag className="w-4 h-4 mr-1" />
-                          Signaler
+                          {isEnglish ? 'Report' : 'Signaler'}
                         </Button>
                       </div>
                     </div>
@@ -314,13 +317,13 @@ export default function ProductReviews({
         <div className="text-center py-12">
           <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">
-            Aucun avis pour le moment
+            {isEnglish ? 'No reviews yet' : 'Aucun avis pour le moment'}
           </h3>
           <p className="text-muted-foreground mb-4">
-            Soyez le premier à donner votre avis sur ce produit !
+            {isEnglish ? 'Be the first to review this product.' : 'Soyez le premier à donner votre avis sur ce produit !'}
           </p>
           <Button onClick={() => setShowReviewForm(true)}>
-            Écrire le premier avis
+            {isEnglish ? 'Write the first review' : 'Écrire le premier avis'}
           </Button>
         </div>
       )}

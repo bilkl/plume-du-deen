@@ -1,136 +1,222 @@
-import { ShoppingCart } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { CheckCircle2, ShoppingCart, Sparkles } from 'lucide-react';
 import { Link } from 'wouter';
 import { useCart } from '@/contexts/CartContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { STORE_PRODUCTS, StoreProduct } from '@/data/products';
 
 export default function Products() {
   const { dispatch } = useCart();
+  const { formatPrice } = useCurrency();
+  const { t, localizeProduct, language } = useLanguage();
+  const [activeFilter, setActiveFilter] = useState('all');
+  const products = useMemo(() => STORE_PRODUCTS.map(localizeProduct), [localizeProduct, language]);
 
-  const addToCart = (product: any) => {
+  const filters = [
+    { id: 'all', label: t('collection.filter.all', 'Tous') },
+    { id: 'new', label: t('collection.filter.new', 'Nouveautés') },
+    { id: 'paper', label: t('collection.filter.paper', 'Papier limité') },
+    { id: 'paid', label: t('collection.filter.paid', 'PDF payants') },
+    { id: 'free', label: t('collection.filter.free', 'Offerts') },
+  ];
+
+  const filteredProducts = useMemo(() => {
+    switch (activeFilter) {
+      case 'new':
+        return products.filter((product) => product.isNew);
+      case 'paper':
+        return products.filter((product) => product.paperLimited);
+      case 'paid':
+        return products.filter((product) => product.price !== null && product.price > 0);
+      case 'free':
+        return products.filter((product) => product.price === 0);
+      default:
+        return products;
+    }
+  }, [activeFilter, products]);
+
+  const addToCart = (product: StoreProduct) => {
+    if (product.price === null) {
+      return;
+    }
+
     dispatch({ type: 'ADD_ITEM', payload: {
       id: product.id,
-      name: `${product.title} - PDF`,
+      name: `${product.title} - ${product.paperLimited ? t('common.paperLimited', 'Papier très limité') : t('common.pdf', 'PDF')}`,
       price: product.price,
       image: product.image,
       description: product.description,
-      format: 'digital'
+      format: product.paperLimited ? 'paper' : 'digital'
     }});
   };
 
-  const products = [
-    {
-      id: 1,
-      title: 'Les Invocations du Coran',
-      subtitle: 'Nouveau',
-      description: 'Dossier de 30 cartes avec les invocations du Coran pour accompagner votre quotidien.',
-      image: '/images/invocations.png',
-      color: 'bg-blue-50 dark:bg-blue-900',
-      price: 4.9,
-    },
-    {
-      id: 2,
-      title: 'Planner Ramadan ALIF',
-      subtitle: 'Offert',
-      description: 'Le rituel guidé de 30 jours pour transformer son Ramadan de l\'intérieur.',
-      image: '/images/planner.png',
-      color: 'bg-amber-50 dark:bg-amber-900',
-      price: 0,
-    },
-    {
-      id: 3,
-      title: 'Les 99 Noms d\'Allah',
-      subtitle: 'Idée cadeau',
-      description: 'Entrer en relation avec les Noms d\'Allah à travers 99 cartes spirituelles.',
-      image: '/images/99noms.png',
-      color: 'bg-rose-50 dark:bg-rose-900',
-      price: 9.9,
-    },
-  ];
-
   return (
-    <section id="collection" className="py-20 md:py-32">
-      <div className="container">
+    <section id="collection" className="relative py-24 md:py-32 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background"></div>
+      <div className="orb orb-2 w-[26rem] h-[26rem] bg-primary/10 -top-20 -left-32"></div>
+
+      <div className="container relative">
         {/* Section Header */}
-        <div className="text-center mb-16 md:mb-20 space-y-4 animate-fade-in-up">
-          <h2 className="text-4xl md:text-5xl text-foreground">
-            Pour votre foi
+        <div className="text-center mb-14 md:mb-20 space-y-5 reveal-soft">
+          <div className="ornament mx-auto">
+            <span className="font-poppins text-sm md:text-base tracking-[0.28em] uppercase font-medium">{t('collection.eyebrow', 'Collection Plume du Deen')}</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl text-foreground">
+            {t('collection.title', 'Pour votre foi')}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Des créations qui guident votre quotidien.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            {t('collection.description', 'Des créations qui guident votre quotidien.')}
           </p>
         </div>
 
         {/* Availability Info */}
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 mb-12 text-center animate-fade-in-up">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+        <div className="relative border-gradient-gold rounded-3xl p-7 md:p-10 mb-14 reveal-soft shadow-premium overflow-hidden">
+          <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-accent/10 blur-3xl pointer-events-none"></div>
+          <div className="relative grid grid-cols-1 md:grid-cols-[auto_1fr_auto] gap-5 md:gap-7 items-center text-center md:text-left">
+            <div className="w-16 h-16 mx-auto md:mx-0 bg-gradient-to-br from-primary/15 to-primary/5 text-primary rounded-2xl flex items-center justify-center ring-1 ring-primary/15">
+              <Sparkles className="w-7 h-7" strokeWidth={1.5} />
             </div>
-            <h3 className="text-xl font-semibold text-green-800 dark:text-green-200">
-              Livraison instantanée
-            </h3>
+            <div>
+              <h3 className="text-2xl md:text-[1.65rem] font-semibold text-foreground font-playfair tracking-wide">
+                {t('collection.availabilityTitle', 'Nouveautés disponibles')}
+              </h3>
+              <p className="text-base md:text-lg text-muted-foreground mt-2 leading-relaxed">
+                {t('collection.availabilityDescription', 'Nos créations sont proposées en PDF, avec une version papier très limitée pour les nouveautés.')}
+              </p>
+            </div>
+            <div className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-accent/20 to-accent/10 ring-1 ring-accent/40 px-6 py-3 text-base font-semibold text-primary">
+              <CheckCircle2 className="w-5 h-5" />
+              {t('collection.sadaqa', 'Sadaqa jariya')}
+            </div>
           </div>
-          <p className="text-green-700 dark:text-green-300 mb-3">
-            Tous nos produits sont des <strong className="text-green-800 dark:text-green-100">PDFs</strong> et disponibles <strong className="text-green-800 dark:text-green-100">immédiatement</strong> après achat.
-          </p>
-          <p className="text-sm text-green-600 dark:text-green-400">
-            💝 <strong>1 CHF</strong> sera versé dans des causes de <strong>sadaqa jariya</strong> pour chaque vente.
+          <p className="relative mt-6 text-center text-base text-muted-foreground pt-5 border-t border-border/40">
+            {t('collection.donation', '1 CHF sera versé dans des causes de sadaqa jariya pour chaque vente.')}
           </p>
         </div>
 
+        <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="font-poppins text-base text-muted-foreground">
+            <span className="text-foreground font-semibold">{filteredProducts.length}</span> {filteredProducts.length > 1 ? t('collection.showing', 'créations affichées') : t('collection.showingOne', 'création affichée')}
+          </div>
+          <div className="grid w-full grid-cols-2 gap-2 rounded-3xl bg-card/60 p-1.5 shadow-premium backdrop-blur-md border border-border/60 min-[380px]:grid-cols-3 sm:flex sm:w-auto sm:overflow-x-auto sm:rounded-full" role="tablist" aria-label="Filtres de collection">
+            {filters.map((filter) => (
+              <button
+                key={filter.id}
+                type="button"
+                role="tab"
+                aria-selected={activeFilter === filter.id}
+                onClick={() => setActiveFilter(filter.id)}
+                className={`w-full whitespace-nowrap rounded-full px-3 py-2.5 font-poppins text-sm font-semibold transition-all duration-300 sm:w-auto sm:px-5 sm:text-base ${
+                  activeFilter === filter.id
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'text-foreground/70 hover:text-primary hover:bg-secondary/60'
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
-          {products.map((product) => (
-            <div
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7 md:gap-9">
+          {filteredProducts.map((product, index) => (
+            <article
               key={product.id}
-              className="group flex flex-col overflow-hidden rounded-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 bg-card border border-border animate-fade-in-up"
-              style={{ animationDelay: `${(product.id - 1) * 0.2}s` }}
+              className="group relative flex flex-col overflow-hidden rounded-3xl bg-card border border-border/60 hover-lift hover:shadow-premium-lg hover:border-accent/30 reveal-soft"
+              style={{ animationDelay: `${index * 0.08}s` }}
             >
               {/* Image Container */}
-              <div className="relative h-80 overflow-hidden bg-cover bg-center" style={{ backgroundImage: 'url(/images/banner-background.png)' }}>
+              <div className="relative h-[24rem] min-h-80 overflow-hidden bg-gradient-to-br from-secondary/40 via-secondary/20 to-secondary/40">
+                {/* subtle gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-[1] pointer-events-none"></div>
                 <img
                   src={product.image}
                   alt={product.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-contain p-6 group-hover:scale-[1.06] transition-transform duration-700 ease-out"
+                  loading="lazy"
                 />
-                {/* Badge */}
-                <div className="absolute top-4 left-4 bg-primary text-primary-foreground px-4 py-2 rounded-sm text-sm font-semibold">
+                {/* Subtitle Badge */}
+                <div className="absolute top-5 left-5 max-w-[70%] bg-primary/95 backdrop-blur-md text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold shadow-md tracking-wider z-[2]">
                   {product.subtitle}
                 </div>
-                {/* Digital Badge */}
-                <div className="absolute top-4 right-4 bg-green-600 text-white px-3 py-1 rounded-sm text-xs font-semibold">
-                  PDF
+                {/* Format Badges */}
+                <div className="absolute top-5 right-5 flex flex-col items-end gap-2 z-[2]">
+                  <div className="bg-primary/90 backdrop-blur-md text-white px-3.5 py-1.5 rounded-full text-sm font-semibold shadow-sm ring-1 ring-white/10">
+                      {t('common.pdf', 'PDF')}
+                  </div>
+                  {product.paperLimited && (
+                    <div className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground px-3.5 py-1.5 rounded-full text-sm font-semibold shadow-gold ring-1 ring-white/20">
+                      {t('common.paperLimited', 'Papier limité')}
+                    </div>
+                  )}
+                  {product.isNew && (
+                    <div className="bg-card/90 backdrop-blur-md text-primary px-3.5 py-1.5 rounded-full text-sm font-semibold shadow-sm ring-1 ring-primary/20">
+                      {t('common.new', 'Nouveau')}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Content */}
-              <div className="flex-1 p-6 bg-card flex flex-col">
-                <h3 className="text-xl md:text-2xl text-foreground mb-2">
+              <div className="flex-1 p-7 md:p-8 bg-card flex flex-col">
+                <p className="font-poppins text-sm uppercase tracking-[0.2em] text-accent mb-3 font-semibold">
+                  {product.category}
+                </p>
+                <h3 className="text-2xl md:text-[1.7rem] font-playfair tracking-wide text-foreground mb-3 group-hover:text-primary transition-colors leading-snug">
                   {product.title}
                 </h3>
-                <p className="text-base text-muted-foreground mb-6 flex-1">
+                <p className="text-base md:text-lg text-muted-foreground mb-6 flex-1 leading-relaxed">
                   {product.description}
                 </p>
 
+                <div className="mb-7 grid grid-cols-2 gap-4 border-t border-border/60 pt-5 text-base">
+                  <div>
+                    <span className="block text-muted-foreground/80 mb-1 text-sm uppercase tracking-wider">{t('common.format', 'Format')}</span>
+                    <span className="font-medium text-foreground">
+                      {product.paperLimited ? `${t('common.pdf', 'PDF')} & ${t('common.paperLimited', 'papier limité')}` : t('common.pdf', 'PDF')}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="block text-muted-foreground/80 mb-1 text-sm uppercase tracking-wider">{t('common.price', 'Prix')}</span>
+                    <span className="font-semibold text-primary text-xl font-playfair">
+                      {product.price === null
+                        ? t('common.priceToConfirm', 'Prix à confirmer')
+                        : product.price === 0
+                          ? t('common.free', 'Offert')
+                          : formatPrice(product.price)}
+                    </span>
+                  </div>
+                </div>
+
                 {/* CTA Buttons */}
                 <div className="flex flex-col gap-3">
-                  <Link href={product.id === 1 ? "/invocations" : product.id === 2 ? "/planner" : "/99noms"}>
-                    <button className="w-full px-4 py-3 bg-transparent border-2 border-primary text-primary font-semibold rounded-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground flex items-center justify-center gap-2">
-                      Découvrir
+                  <Link href={product.href}>
+                    <button className="w-full px-5 py-4 bg-transparent border border-border text-foreground text-base font-medium rounded-full transition-all duration-300 hover:border-primary hover:text-primary hover:bg-secondary/40 flex items-center justify-center gap-2">
+                      {t('common.discover', 'Découvrir')}
                     </button>
                   </Link>
 
-                  {/* Add to Cart Button */}
-                  <button
-                    onClick={() => addToCart({ ...product, price: product.price, format: 'digital' })}
-                    className="w-full px-4 py-3 bg-primary text-primary-foreground font-semibold rounded-sm transition-all duration-300 hover:bg-primary/90 hover:shadow-lg flex items-center justify-center gap-2"
-                  >
-                    Ajouter au panier - {product.price === 0 ? 'Offert' : `${product.price.toFixed(2)} CHF`}
-                  </button>
+                  {product.price === null ? (
+                    <Link href="/contact">
+                      <button className="w-full px-5 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-full transition-all duration-300 hover:bg-primary/90 hover:shadow-premium hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                        {t('common.askAvailability', 'Demander la disponibilité')}
+                      </button>
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => addToCart(product)}
+                      className="group/btn relative w-full px-5 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-full transition-all duration-300 hover:bg-primary/95 hover:shadow-premium hover:-translate-y-0.5 flex items-center justify-center gap-2 overflow-hidden"
+                    >
+                      <span className="absolute inset-0 shimmer-gold opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500"></span>
+                      <ShoppingCart className="relative w-[1.1rem] h-[1.1rem]" />
+                      <span className="relative">{t('common.addToCart', 'Ajouter au panier')}{product.price === 0 ? ` - ${t('common.free', 'Offert')}` : ` · ${formatPrice(product.price)}`}</span>
+                    </button>
+                  )}
                 </div>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>

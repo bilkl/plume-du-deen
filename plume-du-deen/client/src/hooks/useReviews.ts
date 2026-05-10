@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
 import { apiUrl } from '@/lib/api'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 export interface Review {
   id: string
@@ -29,6 +30,8 @@ interface UseReviewsReturn {
 // Mock data for development - replace with real API calls
 
 export function useReviews(productId: number): UseReviewsReturn {
+  const { language } = useLanguage()
+  const isEnglish = language === 'en'
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -82,12 +85,12 @@ export function useReviews(productId: number): UseReviewsReturn {
       const productReviews = all[productId] || []
       setReviews(productReviews)
     } catch (err) {
-      setError('Erreur lors du chargement des avis')
+      setError(isEnglish ? 'Error while loading reviews' : 'Erreur lors du chargement des avis')
       console.error('Error fetching reviews:', err)
     } finally {
       setLoading(false)
     }
-  }, [productId])
+  }, [productId, isEnglish])
 
   const addReview = useCallback(async (reviewData: Omit<Review, 'id' | 'date' | 'helpful'>) => {
     try {
@@ -110,7 +113,7 @@ export function useReviews(productId: number): UseReviewsReturn {
             saveAllReviewsToStorage(all)
             return updated
           })
-          showSuccessToast('Avis ajouté avec succès !')
+          showSuccessToast(isEnglish ? 'Review added successfully.' : 'Avis ajouté avec succès !')
           return
         }
       } catch (err) {
@@ -132,13 +135,13 @@ export function useReviews(productId: number): UseReviewsReturn {
         saveAllReviewsToStorage(all)
         return updated
       })
-      showSuccessToast('Avis ajouté (enregistré localement)')
+      showSuccessToast(isEnglish ? 'Review added and saved locally.' : 'Avis ajouté (enregistré localement)')
     } catch (err) {
-      showErrorToast('Erreur lors de l\'ajout de l\'avis')
+      showErrorToast(isEnglish ? 'Error while adding the review' : 'Erreur lors de l\'ajout de l\'avis')
       console.error('Error adding review:', err)
       throw err
     }
-  }, [productId])
+  }, [productId, isEnglish])
 
   const updateReviewHelpful = useCallback(async (reviewId: string) => {
     try {
@@ -192,20 +195,20 @@ export function useReviews(productId: number): UseReviewsReturn {
           body: JSON.stringify({ action: 'report', reviewId, reason })
         })
         if (res.ok) {
-          showSuccessToast('Signalement envoyé. Merci pour votre contribution.')
+          showSuccessToast(isEnglish ? 'Report sent. Thank you for your contribution.' : 'Signalement envoyé. Merci pour votre contribution.')
           return
         }
       } catch (err) {
         console.warn('Failed to send report to server, logging locally', err)
       }
 
-      showSuccessToast('Signalement enregistré localement. Merci.')
+      showSuccessToast(isEnglish ? 'Report saved locally. Thank you.' : 'Signalement enregistré localement. Merci.')
       console.log('Review reported (local):', { reviewId, reason })
     } catch (err) {
-      showErrorToast('Erreur lors du signalement')
+      showErrorToast(isEnglish ? 'Error while reporting' : 'Erreur lors du signalement')
       console.error('Error reporting review:', err)
     }
-  }, [productId])
+  }, [productId, isEnglish])
 
   const refreshReviews = useCallback(async () => {
     await fetchReviews()
