@@ -57,6 +57,41 @@ function formatOrderMoney(amount, currency = 'CHF') {
   }).format(Number(amount || 0))
 }
 
+function isPaperItem(item) {
+  return item?.format === 'paper' || /papier|paper/i.test(String(item?.name || ''))
+}
+
+function itemFormatLabel(item) {
+  return isPaperItem(item) ? 'Version papier' : 'PDF'
+}
+
+function hasPhysicalItems(orderData) {
+  return Boolean(orderData?.hasPhysicalItems) || (orderData?.items || []).some(isPaperItem)
+}
+
+function createAddressHTML(orderData) {
+  const {
+    customerAddress,
+    customerCity,
+    customerPostalCode,
+    customerCountry,
+    customerPhone,
+    customerOrderNotes
+  } = orderData
+
+  if (!customerAddress && !customerCity && !customerPostalCode && !customerCountry && !customerPhone && !customerOrderNotes) {
+    return ''
+  }
+
+  return `
+    ${customerAddress ? `${customerAddress}<br />` : ''}
+    ${(customerPostalCode || '').toString()} ${(customerCity || '').toString()}<br />
+    ${customerCountry || ''}
+    ${customerPhone ? `<br />Tel: ${customerPhone}` : ''}
+    ${customerOrderNotes ? `<br /><em>Note: ${customerOrderNotes}</em>` : ''}
+  `
+}
+
 const RESEND_API_KEY = process.env.RESEND_API_KEY
 if (!RESEND_API_KEY) {
   console.warn('RESEND_API_KEY not set. Email sending is disabled. Add RESEND_API_KEY to .env or to your environment variables for production.')
@@ -106,22 +141,38 @@ function createAdminOrderNotificationHTML(orderData) {
     customerName,
     customerEmail,
     items = [],
+    subtotal,
+    shipping,
     total,
     createdAt,
     customerAddress,
     customerCity,
     customerPostalCode,
     customerCountry,
+    customerPhone,
+    customerOrderNotes,
+    fulfillmentStatus,
     currency = 'CHF'
   } = orderData
+  const physicalOrder = hasPhysicalItems(orderData)
+  const digitalManualAction = Boolean(orderData?.hasDigitalItems) && Number(orderData?.digitalAttachmentsCount || 0) === 0
 
   const itemsHTML = items
     .map(item => {
       const qty = Number(item.quantity || 1)
       const price = Number(item.price || 0)
-      return `<li><strong>${item.name}</strong> — Qté: ${qty} — ${formatOrderMoney(price * qty, currency)}</li>`
+      return `<li><strong>${item.name}</strong> <span style="color:#666;">(${itemFormatLabel(item)})</span> — Qté: ${qty} — ${formatOrderMoney(price * qty, currency)}</li>`
     })
     .join('')
+
+  const addressHTML = createAddressHTML({
+    customerAddress,
+    customerCity,
+    customerPostalCode,
+    customerCountry,
+    customerPhone,
+    customerOrderNotes
+  })
 
   return `
     <!DOCTYPE html>
@@ -134,24 +185,36 @@ function createAdminOrderNotificationHTML(orderData) {
     <body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; padding: 20px; background-color: #f9f9f9;">
       <div style="max-width: 720px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 10px;">
         <h2 style="margin-top: 0;">Nouvelle commande reçue</h2>
+        ${physicalOrder ? `
+        <div style="background:#fff7e6; border:1px solid #e7c46a; padding:14px 16px; border-radius:8px; margin-bottom:18px;">
+          <strong>Action requise:</strong> préparer et expédier la commande papier depuis la Suisse.
+        </div>
+        ` : ''}
+        ${digitalManualAction ? `
+        <div style="background:#eef6ff; border:1px solid #8bbce8; padding:14px 16px; border-radius:8px; margin-bottom:18px;">
+          <strong>Action PDF:</strong> vérifier si un fichier numérique doit être envoyé manuellement au client.
+        </div>
+        ` : ''}
         <p style="margin: 6px 0;"><strong>Commande:</strong> ${orderId}</p>
         <p style="margin: 6px 0;"><strong>Date:</strong> ${createdAt ? new Date(createdAt).toLocaleString('fr-FR') : ''}</p>
         <p style="margin: 6px 0;"><strong>Client:</strong> ${customerName} — <a href="mailto:${customerEmail}">${customerEmail}</a></p>
+        ${customerPhone ? `<p style="margin: 6px 0;"><strong>Téléphone:</strong> ${customerPhone}</p>` : ''}
+        <p style="margin: 6px 0;"><strong>Traitement:</strong> ${fulfillmentStatus === 'paid-awaiting-preparation' ? 'Payée - à préparer' : 'Complétée'}</p>
 
         <h3>Articles</h3>
         <ul>
           ${itemsHTML}
         </ul>
 
+        ${subtotal !== null && subtotal !== undefined ? `<p style="margin: 6px 0;"><strong>Sous-total:</strong> ${formatOrderMoney(subtotal, currency)}</p>` : ''}
+        ${shipping?.required ? `<p style="margin: 6px 0;"><strong>Livraison:</strong> ${formatOrderMoney(shipping.amount, currency)} — ${shipping.countryLabel || customerCountry || ''} — ${shipping.label || 'Expédition depuis la Suisse'}</p>` : ''}
         <p style="margin: 6px 0;"><strong>Total:</strong> ${formatOrderMoney(total, currency)}</p>
 
-        ${(customerAddress || customerCity || customerPostalCode || customerCountry)
+        ${addressHTML
           ? `
-        <h3>Adresse</h3>
+        <h3>Adresse de livraison</h3>
         <p style="margin: 6px 0;">
-          ${customerAddress || ''}<br />
-          ${(customerPostalCode || '').toString()} ${(customerCity || '').toString()}<br />
-          ${customerCountry || ''}
+          ${addressHTML}
         </p>
         `
           : ''}
@@ -197,7 +260,16 @@ export async function sendAdminOrderNotification(orderData) {
 }
 
 function createOrderConfirmationHTML(orderData, hasAttachments = false, attachments = []) {
-  const { orderId, customerName, items, total, createdAt, currency = 'CHF' } = orderData
+  const { orderId, customerName, items = [], subtotal, shipping, total, createdAt, currency = 'CHF' } = orderData
+  const physicalOrder = hasPhysicalItems(orderData)
+  const hasDigitalDelivery = hasAttachments || items.some(item => !isPaperItem(item))
+  const introMessage = physicalOrder && hasDigitalDelivery
+    ? '<br><br><strong>Vos PDF sont joints si disponibles. La version papier sera préparée puis expédiée manuellement depuis la Suisse.</strong>'
+    : physicalOrder
+      ? '<br><br><strong>Votre commande papier sera préparée puis expédiée manuellement depuis la Suisse.</strong>'
+      : hasAttachments
+        ? '<br><br><strong>Vos ebooks sont disponibles immédiatement et joints à cet email.</strong><br>Vous pouvez commencer votre lecture dès maintenant.'
+        : 'Votre commande est confirmée et sera traitée dans les plus brefs délais.'
 
   const itemsHTML = items.map(item => `
     <tr>
@@ -207,7 +279,7 @@ function createOrderConfirmationHTML(orderData, hasAttachments = false, attachme
           <div>
             <strong>${item.name}</strong>
             <br>
-            <span style="color: #666; font-size: 14px;">Quantité: ${item.quantity}</span>
+            <span style="color: #666; font-size: 14px;">${itemFormatLabel(item)} · Quantité: ${item.quantity}</span>
           </div>
         </div>
       </td>
@@ -241,7 +313,7 @@ function createOrderConfirmationHTML(orderData, hasAttachments = false, attachme
           <p style="font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
             Cher(e) ${customerName},<br><br>
             Merci pour votre commande ! Nous avons bien reçu votre paiement.
-            ${hasAttachments ? '<br><br><strong>🎉 Vos ebooks sont disponibles immédiatement et joints à cet email !</strong><br>Vous pouvez commencer votre lecture dès maintenant.' : 'Votre commande est confirmée et sera traitée dans les plus brefs délais.'}
+            ${introMessage}
           </p>
 
           <!-- Order Details -->
@@ -262,6 +334,22 @@ function createOrderConfirmationHTML(orderData, hasAttachments = false, attachme
             </thead>
             <tbody>
               ${itemsHTML}
+              ${subtotal !== null && subtotal !== undefined ? `
+              <tr>
+                <td style="padding: 12px 15px; text-align: right; border-top: 1px solid #eee;">Sous-total</td>
+                <td style="padding: 12px 15px; text-align: right; border-top: 1px solid #eee;">
+                  ${formatOrderMoney(subtotal, currency)}
+                </td>
+              </tr>
+              ` : ''}
+              ${shipping?.required ? `
+              <tr>
+                <td style="padding: 12px 15px; text-align: right; border-top: 1px solid #eee;">Livraison depuis la Suisse</td>
+                <td style="padding: 12px 15px; text-align: right; border-top: 1px solid #eee;">
+                  ${formatOrderMoney(shipping.amount, currency)}
+                </td>
+              </tr>
+              ` : ''}
               <tr style="background-color: #f8f8f8; font-weight: bold;">
                 <td style="padding: 15px; text-align: right; border-top: 2px solid #8B4513;">Total</td>
                 <td style="padding: 15px; text-align: right; border-top: 2px solid #8B4513; color: #8B4513; font-size: 18px;">
@@ -273,10 +361,10 @@ function createOrderConfirmationHTML(orderData, hasAttachments = false, attachme
 
           <!-- Delivery Info -->
           <div style="background-color: #e8f4fd; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-            <h4 style="color: #2c5aa0; margin-top: 0; margin-bottom: 10px;">📚 Livraison numérique instantanée</h4>
+            <h4 style="color: #2c5aa0; margin-top: 0; margin-bottom: 10px;">${physicalOrder ? 'Expédition papier depuis la Suisse' : 'Livraison numérique instantanée'}</h4>
             <p style="margin: 5px 0; color: #555;">
-              ${hasAttachments ? 'Vos ebooks sont joints à cet email et disponibles immédiatement.' : 'Vos produits physiques seront expédiés dans les plus brefs délais.'}
-              ${hasAttachments ? '' : 'Vous recevrez un email de suivi dès que votre colis sera envoyé.'}
+              ${physicalOrder ? `${shipping?.estimate || 'Votre commande sera préparée puis expédiée depuis la Suisse.'} Un numéro de suivi sera transmis s'il est disponible.` : (hasAttachments ? 'Vos ebooks sont joints à cet email et disponibles immédiatement.' : 'Votre fichier PDF sera envoyé séparément par email si aucune pièce jointe n’apparaît dans ce message.')}
+              ${physicalOrder && hasDigitalDelivery ? '<br>Les éléments numériques disponibles sont livrés par email.' : ''}
             </p>
           </div>
 

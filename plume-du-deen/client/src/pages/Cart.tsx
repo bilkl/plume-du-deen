@@ -1,15 +1,17 @@
-import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
+import { FileText, Minus, PackageCheck, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { Link } from 'wouter';
-import { useCart } from '@/contexts/CartContext';
+import { getCartItemKey, type CartItemKey, useCart } from '@/contexts/CartContext';
 import { formatPaymentAmount, useCurrency } from '@/contexts/CurrencyContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import CurrencySwitcher from '@/components/CurrencySwitcher';
 import { PageHero, PageShell, PremiumCard } from '@/components/PageLayout';
+import { cartRequiresShipping } from '@/lib/shipping';
 
 export default function Cart() {
   const { state, dispatch } = useCart();
   const { currency, convertPrice, formatPrice } = useCurrency();
   const { t } = useLanguage();
+  const hasPaperItems = cartRequiresShipping(state.items);
 
   const convertedTotal = state.items.reduce(
     (sum, item) => sum + convertPrice(item.price) * item.quantity,
@@ -17,11 +19,11 @@ export default function Cart() {
   );
   const formatTotal = (total: number) => formatPaymentAmount(total, currency);
 
-  const updateQuantity = (id: number, quantity: number) => {
+  const updateQuantity = (id: CartItemKey, quantity: number) => {
     dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } });
   };
 
-  const removeItem = (id: number) => {
+  const removeItem = (id: CartItemKey) => {
     dispatch({ type: 'REMOVE_ITEM', payload: id });
   };
 
@@ -63,8 +65,10 @@ export default function Cart() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Cart Items */}
               <div className="lg:col-span-2 space-y-6">
-                {state.items.map((item) => (
-                  <PremiumCard key={item.id} className="p-5 md:p-6">
+                {state.items.map((item) => {
+                  const itemKey = getCartItemKey(item);
+                  return (
+                  <PremiumCard key={itemKey} className="p-5 md:p-6">
                     <div className="flex flex-col sm:flex-row gap-4">
                       {/* Product Image */}
                       <div className="flex-shrink-0">
@@ -83,6 +87,14 @@ export default function Cart() {
                         <p className="text-muted-foreground text-sm">
                           {item.description}
                         </p>
+                        <div className="inline-flex items-center gap-2 rounded-sm border border-border/70 bg-secondary/35 px-3 py-1 text-xs font-semibold text-muted-foreground">
+                          {item.format === 'paper' ? (
+                            <PackageCheck className="h-3.5 w-3.5 text-primary" />
+                          ) : (
+                            <FileText className="h-3.5 w-3.5 text-primary" />
+                          )}
+                          {item.format === 'paper' ? t('product.paperVersion', 'Version papier') : t('common.pdf', 'PDF')}
+                        </div>
                         <div className="text-lg font-bold text-primary">
                           {formatPrice(item.price)}
                         </div>
@@ -92,7 +104,7 @@ export default function Cart() {
                       <div className="flex flex-col items-end gap-4">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            onClick={() => updateQuantity(itemKey, item.quantity - 1)}
                             className="p-2 bg-secondary hover:bg-secondary/80 rounded-md transition-colors"
                           >
                             <Minus className="w-4 h-4" />
@@ -101,7 +113,7 @@ export default function Cart() {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(itemKey, item.quantity + 1)}
                             className="p-2 bg-secondary hover:bg-secondary/80 rounded-md transition-colors"
                           >
                             <Plus className="w-4 h-4" />
@@ -109,7 +121,7 @@ export default function Cart() {
                         </div>
 
                         <button
-                          onClick={() => removeItem(item.id)}
+                          onClick={() => removeItem(itemKey)}
                           className="text-destructive hover:text-destructive/80 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -117,7 +129,8 @@ export default function Cart() {
                       </div>
                     </div>
                   </PremiumCard>
-                ))}
+                  )
+                })}
               </div>
 
               {/* Order Summary */}
@@ -138,14 +151,23 @@ export default function Cart() {
                     </div>
                     <div className="flex justify-between text-muted-foreground">
                       <span>{t('cart.delivery', 'Livraison')}</span>
-                      <span>{t('cart.deliveryFree', 'Gratuite')}</span>
+                      <span className="text-right">
+                        {hasPaperItems
+                          ? (t('cart.deliveryCheckout', 'Calculée au paiement depuis la Suisse'))
+                          : t('cart.deliveryFree', 'Gratuite')}
+                      </span>
                     </div>
                     <div className="border-t border-border pt-4">
                       <div className="flex justify-between text-xl font-bold text-card-foreground">
-                        <span>{t('cart.total', 'Total')}</span>
+                        <span>{hasPaperItems ? t('cart.totalBeforeShipping', 'Total hors livraison') : t('cart.total', 'Total')}</span>
                         <span>{formatTotal(convertedTotal)}</span>
                       </div>
                     </div>
+                    {hasPaperItems && (
+                      <div className="rounded-lg border border-accent/30 bg-accent/10 p-3 text-sm text-muted-foreground">
+                        {t('cart.shippingNotice', 'Les versions papier sont expédiées manuellement depuis la Suisse. Les frais exacts seront ajoutés au paiement selon le pays de livraison.')}
+                      </div>
+                    )}
                   </div>
 
                   <Link href="/checkout">

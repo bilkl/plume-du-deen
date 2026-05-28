@@ -12,6 +12,9 @@ interface PayPalPaymentFormProps {
   orderData: {
     customer: any
     items: any[]
+    subtotal?: number
+    subtotalChf?: number
+    shipping?: any
     total: number
     currency?: CurrencyCode
     totalChf?: number
@@ -40,6 +43,7 @@ export default function PayPalPaymentForm({ amount, currency, orderData, onSucce
           amount,
           currency,
           items: orderData.items,
+          shipping: orderData.shipping,
         }),
       })
 
@@ -68,6 +72,9 @@ export default function PayPalPaymentForm({ amount, currency, orderData, onSucce
           total: orderData.total,
           currency: orderData.currency,
           totalChf: orderData.totalChf,
+          subtotal: orderData.subtotal,
+          subtotalChf: orderData.subtotalChf,
+          shipping: orderData.shipping,
         }),
       })
 

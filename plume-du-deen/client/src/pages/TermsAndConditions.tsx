@@ -2,22 +2,25 @@ import { LegalDocument } from '@/components/PageLayout'
 
 export default function TermsAndConditions() {
   return (
-    <LegalDocument title="Conditions générales de vente" updated="30 janvier 2026">
+    <LegalDocument title="Conditions générales de vente" updated="12 mai 2026">
           <div className="prose prose-lg max-w-none">
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Objet</h2>
               <p className="text-gray-700 mb-4">
-                Les présentes conditions générales de vente régissent les relations contractuelles entre Plume du Deen et ses clients dans le cadre de la vente en ligne de produits numériques (e-books et ressources téléchargeables).
+                Les présentes conditions générales de vente régissent les relations contractuelles entre Plume du Deen et ses clients dans le cadre de la vente en ligne de produits numériques, ressources téléchargeables et versions papier en quantité limitée.
               </p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Produits numériques</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Produits numériques et papier</h2>
               <p className="text-gray-700 mb-4">
-                Plume du Deen propose exclusivement des produits numériques (e-books, guides spirituels, ressources pédagogiques) accessibles immédiatement après paiement réussi.
+                Plume du Deen propose des produits numériques (e-books, guides spirituels, ressources pédagogiques) et certaines créations en version papier très limitée, selon les disponibilités indiquées sur chaque fiche produit.
               </p>
               <p className="text-gray-700 mb-4">
                 Les produits sont livrés instantanément par email sous forme de lien de téléchargement sécurisé ou d'accès direct à la plateforme.
+              </p>
+              <p className="text-gray-700 mb-4">
+                Les versions papier sont préparées et expédiées manuellement par le vendeur depuis la Suisse, à l'adresse renseignée lors de la commande.
               </p>
               <p className="text-gray-700 mb-4">
                 Les formats de livraison peuvent inclure PDF, EPUB, ou tout autre format numérique approprié indiqué sur la fiche produit.
@@ -27,7 +30,7 @@ export default function TermsAndConditions() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Prix</h2>
               <p className="text-gray-700 mb-4">
-                Les prix de référence sont indiqués en francs suisses (CHF) toutes taxes comprises (TTC). Le site peut afficher et encaisser les commandes en CHF, EUR ou USD selon la devise sélectionnée. Aucun frais de port n'est appliqué pour les produits numériques.
+                Les prix de référence sont indiqués en francs suisses (CHF) toutes taxes comprises (TTC). Le site peut afficher et encaisser les commandes en CHF, EUR ou USD selon la devise sélectionnée. Aucun frais de port n'est appliqué pour les produits numériques. Pour les versions papier, les frais d'expédition sont calculés depuis la Suisse et affichés avant le paiement.
               </p>
               <p className="text-gray-700 mb-4">
                 Plume du Deen se réserve le droit de modifier ses prix à tout moment, mais les produits seront facturés sur la base des tarifs en vigueur au moment de l'enregistrement de la commande.
@@ -45,7 +48,7 @@ export default function TermsAndConditions() {
               <ol className="list-decimal list-inside text-gray-700 mb-4 ml-4">
                 <li>Sélection des produits et ajout au panier</li>
                 <li>Vérification du contenu du panier</li>
-                <li>Saisie des informations nécessaires à la commande (notamment email)</li>
+                <li>Saisie des informations nécessaires à la commande (email et adresse de livraison pour les versions papier)</li>
                 <li>Paiement sécurisé via Stripe ou PayPal, ou autre moyen sur demande</li>
                 <li>Confirmation de commande par email</li>
               </ol>
@@ -62,7 +65,7 @@ export default function TermsAndConditions() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Livraison numérique</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Livraison numérique et expédition papier</h2>
               <p className="text-gray-700 mb-4">
                 La livraison des produits numériques s'effectue instantanément après confirmation du paiement :
               </p>
@@ -73,6 +76,9 @@ export default function TermsAndConditions() {
               </ul>
               <p className="text-gray-700 mb-4">
                 En cas de problème technique empêchant l'accès au produit, Plume du Deen s'engage à fournir une solution alternative dans les 24 heures.
+              </p>
+              <p className="text-gray-700 mb-4">
+                Les commandes papier sont préparées sous 3 à 5 jours ouvrés, puis remises au transporteur depuis la Suisse. Les délais de livraison indiqués sont des estimations et peuvent varier selon la destination et le transporteur. Un numéro de suivi est transmis lorsqu'il est disponible.
               </p>
             </section>
 

@@ -1,8 +1,6 @@
 import { FileText, MessageCircle, PackageCheck, ShoppingCart, Share2 } from 'lucide-react'
 import { Link } from 'wouter'
 import { useCart } from '@/contexts/CartContext'
-import { useCurrency } from '@/contexts/CurrencyContext'
-import { useLanguage } from '@/contexts/LanguageContext'
 import { analytics } from '@/lib/analytics'
 import { showSuccessToast } from '@/lib/toast'
 import ProductReviews from './ProductReviews'
@@ -34,9 +32,6 @@ interface ProductDetailsProps {
 
 export default function ProductDetails({ product, className }: ProductDetailsProps) {
   const { dispatch } = useCart()
-  const { formatPrice } = useCurrency()
-  const { t, language } = useLanguage()
-  const isEnglish = language === 'en'
   const { reviews, addReview, updateReviewHelpful, reportReview } = useReviews(product.id)
 
   const handleAddToCart = () => {
@@ -46,11 +41,11 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
 
     const cartItem = {
       id: product.id,
-      name: `${product.name} - ${product.paperLimited ? t('product.paperVersion', 'Papier très limité') : t('product.digitalVersion', 'Version numérique')}`,
+      name: `${product.name} - Version numérique`,
       price: product.price,
       image: product.image,
       description: product.description,
-      format: product.paperLimited ? 'paper' as const : 'digital' as const
+      format: 'digital' as const
     }
 
     dispatch({ type: 'ADD_ITEM', payload: cartItem })
@@ -72,7 +67,7 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href)
-      showSuccessToast(isEnglish ? 'Link copied to clipboard' : 'Lien copié dans le presse-papiers')
+      showSuccessToast('Lien copié dans le presse-papiers')
     }
   }
 
@@ -103,12 +98,12 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
         <div className="flex flex-wrap gap-2 pt-1">
           <span className="inline-flex items-center gap-2 rounded-sm border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground">
             <FileText className="w-4 h-4 text-primary" />
-            {t('common.pdf', 'PDF')}
+            PDF
           </span>
           {product.paperLimited && (
-            <span className="inline-flex items-center gap-2 rounded-sm border border-accent/40 bg-accent/10 px-3 py-2 text-sm font-semibold text-primary">
+            <span className="inline-flex items-center gap-2 rounded-sm border border-amber-400/40 bg-amber-50 dark:bg-amber-950/30 px-3 py-2 text-sm font-semibold text-amber-700 dark:text-amber-400">
               <PackageCheck className="w-4 h-4" />
-              {t('common.paperLimited', 'Papier très limité')}
+              Papier — bientôt disponible
             </span>
           )}
         </div>
@@ -118,17 +113,17 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
       <div className="bg-secondary/45 border border-border rounded-lg p-6 text-center shadow-sm">
         <div className="text-3xl font-bold text-primary mb-2">
           {product.price === null
-            ? product.priceNote || t('common.priceToConfirm', 'Prix à confirmer')
+            ? product.priceNote || 'Prix à confirmer'
             : product.price === 0
-              ? t('common.free', 'Offert')
-              : formatPrice(product.price)}
+              ? 'Offert'
+              : `${product.price.toFixed(2)} CHF`}
         </div>
         <p className="text-sm text-muted-foreground">
-          {product.availabilityNote || t('product.availabilityDefault', 'Version numérique - PDF')}
+          {product.availabilityNote || 'Version numérique - PDF'}
         </p>
         {product.paperLimited && (
-          <p className="text-sm text-primary font-semibold mt-2">
-            {t('common.paperLimited', 'Version papier en quantité très limitée')}
+          <p className="text-sm text-amber-700 dark:text-amber-400 font-semibold mt-2">
+            Version papier bientôt disponible
           </p>
         )}
       </div>
@@ -139,7 +134,7 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
           <Link href="/contact" className="flex-1">
             <button className="w-full px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex items-center justify-center gap-3 text-lg">
               <MessageCircle className="w-5 h-5" />
-              {t('common.askAvailability', 'Demander la disponibilité')}
+              Demander la disponibilité
             </button>
           </Link>
         ) : (
@@ -148,14 +143,14 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
             className="flex-1 px-8 py-4 bg-primary text-primary-foreground font-semibold rounded-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex items-center justify-center gap-3 text-lg"
           >
             <ShoppingCart className="w-5 h-5" />
-            {t('common.addToCart', 'Ajouter au panier')}
+            Ajouter au panier
           </button>
         )}
 
         <div className="flex gap-3">
           <button
             onClick={handleShare}
-            aria-label={isEnglish ? 'Share this product page' : 'Partager cette fiche produit'}
+            aria-label="Partager cette fiche produit"
             className="p-4 rounded-full border border-border/80 hover:border-primary text-muted-foreground hover:text-primary transition-all duration-200 flex items-center justify-center"
           >
             <Share2 className="w-5 h-5" />
@@ -167,7 +162,7 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
       {product.longDescription && (
         <div className="prose prose-lg max-w-none border-t border-border pt-8">
           <h2 className="text-2xl font-semibold text-foreground mb-4">
-            {t('product.descriptionTitle', 'Description détaillée')}
+            Description détaillée
           </h2>
           <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
             {product.longDescription}
@@ -179,7 +174,7 @@ export default function ProductDetails({ product, className }: ProductDetailsPro
       {product.features && product.features.length > 0 && (
         <div className="border-t border-border pt-8">
           <h2 className="text-2xl font-semibold text-foreground mb-4">
-            {t('product.featuresTitle', 'Caractéristiques')}
+            Caractéristiques
           </h2>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {product.features.map((feature, index) => (

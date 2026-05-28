@@ -20,11 +20,20 @@ interface Order {
     name: string
     price: number
     quantity: number
+    format?: string
     image?: string
   }>
+  subtotal?: number | null
+  shipping?: {
+    required?: boolean
+    amount?: number
+    countryLabel?: string
+    estimate?: string
+  } | null
   total: number
   currency?: CurrencyCode
   status: string
+  fulfillmentStatus?: string
   createdAt: string
   paymentIntentId: string
 }
@@ -209,7 +218,7 @@ export default function Orders() {
                                 <div>
                                   <p className="font-medium">{item.name}</p>
                                   <p className="text-sm text-muted-foreground">
-                                    {isEnglish ? 'Quantity' : 'Quantité'}: {item.quantity} × {formatOrderAmount(item.price, order.currency)}
+                                    {item.format === 'paper' ? (isEnglish ? 'Paper version' : 'Version papier') : 'PDF'} · {isEnglish ? 'Quantity' : 'Quantité'}: {item.quantity} × {formatOrderAmount(item.price, order.currency)}
                                   </p>
                                 </div>
                               </div>
@@ -241,7 +250,15 @@ export default function Orders() {
                               </p>
                             </div>
                             <div className="text-muted-foreground">
-                              <p>{isEnglish ? 'Delivery to the address provided during checkout' : "Livraison à l'adresse indiquée lors de la commande"}</p>
+                              {order.shipping?.required ? (
+                                <>
+                                  <p>{isEnglish ? 'Paper order shipped from Switzerland' : 'Commande papier expédiée depuis la Suisse'}</p>
+                                  <p>{order.shipping.countryLabel} · {formatOrderAmount(order.shipping.amount || 0, order.currency)}</p>
+                                  {order.shipping.estimate && <p>{order.shipping.estimate}</p>}
+                                </>
+                              ) : (
+                                <p>{isEnglish ? 'Digital delivery by email' : 'Livraison numérique par email'}</p>
+                              )}
                             </div>
                           </div>
                         </div>

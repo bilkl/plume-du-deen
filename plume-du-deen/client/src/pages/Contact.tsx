@@ -55,14 +55,14 @@ export default function Contact() {
     {
       title: isEnglish ? 'How do I order a product?' : 'Comment commander un produit ?',
       text: isEnglish
-        ? 'Browse the collection, add your items to the cart, then proceed to payment. Access is sent by email after confirmation.'
-        : 'Parcourez la collection, ajoutez vos articles au panier, puis procédez au paiement. L’accès est envoyé par email après confirmation.'
+        ? 'Browse the collection, choose PDF or paper when available, add your items to the cart, then proceed to payment.'
+        : 'Parcourez la collection, choisissez PDF ou papier quand le format est disponible, ajoutez vos articles au panier, puis procédez au paiement.'
     },
     {
       title: isEnglish ? 'How do I access my purchases?' : 'Comment accéder à mes achats ?',
       text: isEnglish
-        ? 'After payment, you receive a secure download link and the useful information for your digital resources.'
-        : "Après paiement, vous recevez un lien de téléchargement sécurisé et les informations utiles pour vos ressources numériques."
+        ? 'Digital resources are sent by email. Paper orders are prepared manually and shipped from Switzerland to the address entered at checkout.'
+        : "Les ressources numériques sont envoyées par email. Les commandes papier sont préparées manuellement et expédiées depuis la Suisse à l'adresse indiquée au paiement."
     },
     {
       title: isEnglish ? 'Which formats are available?' : 'Quels formats sont disponibles ?',

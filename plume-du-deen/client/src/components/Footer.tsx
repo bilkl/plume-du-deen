@@ -1,6 +1,5 @@
 import { Mail, Instagram } from 'lucide-react';
 import { Link } from 'wouter';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 // TikTok Icon Component
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -15,8 +14,6 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 );
 
 export default function Footer() {
-  const { t } = useLanguage();
-
   return (
     <footer className="bg-primary text-primary-foreground pt-24 pb-12 px-4 md:px-0 relative overflow-hidden">
       {/* Decorative orbs */}
@@ -37,18 +34,18 @@ export default function Footer() {
               <h3 className="text-2xl font-playfair font-semibold tracking-wide">Plume du Deen</h3>
             </div>
             <p className="text-lg text-primary-foreground/75 leading-relaxed font-light italic font-playfair">
-              {t('footer.tagline', "Des pages pour le cœur et l'âme.")}
+              Des pages pour le cœur et l'âme.
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-6">
-            <h4 className="text-xl font-semibold tracking-wide font-playfair">{t('footer.quickLinks', 'Liens rapides')}</h4>
+            <h4 className="text-xl font-semibold tracking-wide font-playfair">Liens rapides</h4>
             <ul className="space-y-3.5 text-base">
               <li>
                 <Link href="/collection" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
-                  {t('nav.collection', 'Collection')}
+                  Collection
                 </Link>
               </li>
               <li>
@@ -60,7 +57,7 @@ export default function Footer() {
               <li>
                 <Link href="/apropos" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
-                  {t('nav.about', 'À propos')}
+                  À propos
                 </Link>
               </li>
             </ul>
@@ -68,30 +65,30 @@ export default function Footer() {
 
           {/* Information */}
           <div className="space-y-6">
-            <h4 className="text-xl font-semibold tracking-wide font-playfair">{t('footer.information', 'Information')}</h4>
+            <h4 className="text-xl font-semibold tracking-wide font-playfair">Information</h4>
             <ul className="space-y-3.5 text-base">
               <li>
                 <Link href="/conditions-generales" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
-                  {t('footer.terms', 'Conditions générales')}
+                  Conditions générales
                 </Link>
               </li>
               <li>
                 <Link href="/politique-confidentialite" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
-                  {t('footer.privacy', 'Politique de confidentialité')}
+                  Politique de confidentialité
                 </Link>
               </li>
               <li>
                 <Link href="/retours-remboursements" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
-                  {t('footer.returns', 'Retours & Remboursements')}
+                  Retours & Remboursements
                 </Link>
               </li>
               <li>
                 <Link href="/mentions-legales" className="text-primary-foreground/75 hover:text-accent transition-colors flex items-center gap-2.5 group">
                   <span className="w-1.5 h-1.5 rounded-full bg-accent/40 group-hover:bg-accent group-hover:w-3 transition-all"></span>
-                  {t('footer.legal', 'Mentions légales')}
+                  Mentions légales
                 </Link>
               </li>
             </ul>
@@ -99,7 +96,7 @@ export default function Footer() {
 
           {/* Contact & Social */}
           <div className="space-y-6">
-            <h4 className="text-xl font-semibold tracking-wide font-playfair">{t('footer.contact', 'Nous contacter')}</h4>
+            <h4 className="text-xl font-semibold tracking-wide font-playfair">Nous contacter</h4>
             <div className="flex items-center gap-3 text-base text-primary-foreground/80 hover:text-accent transition-colors cursor-pointer p-3.5 bg-white/5 rounded-2xl border border-white/10 w-fit">
               <Mail className="w-5 h-5" />
               <a href="mailto:contact@plume-du-deen.com">contact@plume-du-deen.com</a>
@@ -123,7 +120,7 @@ export default function Footer() {
           <p>© 2026 Plume du Deen.</p>
           <div className="flex items-center gap-3">
             <span className="w-10 h-px bg-accent/60"></span>
-            <p className="font-playfair italic text-base">{t('footer.made', 'Créé avec intention et douceur')}</p>
+            <p className="font-playfair italic text-base">Créé avec intention et douceur</p>
             <span className="w-10 h-px bg-accent/60"></span>
           </div>
         </div>

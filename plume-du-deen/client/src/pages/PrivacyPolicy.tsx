@@ -2,7 +2,7 @@ import { LegalDocument } from '@/components/PageLayout'
 
 export default function PrivacyPolicy() {
   return (
-    <LegalDocument title="Politique de confidentialité" updated="30 janvier 2026">
+    <LegalDocument title="Politique de confidentialité" updated="12 mai 2026">
           <div className="prose prose-lg max-w-none">
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
@@ -20,8 +20,8 @@ export default function PrivacyPolicy() {
               <ul className="list-disc list-inside text-gray-700 mb-4 ml-4">
                 <li>Nom et prénom</li>
                 <li>Adresse email</li>
-                <li>Adresse de livraison et de facturation</li>
-                <li>Numéro de téléphone</li>
+                <li>Adresse de livraison pour les commandes papier</li>
+                <li>Numéro de téléphone si vous le renseignez pour faciliter une livraison</li>
                 <li>Informations de paiement (traitées par Stripe)</li>
               </ul>
 
@@ -54,7 +54,7 @@ export default function PrivacyPolicy() {
                 Nous ne vendons, n'échangeons ni ne louons vos données personnelles à des tiers. Nous pouvons partager vos informations uniquement dans les cas suivants :
               </p>
               <ul className="list-disc list-inside text-gray-700 mb-4 ml-4">
-                <li>Avec nos prestataires de services (transporteurs, services de paiement)</li>
+                <li>Avec nos prestataires de services (transporteurs pour les commandes papier, services de paiement)</li>
                 <li>Lorsque la loi l'exige</li>
                 <li>Pour protéger nos droits et ceux de nos utilisateurs</li>
                 <li>Avec votre consentement explicite</li>

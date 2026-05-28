@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { amount, currency = 'CHF', items } = req.body
+    const { amount, currency = 'CHF', items = [], shipping } = req.body
 
     // Validation des données avec fonctions utilitaires
     if (!amount || typeof amount !== 'number' || amount <= 0 || amount > 10000) {
@@ -48,23 +48,34 @@ export default async function handler(req, res) {
       })
     }
 
-    // Validation des items si fournis
-    if (items && Array.isArray(items)) {
-      for (const item of items) {
-        if (!item.name || typeof item.name !== 'string' || item.name.length > 100) {
-          return res.status(400).json({
-            error: 'Nom de produit invalide',
-            details: 'Chaque produit doit avoir un nom valide (max 100 caractères)'
-          })
-        }
-        if (!item.price || typeof item.price !== 'number' || item.price <= 0) {
-          return res.status(400).json({
-            error: 'Prix invalide',
-            details: 'Chaque produit doit avoir un prix positif'
-          })
-        }
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        error: 'Articles invalides',
+        details: 'La commande doit contenir au moins un article'
+      })
+    }
+
+    for (const item of items) {
+      if (!item.name || typeof item.name !== 'string' || item.name.length > 100) {
+        return res.status(400).json({
+          error: 'Nom de produit invalide',
+          details: 'Chaque produit doit avoir un nom valide (max 100 caractères)'
+        })
+      }
+      if (typeof item.price !== 'number' || item.price < 0) {
+        return res.status(400).json({
+          error: 'Prix invalide',
+          details: 'Chaque produit doit avoir un prix positif ou nul'
+        })
       }
     }
+
+    const payableItems = items.filter(item => Number(item.price || 0) > 0)
+    const itemTotal = payableItems.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 1), 0)
+    const shippingAmount = shipping?.required ? Number(shipping.amount || 0) : 0
+    const amountValue = (amount / 100).toFixed(2)
+    const itemTotalValue = itemTotal.toFixed(2)
+    const shippingValue = shippingAmount.toFixed(2)
 
     // Créer la commande PayPal
     const request = new paypalClient.orders.OrdersCreateRequest()
@@ -73,15 +84,21 @@ export default async function handler(req, res) {
       purchase_units: [{
         amount: {
           currency_code: currency,
-          value: (amount / 100).toFixed(2), // Convertir de centimes à euros/francs
+          value: amountValue, // Convertir de centimes à euros/francs
           breakdown: {
             item_total: {
               currency_code: currency,
-              value: (amount / 100).toFixed(2)
-            }
+              value: itemTotalValue
+            },
+            ...(shippingAmount > 0 ? {
+              shipping: {
+                currency_code: currency,
+                value: shippingValue
+              }
+            } : {})
           }
         },
-        items: items.map(item => ({
+        items: payableItems.map(item => ({
           name: item.name.substring(0, 127), // Limite PayPal
           unit_amount: {
             currency_code: currency,

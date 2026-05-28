@@ -2,39 +2,34 @@ import { useMemo, useState } from 'react';
 import { CheckCircle2, ShoppingCart, Sparkles } from 'lucide-react';
 import { Link } from 'wouter';
 import { useCart } from '@/contexts/CartContext';
-import { useCurrency } from '@/contexts/CurrencyContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { STORE_PRODUCTS, StoreProduct } from '@/data/products';
 
 export default function Products() {
   const { dispatch } = useCart();
-  const { formatPrice } = useCurrency();
-  const { t, localizeProduct, language } = useLanguage();
   const [activeFilter, setActiveFilter] = useState('all');
-  const products = useMemo(() => STORE_PRODUCTS.map(localizeProduct), [localizeProduct, language]);
 
   const filters = [
-    { id: 'all', label: t('collection.filter.all', 'Tous') },
-    { id: 'new', label: t('collection.filter.new', 'Nouveautés') },
-    { id: 'paper', label: t('collection.filter.paper', 'Papier limité') },
-    { id: 'paid', label: t('collection.filter.paid', 'PDF payants') },
-    { id: 'free', label: t('collection.filter.free', 'Offerts') },
+    { id: 'all', label: 'Tous' },
+    { id: 'new', label: 'Nouveautés' },
+    { id: 'paper', label: 'Papier limité' },
+    { id: 'paid', label: 'PDF payants' },
+    { id: 'free', label: 'Offerts' },
   ];
 
   const filteredProducts = useMemo(() => {
     switch (activeFilter) {
       case 'new':
-        return products.filter((product) => product.isNew);
+        return STORE_PRODUCTS.filter((product) => product.isNew);
       case 'paper':
-        return products.filter((product) => product.paperLimited);
+        return STORE_PRODUCTS.filter((product) => product.paperLimited);
       case 'paid':
-        return products.filter((product) => product.price !== null && product.price > 0);
+        return STORE_PRODUCTS.filter((product) => product.price !== null && product.price > 0);
       case 'free':
-        return products.filter((product) => product.price === 0);
+        return STORE_PRODUCTS.filter((product) => product.price === 0);
       default:
-        return products;
+        return STORE_PRODUCTS;
     }
-  }, [activeFilter, products]);
+  }, [activeFilter]);
 
   const addToCart = (product: StoreProduct) => {
     if (product.price === null) {
@@ -43,11 +38,11 @@ export default function Products() {
 
     dispatch({ type: 'ADD_ITEM', payload: {
       id: product.id,
-      name: `${product.title} - ${product.paperLimited ? t('common.paperLimited', 'Papier très limité') : t('common.pdf', 'PDF')}`,
+      name: `${product.title} - PDF`,
       price: product.price,
       image: product.image,
       description: product.description,
-      format: product.paperLimited ? 'paper' : 'digital'
+      format: 'digital'
     }});
   };
 
@@ -60,13 +55,13 @@ export default function Products() {
         {/* Section Header */}
         <div className="text-center mb-14 md:mb-20 space-y-5 reveal-soft">
           <div className="ornament mx-auto">
-            <span className="font-poppins text-sm md:text-base tracking-[0.28em] uppercase font-medium">{t('collection.eyebrow', 'Collection Plume du Deen')}</span>
+            <span className="font-poppins text-sm md:text-base tracking-[0.28em] uppercase font-medium">Collection Plume du Deen</span>
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl text-foreground">
-            {t('collection.title', 'Pour votre foi')}
+            Pour votre <span className="text-gradient-gold italic">foi</span>
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            {t('collection.description', 'Des créations qui guident votre quotidien.')}
+            Des créations qui guident votre quotidien.
           </p>
         </div>
 
@@ -79,27 +74,27 @@ export default function Products() {
             </div>
             <div>
               <h3 className="text-2xl md:text-[1.65rem] font-semibold text-foreground font-playfair tracking-wide">
-                {t('collection.availabilityTitle', 'Nouveautés disponibles')}
+                Nouveautés disponibles
               </h3>
               <p className="text-base md:text-lg text-muted-foreground mt-2 leading-relaxed">
-                {t('collection.availabilityDescription', 'Nos créations sont proposées en PDF, avec une version papier très limitée pour les nouveautés.')}
+                Nos créations sont proposées en PDF. La version papier sera bientôt disponible.
               </p>
             </div>
             <div className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-accent/20 to-accent/10 ring-1 ring-accent/40 px-6 py-3 text-base font-semibold text-primary">
               <CheckCircle2 className="w-5 h-5" />
-              {t('collection.sadaqa', 'Sadaqa jariya')}
+              Sadaqa jariya
             </div>
           </div>
           <p className="relative mt-6 text-center text-base text-muted-foreground pt-5 border-t border-border/40">
-            {t('collection.donation', '1 CHF sera versé dans des causes de sadaqa jariya pour chaque vente.')}
+            <strong className="text-foreground">1 CHF</strong> sera versé dans des causes de <strong className="text-foreground">sadaqa jariya</strong> pour chaque vente.
           </p>
         </div>
 
         <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="font-poppins text-base text-muted-foreground">
-            <span className="text-foreground font-semibold">{filteredProducts.length}</span> {filteredProducts.length > 1 ? t('collection.showing', 'créations affichées') : t('collection.showingOne', 'création affichée')}
+            <span className="text-foreground font-semibold">{filteredProducts.length}</span> création{filteredProducts.length > 1 ? 's' : ''} affichée{filteredProducts.length > 1 ? 's' : ''}
           </div>
-          <div className="grid w-full grid-cols-2 gap-2 rounded-3xl bg-card/60 p-1.5 shadow-premium backdrop-blur-md border border-border/60 min-[380px]:grid-cols-3 sm:flex sm:w-auto sm:overflow-x-auto sm:rounded-full" role="tablist" aria-label="Filtres de collection">
+          <div className="flex gap-2 overflow-x-auto pb-1 p-1.5 rounded-full bg-card/60 border border-border/60 backdrop-blur-md shadow-premium" role="tablist" aria-label="Filtres de collection">
             {filters.map((filter) => (
               <button
                 key={filter.id}
@@ -107,7 +102,7 @@ export default function Products() {
                 role="tab"
                 aria-selected={activeFilter === filter.id}
                 onClick={() => setActiveFilter(filter.id)}
-                className={`w-full whitespace-nowrap rounded-full px-3 py-2.5 font-poppins text-sm font-semibold transition-all duration-300 sm:w-auto sm:px-5 sm:text-base ${
+                className={`whitespace-nowrap rounded-full px-5 py-2.5 font-poppins text-base font-semibold transition-all duration-300 ${
                   activeFilter === filter.id
                     ? 'bg-primary text-primary-foreground shadow-md'
                     : 'text-foreground/70 hover:text-primary hover:bg-secondary/60'
@@ -144,16 +139,16 @@ export default function Products() {
                 {/* Format Badges */}
                 <div className="absolute top-5 right-5 flex flex-col items-end gap-2 z-[2]">
                   <div className="bg-primary/90 backdrop-blur-md text-white px-3.5 py-1.5 rounded-full text-sm font-semibold shadow-sm ring-1 ring-white/10">
-                      {t('common.pdf', 'PDF')}
+                    PDF
                   </div>
                   {product.paperLimited && (
                     <div className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground px-3.5 py-1.5 rounded-full text-sm font-semibold shadow-gold ring-1 ring-white/20">
-                      {t('common.paperLimited', 'Papier limité')}
+                      Papier limité
                     </div>
                   )}
                   {product.isNew && (
                     <div className="bg-card/90 backdrop-blur-md text-primary px-3.5 py-1.5 rounded-full text-sm font-semibold shadow-sm ring-1 ring-primary/20">
-                      {t('common.new', 'Nouveau')}
+                      Nouveau
                     </div>
                   )}
                 </div>
@@ -173,19 +168,19 @@ export default function Products() {
 
                 <div className="mb-7 grid grid-cols-2 gap-4 border-t border-border/60 pt-5 text-base">
                   <div>
-                    <span className="block text-muted-foreground/80 mb-1 text-sm uppercase tracking-wider">{t('common.format', 'Format')}</span>
+                    <span className="block text-muted-foreground/80 mb-1 text-sm uppercase tracking-wider">Format</span>
                     <span className="font-medium text-foreground">
-                      {product.paperLimited ? `${t('common.pdf', 'PDF')} & ${t('common.paperLimited', 'papier limité')}` : t('common.pdf', 'PDF')}
+                      {product.paperLimited ? 'PDF · Papier bientôt dispo' : 'PDF'}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="block text-muted-foreground/80 mb-1 text-sm uppercase tracking-wider">{t('common.price', 'Prix')}</span>
+                    <span className="block text-muted-foreground/80 mb-1 text-sm uppercase tracking-wider">Prix</span>
                     <span className="font-semibold text-primary text-xl font-playfair">
                       {product.price === null
-                        ? t('common.priceToConfirm', 'Prix à confirmer')
+                        ? 'À confirmer'
                         : product.price === 0
-                          ? t('common.free', 'Offert')
-                          : formatPrice(product.price)}
+                          ? 'Offert'
+                          : `${product.price.toFixed(2)} CHF`}
                     </span>
                   </div>
                 </div>
@@ -194,14 +189,14 @@ export default function Products() {
                 <div className="flex flex-col gap-3">
                   <Link href={product.href}>
                     <button className="w-full px-5 py-4 bg-transparent border border-border text-foreground text-base font-medium rounded-full transition-all duration-300 hover:border-primary hover:text-primary hover:bg-secondary/40 flex items-center justify-center gap-2">
-                      {t('common.discover', 'Découvrir')}
+                      Découvrir
                     </button>
                   </Link>
 
                   {product.price === null ? (
                     <Link href="/contact">
                       <button className="w-full px-5 py-4 bg-primary text-primary-foreground text-base font-semibold rounded-full transition-all duration-300 hover:bg-primary/90 hover:shadow-premium hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                        {t('common.askAvailability', 'Demander la disponibilité')}
+                        Demander la disponibilité
                       </button>
                     </Link>
                   ) : (
@@ -211,7 +206,7 @@ export default function Products() {
                     >
                       <span className="absolute inset-0 shimmer-gold opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500"></span>
                       <ShoppingCart className="relative w-[1.1rem] h-[1.1rem]" />
-                      <span className="relative">{t('common.addToCart', 'Ajouter au panier')}{product.price === 0 ? ` - ${t('common.free', 'Offert')}` : ` · ${formatPrice(product.price)}`}</span>
+                      <span className="relative">Ajouter au panier{product.price === 0 ? ' - Offert' : ` · ${product.price.toFixed(2)} CHF`}</span>
                     </button>
                   )}
                 </div>

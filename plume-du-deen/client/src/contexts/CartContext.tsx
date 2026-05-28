@@ -3,6 +3,7 @@ import { showSuccessToast, showErrorToast } from '@/lib/toast';
 
 export interface Product {
   id: number;
+  cartKey?: string;
   name: string;
   price: number;
   image: string;
@@ -21,10 +22,12 @@ interface CartState {
   total: number;
 }
 
+export type CartItemKey = number | string;
+
 type CartAction =
   | { type: 'ADD_ITEM'; payload: Product }
-  | { type: 'REMOVE_ITEM'; payload: number }
-  | { type: 'UPDATE_QUANTITY'; payload: { id: number; quantity: number } }
+  | { type: 'REMOVE_ITEM'; payload: CartItemKey }
+  | { type: 'UPDATE_QUANTITY'; payload: { id: CartItemKey; quantity: number } }
   | { type: 'CLEAR_CART' }
   | { type: 'LOAD_CART'; payload: CartState };
 
@@ -35,68 +38,82 @@ const cartMessage = (english: string, french: string) => {
   return french;
 };
 
+export const getCartItemKey = (item: Pick<Product, 'id' | 'format' | 'cartKey'>): string =>
+  item.cartKey || `${item.id}-${item.format || 'digital'}`;
+
+const getActionKey = (payload: CartItemKey): string => String(payload);
+
+const normalizeItems = (items: CartItem[] = []): CartItem[] =>
+  items.map(item => ({
+    ...item,
+    cartKey: getCartItemKey(item),
+  }));
+
+const calculateTotal = (items: CartItem[]) =>
+  items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+const createCartState = (items: CartItem[]): CartState => {
+  const normalizedItems = normalizeItems(items);
+  return {
+    items: normalizedItems,
+    total: calculateTotal(normalizedItems),
+  };
+};
+
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_ITEM': {
-      const existingItem = state.items.find(item => item.id === action.payload.id);
+      const payload = {
+        ...action.payload,
+        cartKey: getCartItemKey(action.payload),
+      };
+      const payloadKey = getCartItemKey(payload);
+      const existingItem = state.items.find(item => getCartItemKey(item) === payloadKey);
       if (existingItem) {
         const updatedItems = state.items.map(item =>
-          item.id === action.payload.id
+          getCartItemKey(item) === payloadKey
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
-        const newState = {
-          items: updatedItems,
-          total: updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-        };
-        showSuccessToast(cartMessage(`Quantity updated: ${action.payload.name}`, `Quantité mise à jour : ${action.payload.name}`));
+        const newState = createCartState(updatedItems);
+        showSuccessToast(cartMessage(`Quantity updated: ${payload.name}`, `Quantité mise à jour : ${payload.name}`));
         return newState;
       } else {
-        const newItem: CartItem = { ...action.payload, quantity: 1 };
+        const newItem: CartItem = { ...payload, quantity: 1 };
         const newItems = [...state.items, newItem];
-        const newState = {
-          items: newItems,
-          total: newItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-        };
-        showSuccessToast(cartMessage(`${action.payload.name} added to cart.`, `${action.payload.name} ajouté au panier !`));
+        const newState = createCartState(newItems);
+        showSuccessToast(cartMessage(`${payload.name} added to cart.`, `${payload.name} ajouté au panier !`));
         return newState;
       }
     }
     case 'REMOVE_ITEM': {
-      const itemToRemove = state.items.find(item => item.id === action.payload);
-      const newItems = state.items.filter(item => item.id !== action.payload);
-      const newState = {
-        items: newItems,
-        total: newItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-      };
+      const actionKey = getActionKey(action.payload);
+      const itemToRemove = state.items.find(item => getCartItemKey(item) === actionKey);
+      const newItems = state.items.filter(item => getCartItemKey(item) !== actionKey);
+      const newState = createCartState(newItems);
       if (itemToRemove) {
         showSuccessToast(cartMessage(`${itemToRemove.name} removed from cart`, `${itemToRemove.name} retiré du panier`));
       }
       return newState;
     }
     case 'UPDATE_QUANTITY': {
+      const actionKey = getActionKey(action.payload.id);
       if (action.payload.quantity <= 0) {
-        const itemToRemove = state.items.find(item => item.id === action.payload.id);
-        const newItems = state.items.filter(item => item.id !== action.payload.id);
-        const newState = {
-          items: newItems,
-          total: newItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-        };
+        const itemToRemove = state.items.find(item => getCartItemKey(item) === actionKey);
+        const newItems = state.items.filter(item => getCartItemKey(item) !== actionKey);
+        const newState = createCartState(newItems);
         if (itemToRemove) {
           showSuccessToast(cartMessage(`${itemToRemove.name} removed from cart`, `${itemToRemove.name} retiré du panier`));
         }
         return newState;
       }
       const updatedItems = state.items.map(item =>
-        item.id === action.payload.id
+        getCartItemKey(item) === actionKey
           ? { ...item, quantity: action.payload.quantity }
           : item
       );
-      const newState = {
-        items: updatedItems,
-        total: updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-      };
-      const updatedItem = updatedItems.find(item => item.id === action.payload.id);
+      const newState = createCartState(updatedItems);
+      const updatedItem = updatedItems.find(item => getCartItemKey(item) === actionKey);
       if (updatedItem) {
         showSuccessToast(cartMessage(`Quantity updated: ${updatedItem.name} (${action.payload.quantity})`, `Quantité mise à jour : ${updatedItem.name} (${action.payload.quantity})`));
       }
@@ -106,7 +123,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
       showSuccessToast(cartMessage('Cart cleared', 'Panier vidé'));
       return { items: [], total: 0 };
     case 'LOAD_CART':
-      return action.payload;
+      return createCartState(action.payload.items || []);
     default:
       return state;
   }

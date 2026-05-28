@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { sendOrderConfirmationEmail, sendAdminOrderNotification } from './emailService.js';
 import { getEbooksForOrder } from './ebookConfig.js';
-import { validateCustomerData, isValidAmount, setSecurityHeaders, SECURITY_CONFIG } from './security.js';
+import { validateCustomerData, isValidAmount, setSecurityHeaders, SECURITY_CONFIG, sanitizeString } from './security.js';
 
 // NOTE: Cette route tourne en serverless sur Vercel.
 // SQLite (better-sqlite3) est une dépendance native qui peut casser l'installation
@@ -36,6 +36,33 @@ function isValidZeroOrPositiveAmount(amount) {
     Number.isFinite(amount) &&
     amount >= 0 &&
     amount <= SECURITY_CONFIG.MAX_AMOUNT;
+}
+
+function orderHasPhysicalItems(items) {
+  return Array.isArray(items) && items.some(item => item?.format === 'paper');
+}
+
+function normalizeShippingData(shipping, hasPhysicalItems) {
+  const raw = shipping && typeof shipping === 'object' ? shipping : {};
+  const allowedZones = ['CH', 'EUROPE', 'WORLD'];
+  const zone = allowedZones.includes(raw.zone) ? raw.zone : 'CH';
+  const amount = Number(raw.amount || 0);
+  const amountChf = Number(raw.amountChf || 0);
+
+  return {
+    required: Boolean(hasPhysicalItems),
+    originCountry: 'CH',
+    originLabel: 'Suisse',
+    countryCode: sanitizeString(raw.countryCode || 'CH', 10),
+    countryLabel: sanitizeString(raw.countryLabel || raw.countryCode || 'Suisse', SECURITY_CONFIG.MAX_NAME_LENGTH),
+    zone,
+    method: 'manual_from_switzerland',
+    amount: Number.isFinite(amount) && amount >= 0 ? amount : 0,
+    amountChf: Number.isFinite(amountChf) && amountChf >= 0 ? amountChf : 0,
+    preparation: sanitizeString(raw.preparation || '3 à 5 jours ouvrés', 80),
+    estimate: sanitizeString(raw.estimate || '', 180),
+    label: sanitizeString(raw.label || 'Expédition manuelle depuis la Suisse', 100)
+  };
 }
 
 async function parseJsonBody(req) {
@@ -136,10 +163,14 @@ export default async function handler(req, res) {
       const {
         customer,
         items,
+        subtotal,
+        subtotalChf,
+        shipping,
         total,
         currency = 'CHF',
         totalChf,
-        paymentIntentId
+        paymentIntentId,
+        paymentMethod
       } = body;
       const normalizedCurrency = String(currency || 'CHF').toUpperCase();
       const allowedCurrencies = ['CHF', 'EUR', 'USD'];
@@ -247,6 +278,32 @@ export default async function handler(req, res) {
             details: 'Le nom d\'un article ne peut pas dépasser 100 caractères'
           });
         }
+
+        const quantity = Number(item.quantity || 1);
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+          return res.status(400).json({
+            error: 'Quantité invalide',
+            details: 'Chaque article doit avoir une quantité entre 1 et 99'
+          });
+        }
+
+        if (item.format && !['digital', 'paper'].includes(item.format)) {
+          return res.status(400).json({
+            error: 'Format invalide',
+            details: 'Le format doit être digital ou paper'
+          });
+        }
+      }
+
+      const hasPhysicalItems = orderHasPhysicalItems(items);
+      const hasDigitalItems = items.some(item => item?.format !== 'paper');
+      const normalizedShipping = normalizeShippingData(shipping, hasPhysicalItems);
+
+      if (hasPhysicalItems && (!validatedCustomer.address || !validatedCustomer.city || !validatedCustomer.postalCode || !validatedCustomer.country)) {
+        return res.status(400).json({
+          error: 'Adresse de livraison requise',
+          details: 'Les commandes papier nécessitent une adresse, une ville, un code postal et un pays de livraison'
+        });
       }
 
       // Générer un ID de commande unique
@@ -263,14 +320,21 @@ export default async function handler(req, res) {
           address: validatedCustomer.address || null,
           city: validatedCustomer.city || null,
           postalCode: validatedCustomer.postalCode || null,
-          country: validatedCustomer.country || null
+          country: validatedCustomer.country || null,
+          shippingCountryCode: validatedCustomer.shippingCountryCode || null,
+          orderNotes: validatedCustomer.orderNotes || null
         },
         items,
+        subtotal: typeof subtotal === 'number' && Number.isFinite(subtotal) ? subtotal : null,
+        subtotalChf: typeof subtotalChf === 'number' && Number.isFinite(subtotalChf) ? subtotalChf : null,
+        shipping: normalizedShipping,
         total,
         currency: normalizedCurrency,
         totalChf: typeof totalChf === 'number' && Number.isFinite(totalChf) ? totalChf : null,
         paymentIntentId,
+        paymentMethod: paymentMethod || null,
         status: 'completed',
+        fulfillmentStatus: hasPhysicalItems ? 'paid-awaiting-preparation' : 'completed',
         createdAt: new Date().toISOString()
       };
 
@@ -286,12 +350,20 @@ export default async function handler(req, res) {
         items,
         total,
         currency: normalizedCurrency,
+        subtotal: orderRecord.subtotal,
+        subtotalChf: orderRecord.subtotalChf,
+        shipping: normalizedShipping,
         totalChf: orderRecord.totalChf,
         createdAt: orderRecord.createdAt,
+        hasPhysicalItems,
+        hasDigitalItems,
+        fulfillmentStatus: orderRecord.fulfillmentStatus,
+        customerPhone: validatedCustomer.phone,
         customerAddress: validatedCustomer.address,
         customerCity: validatedCustomer.city,
         customerPostalCode: validatedCustomer.postalCode,
-        customerCountry: validatedCustomer.country
+        customerCountry: validatedCustomer.country,
+        customerOrderNotes: validatedCustomer.orderNotes
       };
 
       // Récupérer les ebooks pour cette commande
@@ -317,6 +389,7 @@ export default async function handler(req, res) {
 
       // Envoyer l'email de confirmation au client (en arrière-plan)
       try {
+        orderEmailData.digitalAttachmentsCount = attachments.length;
         await sendOrderConfirmationEmail(orderEmailData, attachments);
         console.log(`Email de confirmation envoyé pour la commande ${orderId}`);
       } catch (emailError) {
@@ -369,9 +442,12 @@ export default async function handler(req, res) {
         customerName: `${order.customer.firstName} ${order.customer.lastName}`,
         customerEmail: order.customer.email,
         items: Array.isArray(order.items) ? order.items : [],
+        subtotal: order.subtotal ?? null,
+        shipping: order.shipping || null,
         total: order.total,
         currency: order.currency || 'CHF',
         status: order.status || 'completed',
+        fulfillmentStatus: order.fulfillmentStatus || order.status || 'completed',
         createdAt: new Date(order.createdAt).toLocaleDateString('fr-FR', {
           year: 'numeric',
           month: 'long',

@@ -3,10 +3,15 @@ import { Menu, X, ShoppingCart, Sun, Moon, Search } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useCart } from '@/contexts/CartContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import SearchModal from './SearchModal';
-import CurrencySwitcher from './CurrencySwitcher';
-import LanguageSwitcher from './LanguageSwitcher';
+
+const navLinks = [
+  { href: '/', label: 'Accueil' },
+  { href: '/collection', label: 'Collection' },
+  { href: '/ramadan', label: 'Ramadan' },
+  { href: '/contact', label: 'Contact' },
+  { href: '/apropos', label: 'À propos' },
+];
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,15 +20,6 @@ export default function Header() {
   const [location] = useLocation();
   const { theme, toggleTheme } = useTheme();
   const { state } = useCart();
-  const { t, language } = useLanguage();
-  const isEnglish = language === 'en';
-  const navLinks = [
-    { href: '/', label: t('nav.home', 'Accueil') },
-    { href: '/collection', label: t('nav.collection', 'Collection') },
-    { href: '/ramadan', label: t('nav.ramadan', 'Ramadan') },
-    { href: '/contact', label: t('nav.contact', 'Contact') },
-    { href: '/apropos', label: t('nav.about', 'À propos') },
-  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -47,7 +43,7 @@ export default function Header() {
     }`}>
       <div className="container">
         {/* Desktop Layout */}
-        <div className={`hidden xl:grid xl:grid-cols-[minmax(220px,0.9fr)_auto_minmax(300px,1fr)] xl:items-center transition-all duration-500 ${scrolled ? 'xl:h-20' : 'xl:h-24'}`}>
+        <div className={`hidden lg:grid lg:grid-cols-[minmax(220px,1fr)_auto_minmax(160px,1fr)] lg:items-center transition-all duration-500 ${scrolled ? 'lg:h-20' : 'lg:h-24'}`}>
           {/* Logo */}
           <div className="flex justify-start">
             <Link href="/" className="group flex items-center gap-3 transition-opacity">
@@ -60,7 +56,7 @@ export default function Header() {
           </div>
 
           {/* Navigation Desktop */}
-          <nav className="flex justify-center items-center gap-1 rounded-full border border-border/60 bg-card/60 backdrop-blur-xl px-1.5 py-1.5 shadow-premium transition-all hover:shadow-premium-lg" aria-label={isEnglish ? 'Main navigation' : 'Navigation principale'}>
+          <nav className="flex justify-center items-center gap-1 rounded-full border border-border/60 bg-card/60 backdrop-blur-xl px-1.5 py-1.5 shadow-premium transition-all hover:shadow-premium-lg" aria-label="Navigation principale">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -78,18 +74,16 @@ export default function Header() {
 
           {/* Icons Desktop */}
           <div className="flex justify-end items-center gap-3">
-            <LanguageSwitcher compact />
-            <CurrencySwitcher compact />
             <button
               onClick={() => setIsSearchOpen(true)}
-              aria-label={t('header.search', 'Rechercher')}
+              aria-label="Rechercher"
               className="p-2.5 border border-border/50 bg-card/50 hover:bg-secondary/80 hover:shadow-sm rounded-full transition-all"
             >
               <Search className="w-5 h-5 text-foreground/80" />
             </button>
             <button
               onClick={toggleTheme}
-              aria-label={theme === 'light' ? (isEnglish ? 'Enable dark mode' : 'Activer le mode sombre') : (isEnglish ? 'Enable light mode' : 'Activer le mode clair')}
+              aria-label={theme === 'light' ? 'Activer le mode sombre' : 'Activer le mode clair'}
               className="p-2.5 border border-border/50 bg-card/50 hover:bg-secondary/80 hover:shadow-sm rounded-full transition-all"
             >
               {theme === 'light' ? (
@@ -100,7 +94,7 @@ export default function Header() {
             </button>
             {/* favorites removed */}
             <Link href="/panier">
-              <button className="relative p-2.5 border border-border/50 bg-card/50 hover:bg-secondary/80 hover:shadow-sm rounded-full transition-all" aria-label={isEnglish ? 'View cart' : 'Voir le panier'}>
+              <button className="relative p-2.5 border border-border/50 bg-card/50 hover:bg-secondary/80 hover:shadow-sm rounded-full transition-all" aria-label="Voir le panier">
                 <ShoppingCart className="w-5 h-5 text-foreground/80" />
                 {totalItems > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 bg-accent text-accent-foreground text-sm rounded-full w-6 h-6 flex items-center justify-center font-bold shadow-sm animate-in zoom-in">
@@ -113,37 +107,37 @@ export default function Header() {
         </div>
 
         {/* Mobile Layout */}
-        <div className="xl:hidden flex h-20 w-full items-center justify-between gap-1">
+        <div className="lg:hidden flex h-20 w-full max-w-[24rem] items-center justify-between gap-2">
           {/* Logo */}
           <div className="flex min-w-0 flex-1 items-center">
             <Link href="/" className="flex min-w-0 items-center gap-2 hover:opacity-80 transition-opacity" onClick={() => setIsOpen(false)}>
-              <img src="/images/logo.png" alt="Plume du Deen" className="h-9 w-auto flex-shrink-0 drop-shadow-sm min-[360px]:h-10" />
-              <span className="hidden truncate text-lg font-playfair font-semibold text-foreground tracking-wide sm:inline">Plume du Deen</span>
+              <img src="/images/logo.png" alt="Plume du Deen" className="h-10 w-auto flex-shrink-0 drop-shadow-sm" />
+              <span className="truncate text-lg font-playfair font-semibold text-foreground tracking-wide">Plume du Deen</span>
             </Link>
           </div>
 
           {/* Mobile Icons */}
-          <div className="ml-auto flex flex-shrink-0 items-center gap-0.5 min-[360px]:gap-1">
+          <div className="flex flex-shrink-0 items-center gap-1">
             <button
               onClick={() => setIsSearchOpen(true)}
-              aria-label={t('header.search', 'Rechercher')}
-              className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary/80 transition-colors min-[360px]:h-10 min-[360px]:w-10"
+              aria-label="Rechercher"
+              className="p-2 hover:bg-secondary/80 rounded-full transition-colors"
             >
               <Search className="w-5 h-5 text-foreground/80" />
             </button>
             <button
               onClick={toggleTheme}
-              aria-label={theme === 'light' ? (isEnglish ? 'Enable dark mode' : 'Activer le mode sombre') : (isEnglish ? 'Enable light mode' : 'Activer le mode clair')}
-              className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary/80 transition-colors min-[360px]:h-10 min-[360px]:w-10"
+              aria-label={theme === 'light' ? 'Activer le mode sombre' : 'Activer le mode clair'}
+              className="p-2 hover:bg-secondary/80 rounded-full transition-colors"
             >
               {theme === 'light' ? (
                 <Moon className="w-5 h-5 text-foreground/80" />
               ) : (
                 <Sun className="w-5 h-5 text-foreground/80" />
-              )}
+            )}
             </button>
             <Link href="/panier">
-              <button className="relative flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary/80 transition-colors min-[360px]:h-10 min-[360px]:w-10" aria-label={isEnglish ? 'View cart' : 'Voir le panier'}>
+              <button className="relative p-2 hover:bg-secondary/80 rounded-full transition-colors" aria-label="Voir le panier">
                 <ShoppingCart className="w-5 h-5 text-foreground/80" />
                 {totalItems > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-accent text-accent-foreground text-[0.7rem] rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-sm">
@@ -155,13 +149,13 @@ export default function Header() {
             <button
               onClick={() => setIsOpen(!isOpen)}
               aria-expanded={isOpen}
-              aria-label={isOpen ? t('header.closeMenu', 'Fermer le menu') : t('header.openMenu', 'Ouvrir le menu')}
-              className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-secondary/80 transition-colors min-[360px]:h-10 min-[360px]:w-10"
+              aria-label={isOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+              className="p-2 hover:bg-secondary/80 rounded-full transition-colors"
             >
               {isOpen ? (
-                <X className="w-5 h-5 text-foreground/80" />
+                <X className="w-6 h-6 text-foreground/80" />
               ) : (
-                <Menu className="w-5 h-5 text-foreground/80" />
+                <Menu className="w-6 h-6 text-foreground/80" />
               )}
             </button>
           </div>
@@ -169,12 +163,8 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <nav className="xl:hidden -mx-4 max-h-[calc(100vh-5rem)] overflow-y-auto border-t border-border/60 bg-background/95 px-4 pb-6 shadow-premium backdrop-blur-2xl reveal-soft" aria-label={isEnglish ? 'Mobile navigation' : 'Navigation mobile'}>
+          <nav className="lg:hidden pb-6 border-t border-border/60 reveal-soft" aria-label="Navigation mobile">
             <div className="flex flex-col gap-1 pt-4">
-              <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-2 pb-3">
-                <LanguageSwitcher className="w-full" />
-                <CurrencySwitcher className="w-full" />
-              </div>
               {navLinks.map((link) => (
                 <Link
                   key={link.href}

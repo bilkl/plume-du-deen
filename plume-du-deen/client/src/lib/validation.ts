@@ -23,21 +23,39 @@ export const orderSchema = z.object({
   email: z.string()
     .email('Adresse email invalide'),
   phone: z.string()
-    .regex(/^(\+33|0)[1-9](\d{2}){4}$/, 'Numéro de téléphone invalide (format: 06 12 34 56 78)'),
+    .regex(/^[+0-9\s().-]{7,20}$/, 'Numéro de téléphone invalide')
+    .optional()
+    .or(z.literal('')),
   address: z.string()
-    .min(5, 'L\'adresse doit contenir au moins 5 caractères'),
+    .max(100, 'L\'adresse ne peut pas dépasser 100 caractères')
+    .optional()
+    .or(z.literal('')),
   city: z.string()
-    .min(2, 'La ville doit contenir au moins 2 caractères'),
+    .max(50, 'La ville ne peut pas dépasser 50 caractères')
+    .optional()
+    .or(z.literal('')),
   postalCode: z.string()
-    .regex(/^\d{5}$/, 'Code postal invalide (5 chiffres)'),
+    .max(12, 'Code postal invalide')
+    .optional()
+    .or(z.literal('')),
   country: z.string()
-    .min(2, 'Le pays est requis'),
+    .max(50, 'Le pays ne peut pas dépasser 50 caractères')
+    .optional()
+    .or(z.literal('')),
+  countryOther: z.string()
+    .max(50, 'Le pays ne peut pas dépasser 50 caractères')
+    .optional()
+    .or(z.literal('')),
+  orderNotes: z.string()
+    .max(400, 'La note ne peut pas dépasser 400 caractères')
+    .optional()
+    .or(z.literal('')),
   paymentMethod: z.enum(['card', 'paypal', 'bank-transfer', 'contact'])
     .describe('Méthode de paiement invalide'),
   acceptTerms: z.boolean()
-    .refine(val => val === true, 'Vous devez accepter les conditions générales'),
+    .optional(),
   acceptPrivacy: z.boolean()
-    .refine(val => val === true, 'Vous devez accepter la politique de confidentialité'),
+    .optional(),
 })
 
 export type ContactFormData = z.infer<typeof contactSchema>

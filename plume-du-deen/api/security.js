@@ -71,7 +71,10 @@ export function validateCustomerData(customer) {
     address: sanitizeString(customer.address, SECURITY_CONFIG.MAX_ADDRESS_LENGTH),
     city: sanitizeString(customer.city, SECURITY_CONFIG.MAX_NAME_LENGTH),
     postalCode: sanitizeString(customer.postalCode, 10),
-    country: sanitizeString(customer.country, SECURITY_CONFIG.MAX_NAME_LENGTH)
+    country: sanitizeString(customer.country, SECURITY_CONFIG.MAX_NAME_LENGTH),
+    countryOther: sanitizeString(customer.countryOther, SECURITY_CONFIG.MAX_NAME_LENGTH),
+    shippingCountryCode: sanitizeString(customer.shippingCountryCode, 10),
+    orderNotes: sanitizeString(customer.orderNotes, 400)
   };
 
   if (!sanitized.firstName || !sanitized.lastName || !sanitized.email) {

@@ -168,6 +168,10 @@ export default async function handler(req, res) {
         customer_name: raw.customer_name ? sanitizeString(raw.customer_name) : undefined,
         currency: raw.currency ? sanitizeString(String(raw.currency), 10) : undefined,
         total_chf: raw.total_chf ? sanitizeString(String(raw.total_chf), 20) : undefined,
+        subtotal_chf: raw.subtotal_chf ? sanitizeString(String(raw.subtotal_chf), 20) : undefined,
+        shipping_chf: raw.shipping_chf ? sanitizeString(String(raw.shipping_chf), 20) : undefined,
+        has_paper_items: raw.has_paper_items ? sanitizeString(String(raw.has_paper_items), 10) : undefined,
+        shipping_country: raw.shipping_country ? sanitizeString(String(raw.shipping_country), 80) : undefined,
         order_items: raw.order_items ? sanitizeString(String(raw.order_items), 2000) : undefined,
         orderId: raw.orderId ? sanitizeString(raw.orderId) : undefined,
         productName: raw.productName ? sanitizeString(raw.productName) : undefined

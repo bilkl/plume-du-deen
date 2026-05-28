@@ -6,6 +6,9 @@ import { useLanguage } from '@/contexts/LanguageContext'
 interface OrderData {
   customer: any
   items: any[]
+  subtotal?: number
+  subtotalChf?: number
+  shipping?: any
   total: number
   currency?: string
   totalChf?: number

@@ -37,6 +37,10 @@ export function getEbooksForOrder(items) {
   const ebooks = []
 
   items.forEach(item => {
+    if (item.format === 'paper') {
+      return
+    }
+
     // Extraire l'ID du produit depuis l'ID de l'article
     // Les articles ont des IDs comme "1", "2", "3" etc.
     const productId = parseInt(item.id)

@@ -26,9 +26,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { orderId, orderData, customer, items, total, currency, totalChf } = req.body
+    const { orderId, orderData, customer, items, total, currency, totalChf, subtotal, subtotalChf, shipping } = req.body
 
-    const normalizedOrderData = orderData || (customer ? { customer, items, total, currency, totalChf } : null)
+    const normalizedOrderData = orderData || (customer ? { customer, items, total, currency, totalChf, subtotal, subtotalChf, shipping } : null)
 
     // Validation des données
     if (!orderId) {
@@ -64,6 +64,9 @@ export default async function handler(req, res) {
           body: JSON.stringify({
             customer: normalizedOrderData.customer,
             items: normalizedOrderData.items,
+            subtotal: normalizedOrderData.subtotal,
+            subtotalChf: normalizedOrderData.subtotalChf,
+            shipping: normalizedOrderData.shipping,
             total: normalizedOrderData.total,
             currency: normalizedOrderData.currency,
             totalChf: normalizedOrderData.totalChf,

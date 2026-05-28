@@ -31,6 +31,9 @@ interface StripePaymentFormProps {
   orderData?: {
     customer: any
     items: any[]
+    subtotal?: number
+    subtotalChf?: number
+    shipping?: any
     total: number
     currency?: CurrencyCode
     totalChf?: number

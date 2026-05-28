@@ -8,16 +8,17 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2, AlertCircle, Mail, Phone, MapPin, CreditCard } from 'lucide-react'
 import { Link, useLocation } from 'wouter'
-import { useCart } from '@/contexts/CartContext'
+import { getCartItemKey, useCart } from '@/contexts/CartContext'
 import { formatPaymentAmount, useCurrency } from '@/contexts/CurrencyContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { showSuccessToast, showErrorToast } from '@/lib/toast'
-import { validateForm, type OrderFormData, orderSchema } from '@/lib/validation'
+import type { OrderFormData } from '@/lib/validation'
 import { apiUrl } from '@/lib/api'
 import StripePaymentForm from './StripePaymentForm'
 import PayPalPaymentForm from './PayPalPaymentForm'
 import { useStripePayment } from '@/hooks/useStripePayment'
 import CurrencySwitcher from './CurrencySwitcher'
+import { buildShippingSummary, cartRequiresShipping, SHIPPING_COUNTRIES } from '@/lib/shipping'
 
 export default function CheckoutForm() {
   const { state, dispatch } = useCart()
@@ -26,11 +27,17 @@ export default function CheckoutForm() {
   const isEnglish = language === 'en'
   const { createPaymentIntent, loading: paymentLoading } = useStripePayment()
   const [, setLocation] = useLocation()
-  const isFreeOrder = state.total === 0
   const [formData, setFormData] = useState<Partial<OrderFormData>>({
     firstName: '',
     lastName: '',
     email: '',
+    phone: '',
+    address: '',
+    city: '',
+    postalCode: '',
+    country: 'CH',
+    countryOther: '',
+    orderNotes: '',
     paymentMethod: 'card'
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -38,21 +45,35 @@ export default function CheckoutForm() {
   const [paymentIntent, setPaymentIntent] = useState<any>(null)
   const [showPayPal, setShowPayPal] = useState(false)
   const [showContactInfo, setShowContactInfo] = useState(false)
+  const requiresShipping = cartRequiresShipping(state.items)
+  const shippingSummary = useMemo(() => buildShippingSummary({
+    items: state.items,
+    countryCode: formData.country || 'CH',
+    countryOther: formData.countryOther || '',
+    convertPrice,
+    isEnglish,
+  }), [convertPrice, formData.country, formData.countryOther, isEnglish, state.items])
   const paymentItems = useMemo(() => state.items.map((item) => ({
     ...item,
     price: convertPrice(item.price),
     priceChf: item.price,
   })), [state.items, convertPrice])
-  const paymentTotal = useMemo(
+  const paymentSubtotal = useMemo(
     () => paymentItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
     [paymentItems]
   )
+  const paymentTotal = useMemo(
+    () => paymentSubtotal + shippingSummary.amount,
+    [paymentSubtotal, shippingSummary.amount]
+  )
+  const paymentTotalChf = state.total + shippingSummary.amountChf
+  const isFreeOrder = paymentTotal === 0
   const formattedPaymentTotal = formatPaymentAmount(paymentTotal, currency)
 
   useEffect(() => {
     setPaymentIntent(null)
     setShowPayPal(false)
-  }, [currency])
+  }, [currency, shippingSummary.amountChf, shippingSummary.countryLabel])
 
   const handleInputChange = (field: keyof OrderFormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -97,6 +118,24 @@ export default function CheckoutForm() {
         if (!value) error = isEnglish ? 'Email is required' : 'L\'email est requis'
         else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value as string)) error = isEnglish ? 'Invalid email address' : 'Adresse email invalide'
         break
+      case 'phone':
+        if (value && !/^[+0-9\s().-]{7,20}$/.test(value as string)) error = isEnglish ? 'Invalid phone number' : 'Numéro de téléphone invalide'
+        break
+      case 'address':
+        if (requiresShipping && (!value || (value as string).length < 5)) error = isEnglish ? 'Shipping address is required' : 'L\'adresse de livraison est requise'
+        break
+      case 'postalCode':
+        if (requiresShipping && (!value || (value as string).length < 3)) error = isEnglish ? 'Postal code is required' : 'Le code postal est requis'
+        break
+      case 'city':
+        if (requiresShipping && (!value || (value as string).length < 2)) error = isEnglish ? 'City is required' : 'La ville est requise'
+        break
+      case 'country':
+        if (requiresShipping && !value) error = isEnglish ? 'Shipping country is required' : 'Le pays de livraison est requis'
+        break
+      case 'countryOther':
+        if (requiresShipping && formData.country === 'OTHER' && (!value || (value as string).length < 2)) error = isEnglish ? 'Please specify the destination country' : 'Veuillez préciser le pays de livraison'
+        break
       default:
         break
     }
@@ -118,11 +157,20 @@ export default function CheckoutForm() {
       'firstName', 'lastName', 'email'
     ]
 
+    if (requiresShipping) {
+      fieldsToValidate.push('address', 'postalCode', 'city', 'country')
+      if (formData.country === 'OTHER') {
+        fieldsToValidate.push('countryOther')
+      }
+    }
+
+    if (formData.phone) {
+      fieldsToValidate.push('phone')
+    }
+
     fieldsToValidate.forEach(field => {
       const value = formData[field]
       let error: string | undefined
-
-      console.log(`Validating ${field}:`, value, typeof value)
 
       switch (field) {
         case 'firstName':
@@ -135,27 +183,58 @@ export default function CheckoutForm() {
           if (!value) error = isEnglish ? 'Email is required' : 'L\'email est requis'
           else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value as string)) error = isEnglish ? 'Invalid email address' : 'Adresse email invalide'
           break
+        case 'phone':
+          if (value && !/^[+0-9\s().-]{7,20}$/.test(value as string)) error = isEnglish ? 'Invalid phone number' : 'Numéro de téléphone invalide'
+          break
+        case 'address':
+          if (!value || (value as string).length < 5) error = isEnglish ? 'Shipping address is required' : 'L\'adresse de livraison est requise'
+          break
+        case 'postalCode':
+          if (!value || (value as string).length < 3) error = isEnglish ? 'Postal code is required' : 'Le code postal est requis'
+          break
+        case 'city':
+          if (!value || (value as string).length < 2) error = isEnglish ? 'City is required' : 'La ville est requise'
+          break
+        case 'country':
+          if (!value) error = isEnglish ? 'Shipping country is required' : 'Le pays de livraison est requis'
+          break
+        case 'countryOther':
+          if (formData.country === 'OTHER' && (!value || (value as string).length < 2)) error = isEnglish ? 'Please specify the destination country' : 'Veuillez préciser le pays de livraison'
+          break
         default:
           break
       }
 
       if (error) {
         newErrors[field] = error
-        console.log(`Error for ${field}:`, error)
       }
     })
 
-    console.log('Final validation errors:', newErrors)
     return newErrors
   }
 
+  const getCustomerForOrder = () => ({
+    ...formData,
+    country: requiresShipping ? shippingSummary.countryLabel : formData.country,
+    shippingCountryCode: requiresShipping ? shippingSummary.countryCode : undefined,
+  })
+
+  const getOrderData = () => ({
+    customer: getCustomerForOrder(),
+    items: paymentItems,
+    subtotal: paymentSubtotal,
+    subtotalChf: state.total,
+    shipping: shippingSummary,
+    total: paymentTotal,
+    currency,
+    totalChf: paymentTotalChf,
+  })
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submitted with data:', formData)
 
     // Validate all fields
     const validationErrors = validateAllFields()
-    console.log('Validation errors:', validationErrors)
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
@@ -177,6 +256,8 @@ export default function CheckoutForm() {
     setIsSubmitting(true)
 
     try {
+      const orderData = getOrderData()
+
       // Free order: no payment needed (e.g., free Planner Ramadan)
       if (isFreeOrder) {
         const response = await fetch(apiUrl('/api/orders'), {
@@ -185,10 +266,7 @@ export default function CheckoutForm() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            customer: formData,
-            items: state.items,
-            total: 0,
-            currency,
+            ...orderData,
             paymentIntentId: 'FREE',
             status: 'completed'
           }),
@@ -212,11 +290,17 @@ export default function CheckoutForm() {
           currency: currency.toLowerCase(),
           metadata: {
             currency,
-            total_chf: state.total.toFixed(2),
+            total_chf: paymentTotalChf.toFixed(2),
+            subtotal_chf: state.total.toFixed(2),
+            shipping_chf: shippingSummary.amountChf.toFixed(2),
+            has_paper_items: requiresShipping ? 'true' : 'false',
+            shipping_country: shippingSummary.countryLabel,
             customer_email: formData.email,
             customer_name: `${formData.firstName} ${formData.lastName}`,
             order_items: JSON.stringify(paymentItems.map(item => ({
               id: item.id,
+              cartKey: item.cartKey,
+              format: item.format,
               name: item.name,
               quantity: item.quantity,
               price: item.price,
@@ -243,16 +327,11 @@ export default function CheckoutForm() {
       // Create order object
       const order = {
         id: Date.now().toString(),
-        customer: formData,
-        items: paymentItems,
-        total: paymentTotal,
-        currency,
-        totalChf: state.total,
+        ...orderData,
         status: 'pending',
         createdAt: new Date().toISOString()
       }
-
-      console.log('Order created:', order)
+      void order
 
       // Clear cart
       dispatch({ type: 'CLEAR_CART' })
@@ -297,7 +376,7 @@ export default function CheckoutForm() {
             </div>
             <div className="space-y-4">
               {state.items.map((item) => (
-                <div key={`${item.id}-${item.format}`} className="flex items-center gap-4">
+                <div key={getCartItemKey(item)} className="flex items-center gap-4">
                   <img
                     src={item.image}
                     alt={item.name}
@@ -308,6 +387,9 @@ export default function CheckoutForm() {
                     <p className="text-sm text-muted-foreground">
                       {t('common.quantity', 'Quantité')}: {item.quantity}
                     </p>
+                    <Badge variant="secondary" className="mt-2 rounded-sm">
+                      {item.format === 'paper' ? t('product.paperVersion', 'Version papier') : t('common.pdf', 'PDF')}
+                    </Badge>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold">{formatPaymentAmount(convertPrice(item.price) * item.quantity, currency)}</p>
@@ -315,8 +397,25 @@ export default function CheckoutForm() {
                 </div>
               ))}
 
-              <div className="border-t pt-4">
-                <div className="flex justify-between items-center text-lg font-semibold">
+              <div className="border-t pt-4 space-y-2">
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{t('cart.subtotal', 'Sous-total')}</span>
+                  <span>{formatPaymentAmount(paymentSubtotal, currency)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{t('cart.delivery', 'Livraison')}</span>
+                  <span>
+                    {shippingSummary.required
+                      ? formatPaymentAmount(shippingSummary.amount, currency)
+                      : t('cart.deliveryFree', 'Gratuite')}
+                  </span>
+                </div>
+                {shippingSummary.required && (
+                  <p className="rounded-lg border border-accent/30 bg-accent/10 p-3 text-sm text-muted-foreground">
+                    {shippingSummary.label} · {shippingSummary.estimate}
+                  </p>
+                )}
+                <div className="flex justify-between items-center text-lg font-semibold pt-2">
                   <span>{t('cart.total', 'Total')}</span>
                   <span>{formattedPaymentTotal}</span>
                 </div>
@@ -402,6 +501,159 @@ export default function CheckoutForm() {
                 )}
               </div>
 
+              {requiresShipping && (
+                <div className="rounded-lg border border-accent/30 bg-accent/10 p-4 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 rounded-full bg-accent/20 p-2 text-primary">
+                      <MapPin className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">
+                        {isEnglish ? 'Paper delivery from Switzerland' : 'Livraison papier depuis la Suisse'}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {isEnglish
+                          ? 'The seller prepares and ships paper orders manually. Shipping is calculated from Switzerland according to the destination country.'
+                          : 'Le vendeur prépare et expédie les commandes papier manuellement. Les frais sont calculés depuis la Suisse selon le pays de livraison.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="country">{isEnglish ? 'Delivery country' : 'Pays de livraison'} *</Label>
+                    <Select
+                      value={formData.country || 'CH'}
+                      onValueChange={(value) => handleInputChange('country', value)}
+                    >
+                      <SelectTrigger id="country" className={errors.country ? 'border-destructive' : ''}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {SHIPPING_COUNTRIES.map((country) => (
+                          <SelectItem key={country.code} value={country.code}>
+                            {isEnglish ? country.labelEn : country.labelFr}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.country && (
+                      <p className="text-sm text-destructive mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.country}
+                      </p>
+                    )}
+                  </div>
+
+                  {formData.country === 'OTHER' && (
+                    <div>
+                      <Label htmlFor="countryOther">{isEnglish ? 'Specify country' : 'Précisez le pays'} *</Label>
+                      <Input
+                        id="countryOther"
+                        value={formData.countryOther || ''}
+                        onChange={(e) => handleInputChange('countryOther', e.target.value)}
+                        onBlur={() => validateField('countryOther')}
+                        className={errors.countryOther ? 'border-destructive' : ''}
+                      />
+                      {errors.countryOther && (
+                        <p className="text-sm text-destructive mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" />
+                          {errors.countryOther}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  <div>
+                    <Label htmlFor="address">{isEnglish ? 'Shipping address' : 'Adresse de livraison'} *</Label>
+                    <Input
+                      id="address"
+                      value={formData.address || ''}
+                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      onBlur={() => validateField('address')}
+                      className={errors.address ? 'border-destructive' : ''}
+                    />
+                    {errors.address && (
+                      <p className="text-sm text-destructive mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.address}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-[0.85fr_1.15fr] gap-4">
+                    <div>
+                      <Label htmlFor="postalCode">{isEnglish ? 'Postal code' : 'Code postal'} *</Label>
+                      <Input
+                        id="postalCode"
+                        value={formData.postalCode || ''}
+                        onChange={(e) => handleInputChange('postalCode', e.target.value)}
+                        onBlur={() => validateField('postalCode')}
+                        className={errors.postalCode ? 'border-destructive' : ''}
+                      />
+                      {errors.postalCode && (
+                        <p className="text-sm text-destructive mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" />
+                          {errors.postalCode}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <Label htmlFor="city">{isEnglish ? 'City' : 'Ville'} *</Label>
+                      <Input
+                        id="city"
+                        value={formData.city || ''}
+                        onChange={(e) => handleInputChange('city', e.target.value)}
+                        onBlur={() => validateField('city')}
+                        className={errors.city ? 'border-destructive' : ''}
+                      />
+                      {errors.city && (
+                        <p className="text-sm text-destructive mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" />
+                          {errors.city}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="phone" className="flex items-center gap-2">
+                      <Phone className="h-4 w-4" />
+                      {isEnglish ? 'Phone (optional)' : 'Téléphone (facultatif)'}
+                    </Label>
+                    <Input
+                      id="phone"
+                      value={formData.phone || ''}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      onBlur={() => validateField('phone')}
+                      className={errors.phone ? 'border-destructive' : ''}
+                    />
+                    {errors.phone && (
+                      <p className="text-sm text-destructive mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {errors.phone}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="orderNotes">{isEnglish ? 'Delivery note (optional)' : 'Note de livraison (facultatif)'}</Label>
+                    <Textarea
+                      id="orderNotes"
+                      value={formData.orderNotes || ''}
+                      onChange={(e) => handleInputChange('orderNotes', e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="rounded-md border border-border/70 bg-card/70 p-3 text-sm text-muted-foreground">
+                    <strong className="text-foreground">
+                      {formatPaymentAmount(shippingSummary.amount, currency)}
+                    </strong>{' '}
+                    {isEnglish ? 'shipping added to this order.' : 'de frais de livraison ajoutés à cette commande.'}
+                  </div>
+                </div>
+              )}
+
 
               {!isFreeOrder ? (
                 <div>
@@ -477,11 +729,14 @@ export default function CheckoutForm() {
                   amount={paymentTotal}
                   currency={currency}
                   orderData={{
-                    customer: formData as OrderFormData,
+                    customer: getCustomerForOrder() as OrderFormData,
                     items: paymentItems,
+                    subtotal: paymentSubtotal,
+                    subtotalChf: state.total,
+                    shipping: shippingSummary,
                     total: paymentTotal,
                     currency,
-                    totalChf: state.total,
+                    totalChf: paymentTotalChf,
                   }}
                   onSuccess={() => {
                     // Clear cart and redirect to success
@@ -501,11 +756,14 @@ export default function CheckoutForm() {
                   amount={Math.round(paymentTotal * 100)}
                   currency={currency}
                   orderData={{
-                    customer: formData as OrderFormData,
+                    customer: getCustomerForOrder() as OrderFormData,
                     items: paymentItems,
+                    subtotal: paymentSubtotal,
+                    subtotalChf: state.total,
+                    shipping: shippingSummary,
                     total: paymentTotal,
                     currency,
-                    totalChf: state.total,
+                    totalChf: paymentTotalChf,
                   }}
                   onSuccess={() => {
                     dispatch({ type: 'CLEAR_CART' })
@@ -579,8 +837,14 @@ export default function CheckoutForm() {
                       </div>
                       <div className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                        <span className="text-muted-foreground">{isEnglish ? 'Your email address (to receive the ebooks)' : 'Votre email (pour recevoir les e-books)'}</span>
+                        <span className="text-muted-foreground">{isEnglish ? 'Your email address for order confirmation' : 'Votre email pour la confirmation de commande'}</span>
                       </div>
+                      {requiresShipping && (
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                          <span className="text-muted-foreground">{isEnglish ? 'Your full shipping address for the paper version' : 'Votre adresse complète pour la version papier'}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
